@@ -5,6 +5,8 @@ public class RandomLevelGenerator : MonoBehaviour
     [SerializeField]
     private GameObject normalBlock = default;
 
+    private GameObject[,,] map;
+
     [SerializeField]
     private int xLength = 20;
     [SerializeField]
@@ -13,83 +15,130 @@ public class RandomLevelGenerator : MonoBehaviour
     [SerializeField]
     private float yLength = 0.5f;
 
-    private GameObject[,,] map;
+    private int thirdPassX;
+    private int fourthPassZ;
+    private int fifthPassX;
 
     private void Awake()
     {
+        // Initialize with random seed.
         Random.InitState((int)System.DateTime.Now.Ticks);
+        // Initialize the map matrix.
         map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
     }
 
     private void Start()
     {
-        InitializeMapBlocks();
-        InitializePath();
+        GenerateMap();
     }
 
-    private void InitializeMapBlocks()
+    private void GenerateMap()
+    {
+        GenerateMapBlocks();
+        GenerateMapPath();
+    }
+
+    private void GenerateMapBlocks()
     {
         // Instantiate the every X row.
         for (int xRow = 0; xRow < xLength; xRow++)
         {
             GameObject xObject = Instantiate(normalBlock);
             xObject.transform.position = new Vector3(xRow, 0, 0);
-            // Add map array for further processing.
+            // Add to map array for further processing.
             map[xRow, 0, 0] = xObject;
-            // Instantiate every zRow.
+            // Instantiate every Z row.
             for (int zRow = 0; zRow < zLength; zRow++)
             {
                 GameObject zObject = Instantiate(normalBlock);
                 zObject.transform.position = new Vector3(xRow, 0, zRow);
-                // Add map array for further processing.
+                // Add to map array for further processing.
                 map[xRow, 0, zRow] = zObject;
-                // Instantiate every yRow.
+                // Instantiate every Y row.
                 for (float yRow = 0; yRow < yLength; yRow += 0.5f)
                 {
                     GameObject yObject = Instantiate(normalBlock);
                     yObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
-                    // Add map array for further processing.
+                    // Add to map array for further processing.
                     map[xRow, Mathf.RoundToInt(yRow + yRow), zRow] = yObject;
                 }
             }
         }
     }
 
-    private void InitializePath()
+    private void GenerateMapPath()
     {
-        int randomStartPassX = Random.Range(5, 14);
-        int randomStartPassAmountZ = Random.Range(4, 8);
-        Debug.Log(randomStartPassX);
-        Debug.Log(randomStartPassAmountZ);
-
-        for (int i = 0; i < randomStartPassAmountZ; i++)
+        try
         {
-            Destroy(map[randomStartPassX, 0, i]);
-        }
-
-        int randomSecondPassAmountX = Random.Range(3, 6);
-        int randomSecondPassDirection = Random.Range(0, 2);
-        Debug.Log(randomSecondPassAmountX);
-        Debug.Log(randomSecondPassDirection);
-
-        for (int i = 0; i < randomSecondPassAmountX; i++)
-        {
-            if (randomSecondPassDirection == 0)
+            int firstPassX = Random.Range(5, 15);
+            int firstPassAmountZ = Random.Range(5, 9);
+            for (int i = 0; i < firstPassAmountZ; i++)
             {
-                print("+");
-                Destroy(map[randomStartPassX + i, 0, randomStartPassAmountZ]);
+                Destroy(map[firstPassX, 0, i]);
             }
-            else
+
+            int secondPassAmountX = Random.Range(5, 9);
+            int secondPassDirection = Random.Range(0, 2);
+            for (int i = 0; i < secondPassAmountX; i++)
             {
-                print("-");
-                Destroy(map[randomStartPassX - i, 0, randomStartPassAmountZ]);
+                if (secondPassDirection == 0)
+                {
+                    thirdPassX = 0;
+                    thirdPassX = firstPassX + i;
+                    Destroy(map[firstPassX + i, 0, firstPassAmountZ]);
+                }
+                else
+                {
+                    thirdPassX = 0;
+                    thirdPassX = firstPassX - i;
+                    Destroy(map[firstPassX - i, 0, firstPassAmountZ]);
+                }
             }
+
+            int thirdPassAmountZ = Random.Range(5, 9);
+            for (int i = 0; i < thirdPassAmountZ; i++)
+            {
+                fourthPassZ = 0;
+                fourthPassZ = firstPassAmountZ + i;
+                Destroy(map[thirdPassX, 0, firstPassAmountZ + i]);
+            }
+
+            int fourthPassAmountX = Random.Range(5, 9);
+            int fourthPassDirection = Random.Range(0, 2);
+            for (int i = 0; i < fourthPassAmountX; i++)
+            {
+                if (fourthPassDirection == 0)
+                {
+                    fifthPassX = 0;
+                    fifthPassX = thirdPassX + i;
+                    Destroy(map[thirdPassX + i, 0, fourthPassZ]);
+                }
+                else
+                {
+                    fifthPassX = thirdPassX - i;
+                    Destroy(map[thirdPassX - i, 0, fourthPassZ]);
+                }
+            }
+            
+            int fifthPassAmountZ = zLength - fourthPassZ;
+            for (int i = 0; i < fifthPassAmountZ; i++)
+            {
+                Destroy(map[fifthPassX, 0, fourthPassZ + i]);
+            }
+            
         }
-        
-        int randomThirdPassAmountZ = Random.Range(4, 8);
-        for (int i = 0; i < randomThirdPassAmountZ; i++)
+        catch (System.Exception e)
         {
-            Destroy(map[randomStartPassX, 0, i]);
+            #if UNITY_EDITOR
+            Debug.Log(e);
+            #endif
+
+            foreach (GameObject block in map)
+            {
+                Destroy(block);
+            }
+
+            GenerateMap();
         }
     }
 }
