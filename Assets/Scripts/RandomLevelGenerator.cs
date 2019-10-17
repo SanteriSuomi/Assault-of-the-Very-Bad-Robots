@@ -22,12 +22,18 @@ public class RandomLevelGenerator : MonoBehaviour
 
     private void Start()
     {
-        // Instantie the every X row.
+        InitializeMapBlocks();
+    }
+
+    private void InitializeMapBlocks()
+    {
+        // Instantiate the every X row.
         for (int xRow = 0; xRow < xLength; xRow++)
         {
             GameObject xObject = Instantiate(normalBlock);
             xObject.transform.position = new Vector3(xRow, 0, 0);
 
+            // Add map array for further processing.
             map[xRow, 0, 0] = xObject;
 
             // Instantiate every zRow.
@@ -36,27 +42,38 @@ public class RandomLevelGenerator : MonoBehaviour
                 GameObject zObject = Instantiate(normalBlock);
                 zObject.transform.position = new Vector3(xRow, 0, zRow);
 
+                // Add map array for further processing.
                 map[xRow, 0, zRow] = zObject;
 
                 // Instantiate every yRow.
                 for (float yRow = 0; yRow < yLength; yRow += 0.5f)
                 {
                     GameObject yObject = Instantiate(normalBlock);
-                    zObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
+                    yObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
 
+                    // Add map array for further processing.
                     map[xRow, Mathf.RoundToInt(yRow + yRow), zRow] = yObject;
                 }
             }
         }
 
-        foreach (var item in map)
-        {
-            print(item.name.ToString());
-        }
+        InitializePath();
     }
 
-    private void Update()
+    private void InitializePath()
     {
+        Vector3 startPos = map[Random.Range(0, xLength), 0, 0].transform.position;
+        print(startPos);
+        Vector3 endPos = map[Random.Range(0, xLength), 0, zLength].transform.position;
+        print(endPos);
+        float distance = Vector3.Distance(startPos, endPos);
+        print(distance);
 
+        RaycastHit[] raycastHits;
+        raycastHits = Physics.RaycastAll(startPos, endPos, distance);
+        foreach (RaycastHit hit in raycastHits)
+        {
+            Destroy(hit.transform.gameObject);
+        }
     }
 }
