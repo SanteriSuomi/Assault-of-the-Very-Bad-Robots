@@ -15,6 +15,9 @@ public class RandomLevelGenerator : MonoBehaviour
 
     private GameObject[,,] map;
 
+    private int startPassArrayIntX;
+    private int startPassArrayIntZ;
+
     private void Awake()
     {
         map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
@@ -62,18 +65,36 @@ public class RandomLevelGenerator : MonoBehaviour
 
     private void InitializePath()
     {
-        Vector3 startPos = map[Random.Range(0, xLength), 0, 0].transform.position;
+        int randomStartPass = Random.Range(1, 19);
+        int randomStartPassAmount = Random.Range(4, 8);
+
+        for (int i = 0; i < randomStartPassAmount; i++)
+        {
+            startPassArrayIntX = i;
+            Destroy(map[randomStartPass, 0, i]);
+        }
+
+        print(startPassArrayIntX);
+        
+        int randomSecondPassAmount = Random.Range(4, 8);
+        for (int i = 0; i < randomSecondPassAmount; i++)
+        {
+            Destroy(map[startPassArrayIntX + i, 0, startPassArrayIntZ]);
+        }
+        
+        /*
+        Vector3 startPos = map[Random.Range(0, xLength), (int)yLength, 0].transform.position;
         print(startPos);
-        Vector3 endPos = map[Random.Range(0, xLength), 0, zLength].transform.position;
+        Vector3 endPos = map[Random.Range(0, xLength), (int)yLength, zLength - 1].transform.position;
         print(endPos);
         float distance = Vector3.Distance(startPos, endPos);
         print(distance);
 
-        RaycastHit[] raycastHits;
-        raycastHits = Physics.RaycastAll(startPos, endPos, distance);
-        foreach (RaycastHit hit in raycastHits)
+        RaycastHit[] raycastHits = Physics.RaycastAll(startPos, endPos, distance);
+        foreach (var hit in raycastHits)
         {
-            Destroy(hit.transform.gameObject);
+            Destroy(hit.collider.gameObject);
         }
+        */
     }
 }
