@@ -15,14 +15,8 @@ public class RandomLevelGenerator : MonoBehaviour
     [SerializeField]
     private float yLength = 0.5f;
 
-    private int thirdPassX;
-    private int fourthPassZ;
-    private int fifthPassX;
-
     private void Awake()
     {
-        // Initialize with random seed.
-        Random.InitState((int)System.DateTime.Now.Ticks);
         // Initialize the map matrix.
         map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
     }
@@ -32,8 +26,11 @@ public class RandomLevelGenerator : MonoBehaviour
         GenerateMap();
     }
 
-    private void GenerateMap()
+    public void GenerateMap()
     {
+        ClearMap();
+
+        Random.InitState((int)System.DateTime.Now.Ticks);
         GenerateMapBlocks();
         GenerateMapPath();
     }
@@ -66,18 +63,22 @@ public class RandomLevelGenerator : MonoBehaviour
         }
     }
 
+    private int thirdPassX;
+    private int fourthPassZ;
+    private int fifthPassX;
+
     private void GenerateMapPath()
     {
         try
         {
-            int firstPassX = Random.Range(5, 15);
-            int firstPassAmountZ = Random.Range(5, 9);
+            int firstPassX = Random.Range(2, xLength - 2);
+            int firstPassAmountZ = Random.Range(2, zLength / 2);
             for (int i = 0; i < firstPassAmountZ; i++)
             {
                 Destroy(map[firstPassX, 0, i]);
             }
 
-            int secondPassAmountX = Random.Range(5, 9);
+            int secondPassAmountX = Random.Range(2, xLength - 2);
             int secondPassDirection = Random.Range(0, 2);
             for (int i = 0; i < secondPassAmountX; i++)
             {
@@ -95,7 +96,7 @@ public class RandomLevelGenerator : MonoBehaviour
                 }
             }
 
-            int thirdPassAmountZ = Random.Range(5, 9);
+            int thirdPassAmountZ = Random.Range(2, zLength / 2);
             for (int i = 0; i < thirdPassAmountZ; i++)
             {
                 fourthPassZ = 0;
@@ -103,7 +104,7 @@ public class RandomLevelGenerator : MonoBehaviour
                 Destroy(map[thirdPassX, 0, firstPassAmountZ + i]);
             }
 
-            int fourthPassAmountX = Random.Range(5, 9);
+            int fourthPassAmountX = Random.Range(2, xLength - 2);
             int fourthPassDirection = Random.Range(0, 2);
             for (int i = 0; i < fourthPassAmountX; i++)
             {
@@ -119,13 +120,13 @@ public class RandomLevelGenerator : MonoBehaviour
                     Destroy(map[thirdPassX - i, 0, fourthPassZ]);
                 }
             }
-            
+
             int fifthPassAmountZ = zLength - fourthPassZ;
             for (int i = 0; i < fifthPassAmountZ; i++)
             {
                 Destroy(map[fifthPassX, 0, fourthPassZ + i]);
             }
-            
+
         }
         catch (System.Exception e)
         {
@@ -133,12 +134,16 @@ public class RandomLevelGenerator : MonoBehaviour
             Debug.Log(e);
             #endif
 
-            foreach (GameObject block in map)
-            {
-                Destroy(block);
-            }
-
+            ClearMap();
             GenerateMap();
+        }
+    }
+
+    private void ClearMap()
+    {
+        foreach (GameObject block in map)
+        {
+            Destroy(block);
         }
     }
 }
