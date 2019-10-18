@@ -4,7 +4,6 @@ public class RandomLevelGenerator : MonoBehaviour
 {
     [SerializeField]
     private GameObject normalBlock = default;
-
     private GameObject[,,] map;
 
     [SerializeField]
@@ -30,7 +29,7 @@ public class RandomLevelGenerator : MonoBehaviour
     {
         ClearMap();
 
-        Random.InitState((int)System.DateTime.Now.Ticks);
+        InitializeSeed();
         GenerateMapBlocks();
         GenerateMapPath();
     }
@@ -126,7 +125,6 @@ public class RandomLevelGenerator : MonoBehaviour
             {
                 Destroy(map[fifthPassX, 0, fourthPassZ + i]);
             }
-
         }
         catch (System.Exception e)
         {
@@ -145,5 +143,10 @@ public class RandomLevelGenerator : MonoBehaviour
         {
             Destroy(block);
         }
+    }
+
+    private void InitializeSeed()
+    {
+        Random.InitState((int)System.DateTime.Now.Ticks);
     }
 }
