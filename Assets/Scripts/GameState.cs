@@ -1,24 +1,19 @@
-﻿using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.Events;
 
 public class GameState : MonoBehaviour
 {
     public static GameState Instance { get; set; }
 
     [SerializeField]
-    private RawImage menuBackground = default;
+    private UnityEvent MainMenu = default;
     [SerializeField]
-    private GameObject menuButtons = default;
+    private UnityEvent GenerateMenu = default;
     [SerializeField]
-    private GameObject generateButtons = default;
-
-    private Image[] menuButtonImages;
+    private UnityEvent PlayMapMenu = default;
 
     private void Awake()
     {
-        menuButtonImages = menuButtons.GetComponentsInChildren<Image>();
-
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -26,6 +21,7 @@ public class GameState : MonoBehaviour
         else
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
     }
 
@@ -53,56 +49,16 @@ public class GameState : MonoBehaviour
         switch (currentState)
         {
             case GameStates.Menu:
-                ShowMenuButtons(show: true);
-                ShowGenerateButtons(show: false);
+                MainMenu.Invoke();
                 break;
             case GameStates.GenerateMap:
-                StartCoroutine(FadeOutMenu());
+                GenerateMenu.Invoke();
                 break;
             case GameStates.PlayMap:
-                ShowGenerateButtons(show: false);
-                ShowMenuButtons(show: false);
+                PlayMapMenu.Invoke();
                 break;
             default:
                 break;
         }
-    }
-
-    private IEnumerator FadeOutMenu()
-    {
-        float alphaMax = 1.0f;
-        Color menuBGColor = menuBackground.color;
-        Color buttonPlayColor = menuButtonImages[0].color;
-        Color buttonExitColor = menuButtonImages[1].color;
-        for (float i = alphaMax; i > 0 ; i -= 1f * Time.deltaTime)
-        {
-            menuBGColor.a = i;
-            menuBackground.color = menuBGColor;
-            buttonPlayColor.a = i;
-            menuButtonImages[0].color = buttonPlayColor;
-            buttonExitColor.a = i;
-            menuButtonImages[1].color = buttonExitColor;
-
-            yield return null;
-        }
-
-        menuBackground.gameObject.SetActive(false);
-        ShowMenuButtons(show: false);
-        ShowGenerateButtons(show: true);
-    }
-
-    private void ShowMenuButtons(bool show)
-    {
-        menuButtons.SetActive(show);
-    }
-
-    private void ShowGenerateButtons(bool show)
-    {
-        generateButtons.SetActive(show);
-    }
-
-    public void ExitGame()
-    {
-        Application.Quit(0);
     }
 }

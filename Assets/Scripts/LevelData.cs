@@ -41,6 +41,7 @@ public class LevelData : MonoBehaviour
         else
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
     }
 }

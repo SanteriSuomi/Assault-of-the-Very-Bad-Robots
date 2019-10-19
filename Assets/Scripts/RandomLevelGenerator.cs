@@ -3,6 +3,8 @@ using UnityEngine.AI;
 
 public class RandomLevelGenerator : MonoBehaviour
 {
+    public static RandomLevelGenerator Instance { get; set; }
+
     [SerializeField]
     private GameObject normalBlock = default;
     [SerializeField]
@@ -23,6 +25,15 @@ public class RandomLevelGenerator : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
         // Initialize the map matrix.
         map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
     }
