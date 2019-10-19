@@ -105,6 +105,8 @@ public class RandomLevelGenerator : MonoBehaviour
                 Destroy(map[firstPassX, 0, i]);
             }
 
+            setAgentStartPoint = false;
+
             int secondPassAmountX = Random.Range(2, xLength - 2);
             int secondPassDirection = Random.Range(0, 2);
             for (int i = 0; i < secondPassAmountX; i++)
@@ -157,7 +159,6 @@ public class RandomLevelGenerator : MonoBehaviour
                 agentEndPoint = SetAgentEndPoint(agentEndPoint, i);
             }
 
-            setAgentStartPoint = false;
             LevelData.Instance.AgentEndPoint = agentEndPoint;
         }
         catch (System.Exception e)
