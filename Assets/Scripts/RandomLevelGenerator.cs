@@ -6,25 +6,20 @@ public class RandomLevelGenerator : MonoBehaviour
     public static RandomLevelGenerator Instance { get; set; }
 
     [SerializeField]
-    private GameObject normalBlock = default;
+    private GameObject levelPrefab = default;
     [SerializeField]
-    private Transform blockParent = default;
-    private GameObject[,,] map;
+    private Transform levelPrefabParent = default;
     [SerializeField]
     private NavMeshSurface navMesh = default;
+    private GameObject[,,] map;
 
     [SerializeField]
     private int xLength = 20;
-    public int XLength { get { return xLength; } }
-
     [SerializeField]
     private int zLength = 20;
-    public int ZLength { get { return zLength; } }
-
     [Tooltip("One Y row is every 0.5.")]
     [SerializeField]
     private float yLength = 0.5f;
-    public float YLength { get { return yLength; } }
 
     private bool setAgentStartPoint;
 
@@ -66,8 +61,8 @@ public class RandomLevelGenerator : MonoBehaviour
             // Instantiate the every X row.
             for (int xRow = 0; xRow < xLength; xRow++)
             {
-                GameObject xObject = Instantiate(normalBlock);
-                xObject.transform.parent = blockParent;
+                GameObject xObject = Instantiate(levelPrefab);
+                xObject.transform.parent = levelPrefabParent;
                 xObject.layer = 9;
                 xObject.transform.position = new Vector3(xRow, 0, 0);
                 // Add to map array for further processing.
@@ -75,8 +70,8 @@ public class RandomLevelGenerator : MonoBehaviour
                 // Instantiate every Z row.
                 for (int zRow = 0; zRow < zLength; zRow++)
                 {
-                    GameObject zObject = Instantiate(normalBlock);
-                    zObject.transform.parent = blockParent;
+                    GameObject zObject = Instantiate(levelPrefab);
+                    zObject.transform.parent = levelPrefabParent;
                     zObject.layer = 9;
                     zObject.transform.position = new Vector3(xRow, 0, zRow);
                     // Add to map array for further processing.
@@ -84,8 +79,8 @@ public class RandomLevelGenerator : MonoBehaviour
                     // Instantiate every Y row.
                     for (float yRow = 0; yRow < yLength; yRow += 0.5f)
                     {
-                        GameObject yObject = Instantiate(normalBlock);
-                        yObject.transform.parent = blockParent;
+                        GameObject yObject = Instantiate(levelPrefab);
+                        yObject.transform.parent = levelPrefabParent;
                         yObject.AddComponent<NavMeshObstacle>().carving = true;
                         yObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
                         // Add to map array for further processing.
@@ -189,6 +184,7 @@ public class RandomLevelGenerator : MonoBehaviour
     #endregion
 
     #region Other Map Methods
+
     private void ClearMap()
     {
         foreach (GameObject block in map)

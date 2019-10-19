@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class LevelPool : MonoBehaviour
 {
@@ -7,7 +8,11 @@ public class LevelPool : MonoBehaviour
 
     [SerializeField]
     private GameObject levelPrefab = default;
-    private Queue<GameObject> levelPool;
+    [SerializeField]
+    private Transform levelPrefabParent = default;
+    private List<GameObject> levelPool = new List<GameObject>();
+
+    private int poolAmount = 400;
 
     private void Awake()
     {
@@ -20,23 +25,24 @@ public class LevelPool : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+    }
 
-        levelPool = new Queue<GameObject>();
-        int poolAmount = RandomLevelGenerator.Instance.XLength * RandomLevelGenerator.Instance.ZLength;
+    private void Start()
+    {
         for (int i = 0; i < poolAmount; i++)
         {
             GameObject levelObject = Instantiate(levelPrefab);
-            levelPool.Enqueue(levelObject);
+            levelObject.transform.parent = levelPrefabParent;
+            levelObject.SetActive(false);
+            levelPool.Add(levelObject);
+            print(levelObject);
         }
     }
 
-    public void Enqueue(GameObject gameObject)
+    public void DeactivateObject(GameObject gameObject)
     {
-        levelPool.Enqueue(gameObject);
+        gameObject.SetActive(false);
     }
 
-    public GameObject Dequeue()
-    {
-        return levelPool.Dequeue();
-    }
+    public GameObject GetObject() => levelPool.Where(g => !g.activeSelf).FirstOrDefault();
 }
