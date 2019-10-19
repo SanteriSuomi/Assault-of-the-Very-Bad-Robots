@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
-using System.Linq;
 
 public class RandomLevelGenerator : MonoBehaviour
 {
@@ -40,42 +39,55 @@ public class RandomLevelGenerator : MonoBehaviour
         GenerateMapBlocks();
         GenerateMapPath();
         GenerateNavMesh();
+        ForceCleanUp();
     }
 
+    #region Generate Map
     private void GenerateMapBlocks()
     {
-        // Instantiate the every X row.
-        for (int xRow = 0; xRow < xLength; xRow++)
+        try
         {
-            GameObject xObject = Instantiate(normalBlock);
-            xObject.transform.parent = blockParent;
-            xObject.layer = 9;
-            xObject.transform.position = new Vector3(xRow, 0, 0);
-            // Add to map array for further processing.
-            map[xRow, 0, 0] = xObject;
-            // Instantiate every Z row.
-            for (int zRow = 0; zRow < zLength; zRow++)
+            // Instantiate the every X row.
+            for (int xRow = 0; xRow < xLength; xRow++)
             {
-                GameObject zObject = Instantiate(normalBlock);
-                zObject.transform.parent = blockParent;
-                zObject.layer = 9;
-                zObject.transform.position = new Vector3(xRow, 0, zRow);
+                GameObject xObject = Instantiate(normalBlock);
+                xObject.transform.parent = blockParent;
+                xObject.layer = 9;
+                xObject.transform.position = new Vector3(xRow, 0, 0);
                 // Add to map array for further processing.
-                map[xRow, 0, zRow] = zObject;
-                // Instantiate every Y row.
-                for (float yRow = 0; yRow < yLength; yRow += 0.5f)
+                map[xRow, 0, 0] = xObject;
+                // Instantiate every Z row.
+                for (int zRow = 0; zRow < zLength; zRow++)
                 {
-                    GameObject yObject = Instantiate(normalBlock);
-                    yObject.transform.parent = blockParent;
-                    yObject.AddComponent<NavMeshObstacle>().carving = true;
-                    yObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
+                    GameObject zObject = Instantiate(normalBlock);
+                    zObject.transform.parent = blockParent;
+                    zObject.layer = 9;
+                    zObject.transform.position = new Vector3(xRow, 0, zRow);
                     // Add to map array for further processing.
-                    map[xRow, Mathf.RoundToInt(yRow + yRow), zRow] = yObject;
+                    map[xRow, 0, zRow] = zObject;
+                    // Instantiate every Y row.
+                    for (float yRow = 0; yRow < yLength; yRow += 0.5f)
+                    {
+                        GameObject yObject = Instantiate(normalBlock);
+                        yObject.transform.parent = blockParent;
+                        yObject.AddComponent<NavMeshObstacle>().carving = true;
+                        yObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
+                        // Add to map array for further processing.
+                        map[xRow, Mathf.RoundToInt(yRow + yRow), zRow] = yObject;
+                    }
                 }
             }
         }
+        catch (System.Exception e)
+        {
+            #if UNITY_EDITOR
+            Debug.Log(e);
+            #endif
+        }
     }
+    #endregion
 
+    #region Generate Path
     private int thirdPassX;
     private int fourthPassZ;
     private int fifthPassX;
@@ -92,8 +104,6 @@ public class RandomLevelGenerator : MonoBehaviour
 
                 Destroy(map[firstPassX, 0, i]);
             }
-
-            setAgentStartPoint = false;
 
             int secondPassAmountX = Random.Range(2, xLength - 2);
             int secondPassDirection = Random.Range(0, 2);
@@ -139,10 +149,16 @@ public class RandomLevelGenerator : MonoBehaviour
             }
 
             int fifthPassAmountZ = zLength - fourthPassZ;
+            Vector3 agentEndPoint = Vector3.zero;
             for (int i = 0; i < fifthPassAmountZ; i++)
             {
                 Destroy(map[fifthPassX, 0, fourthPassZ + i]);
+
+                agentEndPoint = SetAgentEndPoint(agentEndPoint, i);
             }
+
+            setAgentStartPoint = false;
+            LevelData.Instance.AgentEndPoint = agentEndPoint;
         }
         catch (System.Exception e)
         {
@@ -150,25 +166,12 @@ public class RandomLevelGenerator : MonoBehaviour
             Debug.Log(e);
             #endif
 
-            ClearMap();
             GenerateMap();
         }
     }
+    #endregion
 
-    private void SetAgentStartPoint(int firstPassX)
-    {
-        if (!setAgentStartPoint)
-        {
-            setAgentStartPoint = true;
-            LevelData.Instance.AgentStartPoint = map[firstPassX, 0, 0].transform.position;
-        }
-    }
-
-    private void GenerateNavMesh()
-    {
-        navMesh.BuildNavMesh();
-    }
-
+    #region Other Map Methods
     private void ClearMap()
     {
         foreach (GameObject block in map)
@@ -181,4 +184,35 @@ public class RandomLevelGenerator : MonoBehaviour
     {
         Random.InitState((int)System.DateTime.Now.Ticks);
     }
+
+    private void GenerateNavMesh()
+    {
+        navMesh.BuildNavMesh();
+    }
+
+    private void ForceCleanUp()
+    {
+        System.GC.Collect();
+        Resources.UnloadUnusedAssets();
+    }
+
+    private void SetAgentStartPoint(int firstPassX)
+    {
+        if (!setAgentStartPoint)
+        {
+            setAgentStartPoint = true;
+            LevelData.Instance.AgentStartPoint = map[firstPassX, 0, 0].transform.position;
+        }
+    }
+
+    private Vector3 SetAgentEndPoint(Vector3 agentEndPoint, int i)
+    {
+        if (map[fifthPassX, 0, fourthPassZ + i].transform.position.z > agentEndPoint.z)
+        {
+            agentEndPoint = map[fifthPassX, 0, fourthPassZ + i].transform.position;
+        }
+
+        return agentEndPoint;
+    }
+    #endregion
 }

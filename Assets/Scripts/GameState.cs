@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class GameState : MonoBehaviour
 {
+    public static GameState Instance { get; set; }
+
     [SerializeField]
     private RawImage menuBackground = default;
     [SerializeField]
@@ -16,6 +18,15 @@ public class GameState : MonoBehaviour
     private void Awake()
     {
         menuButtonImages = menuButtons.GetComponentsInChildren<Image>();
+
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+        }
     }
 
     private void Start()
