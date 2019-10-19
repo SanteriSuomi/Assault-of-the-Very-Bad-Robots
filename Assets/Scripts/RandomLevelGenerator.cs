@@ -15,11 +15,16 @@ public class RandomLevelGenerator : MonoBehaviour
 
     [SerializeField]
     private int xLength = 20;
+    public int XLength { get { return xLength; } }
+
     [SerializeField]
     private int zLength = 20;
+    public int ZLength { get { return zLength; } }
+
     [Tooltip("One Y row is every 0.5.")]
     [SerializeField]
     private float yLength = 0.5f;
+    public float YLength { get { return yLength; } }
 
     private bool setAgentStartPoint;
 

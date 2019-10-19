@@ -68,7 +68,6 @@ public class MenuController : MonoBehaviour
 
     public void ActivatePlayMenu()
     {
-        HideMenuButtons();
         HideGenerateButtons();
     }
 
@@ -96,7 +95,7 @@ public class MenuController : MonoBehaviour
 
     private void HideGenerateButtons()
     {
-        generateButtons.SetActive(true);
+        generateButtons.SetActive(false);
     }
     #endregion
 }
