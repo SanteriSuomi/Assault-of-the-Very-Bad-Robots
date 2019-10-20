@@ -10,13 +10,15 @@ public class RandomLevelGenerator : MonoBehaviour
     [SerializeField]
     private Transform levelPrefabParent = default;
     [SerializeField]
+    private GameObject cameraPivot = default;
+    [SerializeField]
     private NavMeshSurface navMesh = default;
     private GameObject[,,] map;
 
     [SerializeField]
-    private int xLength = 20;
+    private int xLength = 24;
     [SerializeField]
-    private int zLength = 20;
+    private int zLength = 22;
     [Tooltip("One Y row is every 0.5.")]
     [SerializeField]
     private float yLength = 0.5f;
@@ -36,6 +38,11 @@ public class RandomLevelGenerator : MonoBehaviour
         }
         // Initialize the map matrix.
         map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
+    }
+
+    private void OnEnable()
+    {
+        Instantiate(cameraPivot).transform.position = new Vector3(xLength / 2, yLength, zLength / 2);
     }
 
     private void Start()
@@ -58,32 +65,28 @@ public class RandomLevelGenerator : MonoBehaviour
     {
         try
         {
-            // Instantiate the every X row.
             for (int xRow = 0; xRow < xLength; xRow++)
             {
                 GameObject xObject = Instantiate(levelPrefab);
                 xObject.transform.parent = levelPrefabParent;
                 xObject.layer = 9;
                 xObject.transform.position = new Vector3(xRow, 0, 0);
-                // Add to map array for further processing.
                 map[xRow, 0, 0] = xObject;
-                // Instantiate every Z row.
+
                 for (int zRow = 0; zRow < zLength; zRow++)
                 {
                     GameObject zObject = Instantiate(levelPrefab);
                     zObject.transform.parent = levelPrefabParent;
                     zObject.layer = 9;
                     zObject.transform.position = new Vector3(xRow, 0, zRow);
-                    // Add to map array for further processing.
                     map[xRow, 0, zRow] = zObject;
-                    // Instantiate every Y row.
+
                     for (float yRow = 0; yRow < yLength; yRow += 0.5f)
                     {
                         GameObject yObject = Instantiate(levelPrefab);
                         yObject.transform.parent = levelPrefabParent;
                         yObject.AddComponent<NavMeshObstacle>().carving = true;
                         yObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
-                        // Add to map array for further processing.
                         map[xRow, Mathf.RoundToInt(yRow + yRow), zRow] = yObject;
                     }
                 }

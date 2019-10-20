@@ -184,7 +184,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &209529244
 GameObject:
@@ -444,7 +444,7 @@ RectTransform:
   - {fileID: 986192454}
   - {fileID: 1205529528}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -494,36 +494,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0b9498756ddd2142b9eacff167b97b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &461985014
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 461985015}
-  m_Layer: 0
-  m_Name: CameraPivotGround
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &461985015
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 461985014}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 11, y: 0.5, z: 9}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &462708048
 GameObject:
   m_ObjectHideFlags: 0
@@ -1015,7 +985,7 @@ Transform:
   - {fileID: 1979150947}
   - {fileID: 2113367070}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &986192453
 GameObject:
@@ -1241,9 +1211,11 @@ MonoBehaviour:
   levelPrefab: {fileID: 3383428288038675859, guid: 9bc99d7ab8215c74180bf3513119ec03,
     type: 3}
   levelPrefabParent: {fileID: 1979150947}
+  cameraPivot: {fileID: 5239701654997334797, guid: f5c5b826c2dbf2a4b9da4d210363a3b6,
+    type: 3}
   navMesh: {fileID: 1328193214}
   xLength: 24
-  zLength: 21
+  zLength: 22
   yLength: 0.5
 --- !u!4 &1245602450
 Transform:

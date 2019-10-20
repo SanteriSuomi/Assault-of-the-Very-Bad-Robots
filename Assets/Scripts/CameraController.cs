@@ -10,7 +10,7 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        pivot = GameObject.Find("CameraPivotGround").transform;
+        pivot = GameObject.Find("PRE_CameraPivotGround(Clone)").transform;
     }
 
     private void Update()
