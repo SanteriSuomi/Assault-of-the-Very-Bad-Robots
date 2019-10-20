@@ -40,6 +40,8 @@ public class MenuController : MonoBehaviour
     public void ActivateGenerateMenu()
     {
         StartCoroutine(FadeOutMainMenu());
+        HideMenuButtons();
+        ShowGenerateButtons();
     }
 
     private IEnumerator FadeOutMainMenu()
@@ -61,9 +63,6 @@ public class MenuController : MonoBehaviour
         }
 
         menuBackground.gameObject.SetActive(false);
-        HideMenuButtons();
-
-        ShowGenerateButtons();
     }
 
     public void ActivatePlayMenu()
