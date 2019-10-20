@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5239701654997334796}
   m_Layer: 0
-  m_Name: CameraPivotGround
-  m_TagString: Untagged
+  m_Name: PRE_CameraPivotGround
+  m_TagString: CameraPivot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

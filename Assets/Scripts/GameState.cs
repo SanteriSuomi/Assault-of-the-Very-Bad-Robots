@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 
 public class GameState : MonoBehaviour
 {
     public static GameState Instance { get; set; }
 
-    [SerializeField]
-    private UnityEvent MainMenu = default;
-    [SerializeField]
-    private UnityEvent GenerateMenu = default;
-    [SerializeField]
-    private UnityEvent PlayMapMenu = default;
+    #region Menu Events
+    public delegate void MainMenu();
+    public event MainMenu MainMenuEvent;
+
+    public delegate void GenerateMenu();
+    public event GenerateMenu GenerateMenuEvent;
+
+    public delegate void PlayMapMenu();
+    public event PlayMapMenu PlayMapMenuEvent;
+    #endregion
 
     private void Awake()
     {
@@ -49,13 +52,13 @@ public class GameState : MonoBehaviour
         switch (currentState)
         {
             case GameStates.Menu:
-                MainMenu.Invoke();
+                MainMenuEvent.Invoke();
                 break;
             case GameStates.GenerateMap:
-                GenerateMenu.Invoke();
+                GenerateMenuEvent.Invoke();
                 break;
             case GameStates.PlayMap:
-                PlayMapMenu.Invoke();
+                PlayMapMenuEvent.Invoke();
                 break;
             default:
                 break;

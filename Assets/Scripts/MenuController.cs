@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class MenuController : MonoBehaviour
 {
-    private static MenuController Instance { get; set; }
+    public static MenuController Instance { get; set; }
 
     [SerializeField]
     private RawImage menuBackground = default;
@@ -12,12 +12,19 @@ public class MenuController : MonoBehaviour
     private GameObject menuButtons = default;
     [SerializeField]
     private GameObject generateButtons = default;
+    [SerializeField]
+    private GameObject generatingText = default;
 
     private Image[] menuButtonImages;
 
     private void Awake()
     {
         menuButtonImages = menuButtons.GetComponentsInChildren<Image>();
+
+        GameState.Instance.MainMenuEvent += ActivateMainMenu;
+        GameState.Instance.GenerateMenuEvent += ActivateGenerateMenu;
+        GameState.Instance.PlayMapMenuEvent += ActivatePlayMenu;
+        RandomLevelGenerator.Instance.GeneratingTextHideEvent += HideGeneratingText;
 
         if (Instance != null && Instance != this)
         {
@@ -31,13 +38,13 @@ public class MenuController : MonoBehaviour
     }
 
     #region Event Methods
-    public void ActivateMainMenu()
+    private void ActivateMainMenu()
     {
         ShowMenuButtons();
         HideGenerateButtons();
     }
 
-    public void ActivateGenerateMenu()
+    private void ActivateGenerateMenu()
     {
         StartCoroutine(FadeOutMainMenu());
         HideMenuButtons();
@@ -65,9 +72,25 @@ public class MenuController : MonoBehaviour
         menuBackground.gameObject.SetActive(false);
     }
 
-    public void ActivatePlayMenu()
+    private void ActivatePlayMenu()
     {
         HideGenerateButtons();
+    }
+
+    public void ShowGeneratingText()
+    {
+        generatingText.SetActive(true);
+    }
+
+    private void HideGeneratingText()
+    {
+        StartCoroutine(HideGeneratingTextTimer());
+    }
+
+    private IEnumerator HideGeneratingTextTimer()
+    {
+        yield return new WaitForSeconds(1);
+        generatingText.SetActive(false);
     }
 
     public void ExitGame()

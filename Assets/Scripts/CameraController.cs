@@ -10,13 +10,13 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        pivot = GameObject.Find("PRE_CameraPivotGround(Clone)").transform;
+        pivot = GameObject.FindGameObjectWithTag("CameraPivot").transform;
     }
 
     private void Update()
     {
         float delta = Time.deltaTime;
-
+        
         if (Input.GetKey(KeyCode.A))
         {
             gameObject.transform.RotateAround(pivot.position, pivot.up, rotateSpeed * delta);

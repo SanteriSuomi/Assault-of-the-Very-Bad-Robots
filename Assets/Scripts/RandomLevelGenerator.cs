@@ -1,9 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class RandomLevelGenerator : MonoBehaviour
 {
     public static RandomLevelGenerator Instance { get; set; }
+
+    public delegate void GeneratingTextHide();
+    public event GeneratingTextHide GeneratingTextHideEvent;
 
     [SerializeField]
     private GameObject levelPrefab = default;
@@ -36,7 +40,7 @@ public class RandomLevelGenerator : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        // Initialize the map matrix.
+
         map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
     }
 
@@ -52,12 +56,19 @@ public class RandomLevelGenerator : MonoBehaviour
 
     public void GenerateMap()
     {
+        StartCoroutine(GenerateMapTimer());
+    }
+
+    private IEnumerator GenerateMapTimer()
+    {
+        yield return null;
         ClearMap();
         InitializeSeed();
         GenerateMapBlocks();
         GenerateMapPath();
         GenerateNavMesh();
         ForceCleanUp();
+        GeneratingTextHideEvent.Invoke();
     }
 
     #region Generate Map
@@ -115,7 +126,6 @@ public class RandomLevelGenerator : MonoBehaviour
             for (int i = 0; i < firstPassAmountZ; i++)
             {
                 SetAgentStartPoint(firstPassX);
-
                 Destroy(map[firstPassX, 0, i]);
             }
 
