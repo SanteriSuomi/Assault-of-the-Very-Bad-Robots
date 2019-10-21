@@ -16,6 +16,8 @@ public class MenuController : MonoBehaviour
     private GameObject generatingText = default;
     [SerializeField]
     private GameObject towerButtons = default;
+    [SerializeField]
+    private GameObject healthFundsText = default;
 
     private Image[] menuButtonImages;
 
@@ -77,6 +79,7 @@ public class MenuController : MonoBehaviour
     {
         HideGenerateButtons();
         ShowTowerButtons();
+        ShowHealthFundsText();
     }
 
     public void ShowGeneratingText()
@@ -110,6 +113,16 @@ public class MenuController : MonoBehaviour
     private void HideTowerButtons()
     {
         towerButtons.SetActive(false);
+    }
+
+    private void ShowHealthFundsText()
+    {
+        healthFundsText.SetActive(true);
+    }
+
+    private void HideHealthFundsText()
+    {
+        healthFundsText.SetActive(false);
     }
 
     private void ShowMenuButtons()

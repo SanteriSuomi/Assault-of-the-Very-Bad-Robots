@@ -2,9 +2,11 @@
 
 public abstract class Tower : MonoBehaviour
 {
-    protected abstract string Name { get; set; }
+    public abstract int Id  { get; set; }
 
-    protected abstract int Cost { get; set; }
+    public abstract string Name { get; set; }
+
+    public abstract int Cost { get; set; }
 
     protected abstract void Initialize();
 
