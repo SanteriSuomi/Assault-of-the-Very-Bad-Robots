@@ -14,6 +14,8 @@ public class MenuController : MonoBehaviour
     private GameObject generateButtons = default;
     [SerializeField]
     private GameObject generatingText = default;
+    [SerializeField]
+    private GameObject towerButtons = default;
 
     private Image[] menuButtonImages;
 
@@ -33,7 +35,6 @@ public class MenuController : MonoBehaviour
         else
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
     }
 
@@ -75,6 +76,7 @@ public class MenuController : MonoBehaviour
     private void ActivatePlayMenu()
     {
         HideGenerateButtons();
+        ShowTowerButtons();
     }
 
     public void ShowGeneratingText()
@@ -100,6 +102,16 @@ public class MenuController : MonoBehaviour
     #endregion
 
     #region Private Button Methods
+    private void ShowTowerButtons()
+    {
+        towerButtons.SetActive(true);
+    }
+
+    private void HideTowerButtons()
+    {
+        towerButtons.SetActive(false);
+    }
+
     private void ShowMenuButtons()
     {
         menuButtons.SetActive(true);

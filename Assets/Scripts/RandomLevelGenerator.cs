@@ -38,7 +38,6 @@ public class RandomLevelGenerator : MonoBehaviour
         else
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
 
         map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];

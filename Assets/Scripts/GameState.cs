@@ -24,7 +24,6 @@ public class GameState : MonoBehaviour
         else
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
     }
 
@@ -33,7 +32,7 @@ public class GameState : MonoBehaviour
         currentState = GameStates.Menu;
     }
 
-    private enum GameStates
+    public enum GameStates
     {
         Menu = 1,
         GenerateMap = 2,
@@ -45,6 +44,11 @@ public class GameState : MonoBehaviour
     public void SetState(int state)
     {
         currentState = (GameStates)state;
+    }
+
+    public GameStates GetState()
+    {
+        return currentState;
     }
 
     private void Update()
