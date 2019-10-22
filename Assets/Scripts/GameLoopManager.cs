@@ -3,9 +3,9 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.AI;
 
-public class PlayManager : MonoBehaviour
+public class GameLoopManager : MonoBehaviour
 {
-    public static PlayManager Instance { get; set; }
+    public static GameLoopManager Instance { get; set; }
 
     [SerializeField]
     private TextMeshProUGUI gameStartedCountdownText = default;
@@ -13,26 +13,29 @@ public class PlayManager : MonoBehaviour
     private TextMeshProUGUI healthText = default;
     [SerializeField]
     private TextMeshProUGUI fundsText = default;
-
     [SerializeField]
     private GameObject enemyBasic = default;
 
     [SerializeField]
     private int gameStartCountdownTime = 3;
     [SerializeField]
-    private int startingHealth = 100;
+    private int health = 100;
     [SerializeField]
-    private int startingFunds = 25;
+    private int funds = 10;
+    [SerializeField]
+    private float enemySpawnTime = 4.5f;
 
     public int Health { get; set; }
     public int Funds { get; set; }
 
     private float enemyTimer;
 
+    #region Game Flow Bools
     private bool hasGameStarted = false;
     private bool setHealth = false;
     private bool hasCountdownPlayed = false;
     private bool continueGame = false;
+    #endregion
 
     private void Awake()
     {
@@ -55,53 +58,40 @@ public class PlayManager : MonoBehaviour
         if (!setHealth)
         {
             setHealth = true;
-            Health = startingHealth;
-            Funds = startingFunds;
+            Health = health;
+            Funds = funds;
         }
     }
 
     private void GameEnded()
     {
-        hasGameStarted = false;
+        GameReset();
         GameState.Instance.SetState(2);
+    }
+
+    private void GameReset()
+    {
+        hasGameStarted = false;
+        setHealth = false;
+        hasCountdownPlayed = false;
+        continueGame = false;
     }
 
     private void Update()
     {
         if (hasGameStarted)
         {
-            if (!hasCountdownPlayed)
-            {
-                hasCountdownPlayed = true;
-                StartCoroutine(PlayMapCountdown());
-            }
-
-            if (continueGame)
-            {
-                if (Health < 0)
-                {
-                    GameEnded();
-                }
-
-                healthText.text = $"Health: {Health}";
-                fundsText.text = $"Funds: {Funds}";
-
-                SpawnEnemies(enemyBasic, 4.5f);
-            }
+            Countdown();
+            GameLoop();
         }
     }
 
-    private void SpawnEnemies(GameObject enemy, float time)
+    private void Countdown()
     {
-        enemyTimer += Time.deltaTime;
-        if (enemyTimer >= time)
+        if (!hasCountdownPlayed)
         {
-            enemyTimer = 0;
-            GameObject spawnedEnemy = Instantiate(enemy);
-            NavMeshAgent enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
-            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0, 0.4f, 0);
-            enemyAgent.enabled = true;
-            enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
+            hasCountdownPlayed = true;
+            StartCoroutine(PlayMapCountdown());
         }
     }
 
@@ -125,5 +115,35 @@ public class PlayManager : MonoBehaviour
     {
         Cursor.visible = cursorVisible;
         Cursor.lockState = cursorLock;
+    }
+
+    private void GameLoop()
+    {
+        if (continueGame)
+        {
+            if (Health < 0)
+            {
+                GameEnded();
+            }
+
+            healthText.text = $"Health: {Health}";
+            fundsText.text = $"Funds: {Funds}";
+
+            SpawnEnemies(enemyBasic, enemySpawnTime);
+        }
+    }
+
+    private void SpawnEnemies(GameObject enemy, float time)
+    {
+        enemyTimer += Time.deltaTime;
+        if (enemyTimer >= time)
+        {
+            enemyTimer = 0;
+            GameObject spawnedEnemy = Instantiate(enemy);
+            NavMeshAgent enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
+            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0, 0.4f, 0);
+            enemyAgent.enabled = true;
+            enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
+        }
     }
 }

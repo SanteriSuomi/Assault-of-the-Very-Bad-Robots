@@ -1,16 +1,31 @@
-﻿public class EnemyBasic : Enemy
+﻿using UnityEngine;
+
+public class EnemyBasic : MonoBehaviour, IEnemy
 {
-    public override string Name { get; set; } = "Basic Enemy";
+    public string Name { get; set; }
+    public float Hitpoints { get; set; }
 
-    public override int Hitpoints { get; set; } = 10;
+    [SerializeField]
+    private new string name = "Basic Enemy";
+    [SerializeField]
+    private int hitpoints = 50;
 
-    protected override void Initialize()
+    private void Awake()
     {
-
+        Name = name;
+        Hitpoints = hitpoints;
     }
 
-    protected override void UpdateState()
+    private void Update()
     {
+        if (Hitpoints <= 0)
+        {
+            Die();
+        }
+    }
 
+    public void Die()
+    {
+        Destroy(gameObject);
     }
 }

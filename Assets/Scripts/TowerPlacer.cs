@@ -8,7 +8,7 @@ public class TowerPlacer : MonoBehaviour
     private Camera mainCam;
     private GameObject towerPrefab;
     private Renderer[] towerRenderer;
-    private Tower towerType;
+    private ITower towerType;
 
     private Color[] defaultColor;
 
@@ -28,11 +28,10 @@ public class TowerPlacer : MonoBehaviour
     public void ActivatePlacer(GameObject tower)
     {
         towerPrefab = Instantiate(tower);
-        towerType = towerPrefab.GetComponent<Tower>();
-        if (towerType.Cost > PlayManager.Instance.Funds)
+        towerType = towerPrefab.GetComponent<ITower>();
+        if (towerType.Cost > GameLoopManager.Instance.Funds)
         {
             Destroy(towerPrefab);
-            print("HELLO");
             StartCoroutine(ShowFundsOutText());
             return;
         }
@@ -91,7 +90,7 @@ public class TowerPlacer : MonoBehaviour
                 towerRenderer[i].material.SetColor("_BaseColor", defaultColor[i]);
             }
             towerPrefab.transform.position = hit.point + new Vector3(0, towerPrefab.transform.localScale.y * 1.5f, 0);
-            PlayManager.Instance.Funds -= towerType.Cost;
+            GameLoopManager.Instance.Funds -= towerType.Cost;
             isPlacing = false;
         }
     }
