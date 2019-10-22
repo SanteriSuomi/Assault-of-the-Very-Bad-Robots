@@ -15,6 +15,9 @@ public class GameState : MonoBehaviour
     public event PlayMapMenu PlayMapMenuEvent;
     #endregion
 
+    public delegate void GameStarted();
+    public event GameStarted GameStartedEvent;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -63,6 +66,7 @@ public class GameState : MonoBehaviour
                 break;
             case GameStates.PlayMap:
                 PlayMapMenuEvent.Invoke();
+                GameStartedEvent.Invoke();
                 break;
             default:
                 break;

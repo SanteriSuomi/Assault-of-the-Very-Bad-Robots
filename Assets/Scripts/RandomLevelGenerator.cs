@@ -95,6 +95,7 @@ public class RandomLevelGenerator : MonoBehaviour
                     {
                         GameObject yObject = Instantiate(levelPrefab);
                         yObject.transform.parent = levelPrefabParent;
+                        yObject.layer = 11;
                         yObject.AddComponent<NavMeshObstacle>().carving = true;
                         yObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
                         map[xRow, Mathf.RoundToInt(yRow + yRow), zRow] = yObject;
@@ -196,7 +197,6 @@ public class RandomLevelGenerator : MonoBehaviour
     #endregion
 
     #region Other Map Methods
-
     private void ClearMap()
     {
         foreach (GameObject block in map)

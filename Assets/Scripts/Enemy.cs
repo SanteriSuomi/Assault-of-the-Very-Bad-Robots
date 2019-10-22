@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-public abstract class Tower : MonoBehaviour
+public abstract class Enemy : MonoBehaviour
 {
     public abstract string Name { get; set; }
 
-    public abstract int Cost { get; set; }
+    public abstract int Hitpoints { get; set; }
 
     protected abstract void Initialize();
 
