@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8031476892043332090}
   - component: {fileID: 4513173650685941796}
   m_Layer: 0
-  m_Name: EnemyTest
+  m_Name: PRE_EnemyBasicTest
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -121,7 +121,7 @@ NavMeshAgent:
   m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.3
-  m_Speed: 0.5
+  m_Speed: 0.6
   m_Acceleration: 8
   avoidancePriority: 99
   m_AngularSpeed: 75
@@ -145,3 +145,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb4befbd72a75024b976d95f030a95d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  name: Basic Enemy
+  hitpoints: 50
+  fundAmount: 1

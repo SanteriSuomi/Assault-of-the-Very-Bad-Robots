@@ -2065,6 +2065,8 @@ MonoBehaviour:
   cameraPivot: {fileID: 5239701654997334797, guid: f5c5b826c2dbf2a4b9da4d210363a3b6,
     type: 3}
   navMesh: {fileID: 1328193214}
+  basePrefab: {fileID: 4355138697258453617, guid: 6ff4f0e56a43db24198876dbb4af6006,
+    type: 3}
   xLength: 24
   zLength: 22
   yLength: 0.5

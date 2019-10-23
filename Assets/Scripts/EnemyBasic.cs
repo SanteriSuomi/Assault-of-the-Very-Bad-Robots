@@ -4,16 +4,20 @@ public class EnemyBasic : MonoBehaviour, IEnemy
 {
     public string Name { get; set; }
     public float Hitpoints { get; set; }
+    public int FundAmount { get; set; }
 
     [SerializeField]
     private new string name = "Basic Enemy";
     [SerializeField]
-    private int hitpoints = 50;
+    private float hitpoints = 50;
+    [SerializeField]
+    private int fundAmount = 1;
 
     private void Awake()
     {
         Name = name;
         Hitpoints = hitpoints;
+        FundAmount = fundAmount;
     }
 
     private void Update()
@@ -21,11 +25,17 @@ public class EnemyBasic : MonoBehaviour, IEnemy
         if (Hitpoints <= 0)
         {
             Die();
+            GiveFunds();
         }
     }
 
-    public void Die()
+    private void Die()
     {
         Destroy(gameObject);
+    }
+
+    private void GiveFunds()
+    {
+        GameLoopManager.Instance.Funds += fundAmount;
     }
 }

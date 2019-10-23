@@ -2,5 +2,5 @@
 {
     string Name { get; set; }
     float Hitpoints { get; set; }
-    void Die();
+    int FundAmount { get; set; }
 }

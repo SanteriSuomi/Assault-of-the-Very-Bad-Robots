@@ -17,6 +17,9 @@ public class RandomLevelGenerator : MonoBehaviour
     private GameObject cameraPivot = default;
     [SerializeField]
     private NavMeshSurface navMesh = default;
+    [SerializeField]
+    private GameObject basePrefab = default;
+    private GameObject playerBase;
     private GameObject[,,] map;
 
     [SerializeField]
@@ -182,6 +185,13 @@ public class RandomLevelGenerator : MonoBehaviour
 
                 agentEndPoint = SetAgentEndPoint(agentEndPoint, i);
             }
+
+            if (playerBase != null)
+            {
+                Destroy(playerBase);
+            }
+            playerBase = Instantiate(basePrefab);
+            playerBase.transform.position = agentEndPoint + new Vector3(0, 0.5f, 0);
 
             LevelData.Instance.AgentEndPoint = agentEndPoint;
         }

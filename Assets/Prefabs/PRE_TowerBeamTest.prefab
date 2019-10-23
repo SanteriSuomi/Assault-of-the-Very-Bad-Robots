@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 74793394717403491}
   - component: {fileID: 1479411798}
   m_Layer: 10
-  m_Name: TowerBeamTest
+  m_Name: PRE_TowerBeamTest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,7 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f446529828472047ada8ea182f839f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageTimerAmount: 1
+  name: Beam Tower
+  cost: 10
+  damage: 10
+  damageTimerAmount: 1.2
   turret: {fileID: 812747687598287405}
 --- !u!135 &1479411798
 SphereCollider:

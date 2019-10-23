@@ -9,8 +9,9 @@ public class TowerPlacer : MonoBehaviour
     private GameObject towerPrefab;
     private Renderer[] towerRenderer;
     private ITower towerType;
-
     private Color[] defaultColor;
+
+    Vector3 hitPosGrid;
 
     private readonly string levelTag = "Level";
 
@@ -29,16 +30,26 @@ public class TowerPlacer : MonoBehaviour
     {
         towerPrefab = Instantiate(tower);
         towerType = towerPrefab.GetComponent<ITower>();
-        if (towerType.Cost > GameLoopManager.Instance.Funds)
-        {
-            Destroy(towerPrefab);
-            StartCoroutine(ShowFundsOutText());
-            return;
-        }
+        towerType.IsPlacing(enable: true);
+        CheckCost();
         towerRenderer = towerPrefab.GetComponentsInChildren<Renderer>();
         defaultColor = new Color[towerRenderer.Length];
         GetDefaultColors();
         isPlacing = true;
+    }
+
+    private void CheckCost()
+    {
+        if (towerType.Cost > GameLoopManager.Instance.Funds)
+        {
+            if (towerPrefab != null)
+            {
+                Destroy(towerPrefab);
+            }
+
+            StartCoroutine(ShowFundsOutText());
+            return;
+        }
     }
 
     private IEnumerator ShowFundsOutText()
@@ -69,7 +80,12 @@ public class TowerPlacer : MonoBehaviour
 
     private RaycastHit UpdateTowerPosition(RaycastHit hit)
     {
-        towerPrefab.transform.position = new Vector3(hit.point.x, hit.point.y + 2.5f, hit.point.z);
+        if (towerPrefab != null)
+        {
+            hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 2.5f, Mathf.Round(hit.point.z));
+            towerPrefab.transform.position = hitPosGrid;
+        }
+
         return hit;
     }
 
@@ -87,11 +103,17 @@ public class TowerPlacer : MonoBehaviour
         {
             for (int i = 0; i < towerRenderer.Length; i++)
             {
-                towerRenderer[i].material.SetColor("_BaseColor", defaultColor[i]);
+                if (towerRenderer[i] != null)
+                {
+                    towerRenderer[i].material.SetColor("_BaseColor", defaultColor[i]);
+                }
             }
-            towerPrefab.transform.position = hit.point + new Vector3(0, towerPrefab.transform.localScale.y * 1.5f, 0);
+
+            hitPosGrid.y = 0;
+            towerPrefab.transform.position = hitPosGrid + new Vector3(0, towerPrefab.transform.localScale.y * 2.25f, 0);
             GameLoopManager.Instance.Funds -= towerType.Cost;
             isPlacing = false;
+            towerType.IsPlacing(enable: false);
         }
     }
 
@@ -113,7 +135,10 @@ public class TowerPlacer : MonoBehaviour
     {
         foreach (var item in towerRenderer)
         {
-            item.material.SetColor("_BaseColor", color);
+            if (item != null)
+            {
+                item.material.SetColor("_BaseColor", color);
+            }
         }
     }
 }
