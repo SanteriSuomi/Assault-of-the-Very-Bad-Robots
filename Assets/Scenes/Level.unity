@@ -2059,7 +2059,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 940cfd2e39439094c9ff4a9c2e53bcd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelPrefab: {fileID: 3383428288038675859, guid: 9bc99d7ab8215c74180bf3513119ec03,
+  levelPrefab: {fileID: 3777107106699161344, guid: 039c7a6adef7efd45b104915fe694e94,
     type: 3}
   levelPrefabParent: {fileID: 1979150947}
   cameraPivot: {fileID: 5239701654997334797, guid: f5c5b826c2dbf2a4b9da4d210363a3b6,
@@ -3011,7 +3011,7 @@ Camera:
   m_GameObject: {fileID: 1687258581}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 2
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -3077,7 +3077,7 @@ MonoBehaviour:
     m_Bits: 256
   stopNaNPropagation: 1
   finalBlitToCameraTarget: 1
-  antialiasingMode: 2
+  antialiasingMode: 3
   temporalAntialiasing:
     jitterSpread: 0.75
     sharpness: 0.25
