@@ -73,7 +73,7 @@ public class TowerBeam : MonoBehaviour, ITower
     private void Laser(Collider collision)
     {
         Vector3 enemyPos = collision.transform.position;
-        lineRenderer.SetPosition(0, turret.position + new Vector3(0, 0.35f, 0));
+        lineRenderer.SetPosition(0, turret.position + new Vector3(0, 0.5f, 0));
         lineRenderer.SetPosition(1, enemyPos);
     }
 
