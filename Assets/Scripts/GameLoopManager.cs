@@ -141,7 +141,7 @@ public class GameLoopManager : MonoBehaviour
             enemyTimer = 0;
             GameObject spawnedEnemy = Instantiate(enemy);
             NavMeshAgent enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
-            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0, 0.4f, 0);
+            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0, spawnedEnemy.transform.localScale.y, 0);
             enemyAgent.enabled = true;
             enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
         }

@@ -82,7 +82,7 @@ public class TowerPlacer : MonoBehaviour
     {
         if (towerPrefab != null)
         {
-            hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 2.5f, Mathf.Round(hit.point.z));
+            hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 1, Mathf.Round(hit.point.z));
             towerPrefab.transform.position = hitPosGrid;
         }
 
@@ -112,7 +112,7 @@ public class TowerPlacer : MonoBehaviour
             hitPosGrid.y = 0;
             if (towerPrefab != null)
             {
-                towerPrefab.transform.position = hitPosGrid + new Vector3(0, towerPrefab.transform.localScale.y * 2.25f, 0);
+                towerPrefab.transform.position = hitPosGrid + new Vector3(0, towerPrefab.transform.localScale.y, 0);
             }
 
             GameLoopManager.Instance.Funds -= towerType.Cost;

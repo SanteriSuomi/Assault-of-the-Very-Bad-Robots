@@ -22,7 +22,7 @@ public class EnemyBasic : MonoBehaviour, IEnemy
 
     private void Update()
     {
-        if (Hitpoints <= 0)
+        if (Hitpoints <= 0.1f)
         {
             Die();
             GiveFunds();
