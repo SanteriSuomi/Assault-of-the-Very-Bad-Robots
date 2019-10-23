@@ -60,13 +60,25 @@ public class GameState : MonoBehaviour
         {
             case GameStates.Menu:
                 MainMenuEvent.Invoke();
+
+                #if UNITY_EDITOR
+                Debug.Log("Current State: Menu");
+                #endif
                 break;
             case GameStates.GenerateMap:
                 GenerateMenuEvent.Invoke();
+
+                #if UNITY_EDITOR
+                Debug.Log("Current State: GenerateMap");
+                #endif
                 break;
             case GameStates.PlayMap:
                 PlayMapMenuEvent.Invoke();
                 GameStartedEvent.Invoke();
+
+                #if UNITY_EDITOR
+                Debug.Log("Current State: PlayMap");
+                #endif
                 break;
             default:
                 break;

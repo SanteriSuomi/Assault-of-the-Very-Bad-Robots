@@ -7,6 +7,9 @@ public class GameLoopManager : MonoBehaviour
 {
     public static GameLoopManager Instance { get; set; }
 
+    public int Health { get; set; }
+    public int Funds { get; set; }
+
     [SerializeField]
     private TextMeshProUGUI gameStartedCountdownText = default;
     [SerializeField]
@@ -24,9 +27,6 @@ public class GameLoopManager : MonoBehaviour
     private int funds = 10;
     [SerializeField]
     private float enemySpawnTime = 4.5f;
-
-    public int Health { get; set; }
-    public int Funds { get; set; }
 
     private float enemyTimer;
 

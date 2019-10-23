@@ -115,7 +115,10 @@ public class TowerPlacer : MonoBehaviour
                 towerPrefab.transform.position = hitPosGrid + new Vector3(0, towerPrefab.transform.localScale.y, 0);
             }
 
-            GameLoopManager.Instance.Funds -= towerType.Cost;
+            if (towerPrefab != null)
+            {
+                GameLoopManager.Instance.Funds -= towerType.Cost;
+            }
             isPlacing = false;
             towerType.IsPlacing(enable: false);
         }

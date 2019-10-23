@@ -38,10 +38,7 @@ public class CameraController : MonoBehaviour
         InputZoom(delta);
 
         GetMouseHitForPivot();
-        if (movePivot)
-        {
-            StartCoroutine(MovePivot(delta));
-        }
+        MovePivot(delta);
     }
 
     private void InputRotate(float delta)
@@ -86,7 +83,15 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    private IEnumerator MovePivot(float delta)
+    private void MovePivot(float delta)
+    {
+        if (movePivot)
+        {
+            StartCoroutine(SmoothPivotMove(delta));
+        }
+    }
+
+    private IEnumerator SmoothPivotMove(float delta)
     {
         float distance = Vector3.Distance(pivot.transform.position, pivotHitPoint);
         pivot.transform.position = Vector3.Lerp(pivot.transform.position, pivotHitPoint, pivotStep * delta);
