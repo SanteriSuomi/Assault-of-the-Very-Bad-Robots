@@ -29,6 +29,7 @@ public class RandomLevelGenerator : MonoBehaviour
     [Tooltip("One Y row is every 0.5.")]
     [SerializeField]
     private float yLength = 0.5f;
+    public float YLength { get => yLength; }
 
     private bool setAgentStartPoint;
 
