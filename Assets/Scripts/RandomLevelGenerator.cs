@@ -14,6 +14,8 @@ public class RandomLevelGenerator : MonoBehaviour
     [SerializeField]
     private Transform levelPrefabParent = default;
     [SerializeField]
+    private GameObject levelPathPrefab = default;
+    [SerializeField]
     private GameObject cameraPivot = default;
     [SerializeField]
     private NavMeshSurface navMesh = default;
@@ -81,7 +83,7 @@ public class RandomLevelGenerator : MonoBehaviour
         {
             for (int xRow = 0; xRow < xLength; xRow++)
             {
-                GameObject xObject = Instantiate(levelPrefab);
+                GameObject xObject = Instantiate(levelPathPrefab);
                 xObject.transform.parent = levelPrefabParent;
                 xObject.layer = 9;
                 xObject.transform.position = new Vector3(xRow, 0, 0);
@@ -89,7 +91,7 @@ public class RandomLevelGenerator : MonoBehaviour
 
                 for (int zRow = 0; zRow < zLength; zRow++)
                 {
-                    GameObject zObject = Instantiate(levelPrefab);
+                    GameObject zObject = Instantiate(levelPathPrefab);
                     zObject.transform.parent = levelPrefabParent;
                     zObject.layer = 9;
                     zObject.transform.position = new Vector3(xRow, 0, zRow);
@@ -186,15 +188,9 @@ public class RandomLevelGenerator : MonoBehaviour
 
                 agentEndPoint = SetAgentEndPoint(agentEndPoint, i);
             }
-            
-            if (playerBase != null)
-            {
-                Destroy(playerBase);
-            }
-            playerBase = Instantiate(basePrefab);
-            playerBase.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
-            playerBase.transform.position = agentEndPoint + new Vector3(0, 0.175f, 3.65f);
-            
+
+            SpawnBase(agentEndPoint);
+
             LevelData.Instance.AgentEndPoint = agentEndPoint;
         }
         catch (System.Exception e)
@@ -205,6 +201,17 @@ public class RandomLevelGenerator : MonoBehaviour
 
             GenerateMap();
         }
+    }
+
+    private void SpawnBase(Vector3 agentEndPoint)
+    {
+        if (playerBase != null)
+        {
+            Destroy(playerBase);
+        }
+        playerBase = Instantiate(basePrefab);
+        playerBase.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
+        playerBase.transform.position = agentEndPoint + new Vector3(0, 0, 3.695f);
     }
     #endregion
 

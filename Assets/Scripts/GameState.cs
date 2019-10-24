@@ -64,18 +64,18 @@ public class GameState : MonoBehaviour
         {
             case GameStates.Menu:
                 MainMenuEvent.Invoke();
-                break;
 
+                break;
             case GameStates.GenerateMap:
                 GenerateMenuEvent.Invoke();
                 ClearEntities();
-                break;
 
+                break;
             case GameStates.PlayMap:
                 PlayMapMenuEvent.Invoke();
                 GameStartedEvent.Invoke();
-                break;
 
+                break;
             default:
                 break;
         }
@@ -92,6 +92,7 @@ public class GameState : MonoBehaviour
         }
     }
 
+    #region State Debug
     #if UNITY_EDITOR
     private void StateDebug()
     {
@@ -111,4 +112,5 @@ public class GameState : MonoBehaviour
         }
     }
     #endif
+    #endregion
 }

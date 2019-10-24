@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class PlayManager : MonoBehaviour
@@ -17,7 +17,11 @@ public class PlayManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI fundsText = default;
     [SerializeField]
+    private TextMeshProUGUI timeText = default;
+    [SerializeField]
     private GameObject enemyBasic = default;
+    [SerializeField]
+    private GameObject enemyStrong = default;
 
     [SerializeField]
     private int gameStartCountdownTime = 3;
@@ -25,10 +29,10 @@ public class PlayManager : MonoBehaviour
     private int health = 100;
     [SerializeField]
     private int funds = 10;
-    [SerializeField]
-    private float enemySpawnTime = 4.5f;
 
-    private float enemyTimer;
+    private float enemyBasicTimer;
+    private float enemyStrongTimer;
+    private float textTime;
 
     #region Game Flow Bools
     private bool hasGameStarted = false;
@@ -48,7 +52,7 @@ public class PlayManager : MonoBehaviour
             Instance = this;
         }
 
-        GameState.Instance.GameStartedEvent += GameStarted;
+        GameState.Instance.GameStartedEvent += GameStart;
     }
 
     public void GameReset()
@@ -57,9 +61,12 @@ public class PlayManager : MonoBehaviour
         setHealth = false;
         hasCountdownPlayed = false;
         continueGame = false;
+        textTime = 0;
+        Funds = funds;
+        Health = health;
     }
 
-    private void GameStarted()
+    private void GameStart()
     {
         hasGameStarted = true;
 
@@ -68,6 +75,7 @@ public class PlayManager : MonoBehaviour
             setHealth = true;
             Health = health;
             Funds = funds;
+            textTime = 0;
         }
     }
 
@@ -75,17 +83,16 @@ public class PlayManager : MonoBehaviour
     {
         if (hasGameStarted)
         {
-            Countdown();
-            GameLoop();
-        }
-    }
+            if (!hasCountdownPlayed)
+            {
+                hasCountdownPlayed = true;
+                StartCoroutine(PlayMapCountdown());
+            }
 
-    private void Countdown()
-    {
-        if (!hasCountdownPlayed)
-        {
-            hasCountdownPlayed = true;
-            StartCoroutine(PlayMapCountdown());
+            if (continueGame)
+            {
+                GameLoop();
+            }
         }
     }
 
@@ -113,30 +120,50 @@ public class PlayManager : MonoBehaviour
 
     private void GameLoop()
     {
-        if (continueGame)
+        if (Health < 0)
         {
-            if (Health < 0)
-            {
-                GameReset();
-            }
+            GameReset();
+        }
 
-            healthText.text = $"Health: {Health}";
-            fundsText.text = $"Funds: {Funds}";
+        UpdateHealthFundTimeText();
 
-            SpawnEnemies(enemyBasic, enemySpawnTime);
+        SpawnEnemyBasic(enemyBasic, 5);
+        SpawnEnemyStrong(enemyStrong, 25);
+    }
+
+    private void UpdateHealthFundTimeText()
+    {
+        healthText.text = $"Health: {Health}";
+        fundsText.text = $"Funds: {Funds}";
+        textTime += Time.deltaTime;
+        timeText.text = $"Time Survived Against the Very Bad Robots: {Mathf.RoundToInt(textTime)}";
+    }
+
+    private void SpawnEnemyBasic(GameObject enemy, float time)
+    {
+        enemyBasicTimer += Time.deltaTime;
+        if (enemyBasicTimer >= time)
+        {
+            enemyBasicTimer = 0;
+            GameObject spawnedEnemy = Instantiate(enemy);
+            NavMeshAgent enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
+            EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
+            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint;
+            enemyAgent.enabled = true;
+            enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
         }
     }
 
-    private void SpawnEnemies(GameObject enemy, float time)
+    private void SpawnEnemyStrong(GameObject enemy, float time)
     {
-        enemyTimer += Time.deltaTime;
-        if (enemyTimer >= time)
+        enemyStrongTimer += Time.deltaTime;
+        if (enemyStrongTimer >= time)
         {
-            enemyTimer = 0;
+            enemyStrongTimer = 0;
             GameObject spawnedEnemy = Instantiate(enemy);
             NavMeshAgent enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
-            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0, 0.5f, 0);
             EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
+            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint;
             enemyAgent.enabled = true;
             enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
         }

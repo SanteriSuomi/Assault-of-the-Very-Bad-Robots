@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 
-public class EnemyBasic : MonoBehaviour, IEnemy
+public class Enemy : MonoBehaviour, IEnemy
 {
     public string Name { get; set; }
     public float Hitpoints { get; set; }
+    public int Damage { get; set; }
     public int FundAmount { get; set; }
 
     [SerializeField]
@@ -12,12 +13,15 @@ public class EnemyBasic : MonoBehaviour, IEnemy
     private float hitpoints = 50;
     [SerializeField]
     private int fundAmount = 1;
+    [SerializeField]
+    private int damage = 5;
 
     private void Awake()
     {
         Name = name;
         Hitpoints = hitpoints;
         FundAmount = fundAmount;
+        Damage = damage;
     }
 
     private void Update()

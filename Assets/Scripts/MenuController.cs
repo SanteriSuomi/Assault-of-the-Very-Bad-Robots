@@ -41,7 +41,7 @@ public class MenuController : MonoBehaviour
         RandomLevelGenerator.Instance.GeneratingTextHideEvent += HideGeneratingText;
     }
 
-    #region Public/Event Methods
+    #region Button & Event Methods
     private void ActivateMainMenu()
     {
         ShowMenuButtons();
@@ -127,7 +127,7 @@ public class MenuController : MonoBehaviour
     }
     #endregion
 
-    #region Private Button Methods
+    #region Private Methods
     private void ShowTowerButtons()
     {
         towerButtons.SetActive(true);

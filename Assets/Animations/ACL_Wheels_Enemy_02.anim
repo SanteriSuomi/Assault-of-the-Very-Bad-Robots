@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ACL_Wheels_Enemy_01
+  m_Name: ACL_Wheels_Enemy_02
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
@@ -38,7 +38,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: MSH_Enemy_01_Wheel_Front
+    path: MSH_Enemy_02_Wheels_Back
   - curve:
       serializedVersion: 2
       m_Curve:
@@ -63,7 +63,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: MSH_Enemy_01_Wheel_Back
+    path: MSH_Enemy_02_Wheels_Front
   m_PositionCurves: []
   m_ScaleCurves: []
   m_FloatCurves: []
@@ -76,14 +76,14 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 2094844590
+      path: 513487053
       attribute: 4
       script: {fileID: 0}
       typeID: 4
       customType: 4
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 1116887137
+      path: 2749377541
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -136,7 +136,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: MSH_Enemy_01_Wheel_Front
+    path: MSH_Enemy_02_Wheels_Back
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -164,7 +164,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: MSH_Enemy_01_Wheel_Front
+    path: MSH_Enemy_02_Wheels_Back
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -192,7 +192,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: MSH_Enemy_01_Wheel_Front
+    path: MSH_Enemy_02_Wheels_Back
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -220,7 +220,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: MSH_Enemy_01_Wheel_Back
+    path: MSH_Enemy_02_Wheels_Front
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -248,7 +248,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: MSH_Enemy_01_Wheel_Back
+    path: MSH_Enemy_02_Wheels_Front
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -276,7 +276,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: MSH_Enemy_01_Wheel_Back
+    path: MSH_Enemy_02_Wheels_Front
     classID: 4
     script: {fileID: 0}
   m_EulerEditorCurves:
@@ -287,7 +287,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: MSH_Enemy_01_Wheel_Back
+    path: MSH_Enemy_02_Wheels_Front
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -297,7 +297,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: MSH_Enemy_01_Wheel_Back
+    path: MSH_Enemy_02_Wheels_Front
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -307,7 +307,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: MSH_Enemy_01_Wheel_Back
+    path: MSH_Enemy_02_Wheels_Front
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -317,7 +317,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: MSH_Enemy_01_Wheel_Front
+    path: MSH_Enemy_02_Wheels_Back
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -327,7 +327,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: MSH_Enemy_01_Wheel_Front
+    path: MSH_Enemy_02_Wheels_Back
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -337,7 +337,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: MSH_Enemy_01_Wheel_Front
+    path: MSH_Enemy_02_Wheels_Back
     classID: 4
     script: {fileID: 0}
   m_HasGenericRootTransform: 0
