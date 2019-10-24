@@ -11,6 +11,8 @@ public class MenuController : MonoBehaviour
     [SerializeField]
     private GameObject menuButtons = default;
     [SerializeField]
+    private GameObject tutorialText = default;
+    [SerializeField]
     private GameObject generateButtons = default;
     [SerializeField]
     private GameObject generatingText = default;
@@ -68,10 +70,16 @@ public class MenuController : MonoBehaviour
             buttonExitColor.a = i;
             menuButtonImages[1].color = buttonExitColor;
 
+            if (i > 0.2f && i < 0.3f)
+            {
+                tutorialText.SetActive(false);
+            }
+
             yield return null;
         }
 
         menuBackground.gameObject.SetActive(false);
+
     }
 
     private void ActivatePlayMenu()

@@ -135,7 +135,7 @@ public class PlayManager : MonoBehaviour
             enemyTimer = 0;
             GameObject spawnedEnemy = Instantiate(enemy);
             NavMeshAgent enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
-            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0, spawnedEnemy.transform.localScale.y, 0);
+            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0, 0.5f, 0);
             EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
             enemyAgent.enabled = true;
             enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);

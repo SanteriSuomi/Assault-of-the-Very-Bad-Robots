@@ -48,7 +48,6 @@ public class TowerPlacer : MonoBehaviour
             }
 
             StartCoroutine(ShowFundsOutText());
-            return;
         }
     }
 
