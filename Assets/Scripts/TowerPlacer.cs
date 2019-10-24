@@ -40,7 +40,7 @@ public class TowerPlacer : MonoBehaviour
 
     private void CheckCost()
     {
-        if (towerType.Cost > GameLoopManager.Instance.Funds)
+        if (towerType.Cost > PlayManager.Instance.Funds)
         {
             if (towerPrefab != null)
             {
@@ -113,12 +113,10 @@ public class TowerPlacer : MonoBehaviour
             if (towerPrefab != null)
             {
                 towerPrefab.transform.position = hitPosGrid + new Vector3(0, towerPrefab.transform.localScale.y, 0);
+                PlayManager.Instance.Funds -= towerType.Cost;
+                EntityData.Instance.ActiveMapEntityList.Add(towerPrefab);
             }
 
-            if (towerPrefab != null)
-            {
-                GameLoopManager.Instance.Funds -= towerType.Cost;
-            }
             isPlacing = false;
             towerType.IsPlacing(enable: false);
         }

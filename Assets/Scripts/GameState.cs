@@ -56,32 +56,59 @@ public class GameState : MonoBehaviour
 
     private void Update()
     {
+        #if UNITY_EDITOR 
+        StateDebug(); 
+        #endif
+
         switch (currentState)
         {
             case GameStates.Menu:
                 MainMenuEvent.Invoke();
-
-                #if UNITY_EDITOR
-                Debug.Log("Current State: Menu");
-                #endif
                 break;
+
             case GameStates.GenerateMap:
                 GenerateMenuEvent.Invoke();
-
-                #if UNITY_EDITOR
-                Debug.Log("Current State: GenerateMap");
-                #endif
+                ClearEntities();
                 break;
+
             case GameStates.PlayMap:
                 PlayMapMenuEvent.Invoke();
                 GameStartedEvent.Invoke();
+                break;
 
-                #if UNITY_EDITOR
+            default:
+                break;
+        }
+    }
+
+    private static void ClearEntities()
+    {
+        if (EntityData.Instance.ActiveMapEntityList.Count > 0)
+        {
+            foreach (GameObject entity in EntityData.Instance.ActiveMapEntityList)
+            {
+                Destroy(entity);
+            }
+        }
+    }
+
+    #if UNITY_EDITOR
+    private void StateDebug()
+    {
+        switch (currentState)
+        {
+            case GameStates.Menu:
+                Debug.Log("Current State: Menu");
+                break;
+            case GameStates.GenerateMap:
+                Debug.Log("Current State: GenerateMap");
+                break;
+            case GameStates.PlayMap:
                 Debug.Log("Current State: PlayMap");
-                #endif
                 break;
             default:
                 break;
         }
     }
+    #endif
 }

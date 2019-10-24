@@ -1,18 +1,23 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class GameLoopEscMenu : MonoBehaviour
+public class EscMenu : MonoBehaviour
 {
     [SerializeField]
     private GameObject escMenuButtons = default;
 
     private bool isPaused;
 
+    public void HideEscButtons()
+    {
+        escMenuButtons.SetActive(false);
+    }
+    
     private void Update()
     {
-        if (GameState.Instance.GetState() == GameState.GameStates.PlayMap)
+        if (GameState.Instance.GetState() == GameState.GameStates.PlayMap || GameState.Instance.GetState() == GameState.GameStates.GenerateMap)
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (!isPaused && Input.GetKeyDown(KeyCode.Escape))
             {
                 ActivateEscMenu(true);
                 PauseGame(true);
@@ -32,7 +37,7 @@ public class GameLoopEscMenu : MonoBehaviour
 
     private IEnumerator IsPausedDelay()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSecondsRealtime(0.05f);
         isPaused = true;
     }
 

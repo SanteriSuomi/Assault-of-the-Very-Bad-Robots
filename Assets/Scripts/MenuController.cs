@@ -81,6 +81,22 @@ public class MenuController : MonoBehaviour
         ShowHealthFundsText();
     }
 
+    public void ReActivateMenu()
+    {
+        if (GameState.Instance.GetState() != GameState.GameStates.GenerateMap )
+        {
+            GameState.Instance.SetState(2);
+        }
+
+        Time.timeScale = 1;
+        AudioListener.volume = 1;
+
+        HideTowerButtons();
+        HideHealthFundsText();
+
+        ShowGenerateButtons();
+    }
+    
     public void ShowGeneratingText()
     {
         generatingText.SetActive(true);

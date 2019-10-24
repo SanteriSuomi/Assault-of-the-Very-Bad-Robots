@@ -3,9 +3,9 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.AI;
 
-public class GameLoopManager : MonoBehaviour
+public class PlayManager : MonoBehaviour
 {
-    public static GameLoopManager Instance { get; set; }
+    public static PlayManager Instance { get; set; }
 
     public int Health { get; set; }
     public int Funds { get; set; }
@@ -51,6 +51,14 @@ public class GameLoopManager : MonoBehaviour
         GameState.Instance.GameStartedEvent += GameStarted;
     }
 
+    public void GameReset()
+    {
+        hasGameStarted = false;
+        setHealth = false;
+        hasCountdownPlayed = false;
+        continueGame = false;
+    }
+
     private void GameStarted()
     {
         hasGameStarted = true;
@@ -61,20 +69,6 @@ public class GameLoopManager : MonoBehaviour
             Health = health;
             Funds = funds;
         }
-    }
-
-    private void GameEnded()
-    {
-        GameReset();
-        GameState.Instance.SetState(2);
-    }
-
-    private void GameReset()
-    {
-        hasGameStarted = false;
-        setHealth = false;
-        hasCountdownPlayed = false;
-        continueGame = false;
     }
 
     private void Update()
@@ -123,7 +117,7 @@ public class GameLoopManager : MonoBehaviour
         {
             if (Health < 0)
             {
-                GameEnded();
+                GameReset();
             }
 
             healthText.text = $"Health: {Health}";
@@ -142,6 +136,7 @@ public class GameLoopManager : MonoBehaviour
             GameObject spawnedEnemy = Instantiate(enemy);
             NavMeshAgent enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
             spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0, spawnedEnemy.transform.localScale.y, 0);
+            EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
             enemyAgent.enabled = true;
             enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
         }

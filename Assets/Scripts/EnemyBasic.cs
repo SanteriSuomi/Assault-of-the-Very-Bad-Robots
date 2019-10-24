@@ -36,6 +36,6 @@ public class EnemyBasic : MonoBehaviour, IEnemy
 
     private void GiveFunds()
     {
-        GameLoopManager.Instance.Funds += fundAmount;
+        PlayManager.Instance.Funds += fundAmount;
     }
 }
