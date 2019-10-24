@@ -30,13 +30,17 @@ public class PlayManager : MonoBehaviour
     [SerializeField]
     private int funds = 10;
 
-    private float enemyBasicTimer;
-    private float enemyStrongTimer;
+    [SerializeField]
+    private int enemyBasicSpawnInterval = 5;
+    [SerializeField]
+    private int enemyStrongSpawnInterval = 25;
+
+    private float enemyTimer;
     private float textTime;
 
     #region Game Flow Bools
     private bool hasGameStarted = false;
-    private bool setHealth = false;
+    private bool hasGameResetted = false;
     private bool hasCountdownPlayed = false;
     private bool continueGame = false;
     #endregion
@@ -59,7 +63,6 @@ public class PlayManager : MonoBehaviour
     {
         // Reset all the game variables back to zero.
         hasGameStarted = false;
-        setHealth = false;
         hasCountdownPlayed = false;
         continueGame = false;
         textTime = 0;
@@ -69,28 +72,28 @@ public class PlayManager : MonoBehaviour
 
     private void GameStart()
     {
+        if (!hasGameResetted)
+        {
+            // Make sure to reset the game only at the end.
+            hasGameResetted = true;
+            // Make sure the game variables have been resetted.
+            GameReset();
+        }
         // Variable which stores whether the main game has started or not.
         hasGameStarted = true;
-        // Only set the health and other required variables once.
-        if (!setHealth)
-        {
-            setHealth = true;
-            Health = health;
-            Funds = funds;
-            textTime = 0;
-        }
     }
 
     private void Update()
     {
         if (hasGameStarted)
         {
+            // Play a countdown text once.
             if (!hasCountdownPlayed)
             {
                 hasCountdownPlayed = true;
                 StartCoroutine(PlayMapCountdown());
             }
-
+            // Continue the game to the main game loop after the countdown.
             if (continueGame)
             {
                 GameLoop();
@@ -100,17 +103,18 @@ public class PlayManager : MonoBehaviour
 
     private IEnumerator PlayMapCountdown()
     {
+        // Make cursor invisible and lock it to the screen.
         CursorLock(false, CursorLockMode.Locked);
-
+        // Countdown text timer.
         for (int i = gameStartCountdownTime; i >= 0; i--)
         {
             gameStartedCountdownText.text = i.ToString();
             yield return new WaitForSeconds(1);
         }
-
+        // Reset the countdown text by making it empty string.
         gameStartedCountdownText.text = string.Empty;
         CursorLock(true, CursorLockMode.None);
-
+        // Signal that we can continue the game.
         continueGame = true;
     }
 
@@ -122,45 +126,38 @@ public class PlayManager : MonoBehaviour
 
     private void GameLoop()
     {
-        if (Health < 0)
+        // Reset the game if base health reaches zero or less.
+        if (Health <= 0)
         {
+            // When dead, reset the game.
+            hasGameResetted = false;
             GameReset();
         }
-
+        // Update the health, fund and time info on top of the screen.
         UpdateHealthFundTimeText();
-
-        SpawnEnemyBasic(enemyBasic, 5);
-        SpawnEnemyStrong(enemyStrong, 25);
+        // Spawn the enemies on intervals.
+        enemyTimer += Time.deltaTime;
+        SpawnEnemy(enemy: enemyBasic, interval: enemyBasicSpawnInterval);
+        SpawnEnemy(enemy: enemyStrong, interval: enemyStrongSpawnInterval);
     }
 
     private void UpdateHealthFundTimeText()
     {
         healthText.text = $"Health: {Health}";
         fundsText.text = $"Funds: {Funds}";
+        // Time text timer.
         textTime += Time.deltaTime;
         timeText.text = $"Time Survived Against the Very Bad Robots: {Mathf.RoundToInt(textTime)}";
     }
 
-    private void SpawnEnemyBasic(GameObject enemy, float time)
+    private void SpawnEnemy(GameObject enemy, float interval)
     {
-        enemyBasicTimer += Time.deltaTime;
-        if (enemyBasicTimer >= time)
+        if (enemyTimer >= interval)
         {
-            enemyBasicTimer = 0;
-
+            enemyTimer = 0;
+            // Initialize the given parameter gameobject on given intervals and get the navmeshagent.
             InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
-            SetEnemyPath(spawnedEnemy, enemyAgent);
-        }
-    }
-
-    private void SpawnEnemyStrong(GameObject enemy, float time)
-    {
-        enemyStrongTimer += Time.deltaTime;
-        if (enemyStrongTimer >= time)
-        {
-            enemyStrongTimer = 0;
-
-            InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
+            // Set the required path for the enemy to travel (leveldata).
             SetEnemyPath(spawnedEnemy, enemyAgent);
         }
     }
@@ -169,13 +166,17 @@ public class PlayManager : MonoBehaviour
     {
         spawnedEnemy = Instantiate(enemy);
         enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
+        // Add the enemy isntance to the entitylist.
         EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
     }
 
     private void SetEnemyPath(GameObject spawnedEnemy, NavMeshAgent enemyAgent)
     {
+        // Set the starting point.
         spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint;
+        // Enable navmeshagent after placing it on the navmesh.
         enemyAgent.enabled = true;
+        // Start moving to the end point.
         enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
     }
 }

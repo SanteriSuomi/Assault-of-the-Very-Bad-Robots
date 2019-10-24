@@ -15,6 +15,8 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float pivotStep = 8;
 
+    private int layerMask;
+
     private Vector3 pivotHitPoint;
 
     private bool movePivot;
@@ -29,30 +31,35 @@ public class CameraController : MonoBehaviour
         {
             Instance = this;
         }
+        // Layermask for raycast, only check collisions with layers 9 and 11 (walkable and level).
+        layerMask = (1 << 9) | (1 << 11);
     }
 
     private void Start()
     {
         pivot = GameObject.FindGameObjectWithTag("CameraPivot").transform;
         mainCam = GetComponent<Camera>();
-
-        InitializePivotPos();
+        // Set the maincam to the current pivot position and parent it.
+        InitializeCameraToPivot();
     }
 
-    private void InitializePivotPos()
+    private void InitializeCameraToPivot()
     {
-        mainCam.transform.position = pivot.position + new Vector3(0, 18, -11);
+        // Position the camera so that the pivot is in the middle of the screen.
+        mainCam.transform.position = pivot.position + new Vector3(0, 17.5f, -8.25f);
         mainCam.transform.parent = pivot;
     }
 
     private void Update()
     {
+        // Calculate the deltaTime.
         float delta = Time.deltaTime;
 
         InputRotate(delta);
         InputZoom(delta);
-
+        // Move the camera pivot according to user input.
         GetMouseHitForPivot();
+        // Smoothly move the pivot to the desired position.
         MovePivot(delta);
     }
 
@@ -85,16 +92,24 @@ public class CameraController : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
-            Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity);
+            Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask);
 
-            if (hit.collider.gameObject.CompareTag("Level") 
-                || hit.collider.gameObject.layer == 9 
-                || hit.collider.gameObject.layer == 10) 
+            try
             {
-                pivotHitPoint = hit.point;
-                pivotHitPoint.y = RandomLevelGenerator.Instance.YLength;
+                if (hit.collider.gameObject.layer == 9 
+                || hit.collider.gameObject.layer == 11) 
+                {
+                pivotHitPoint = hit.point + new Vector3(0, -0.08f, 0);
                 movePivot = true;
+                }
             }
+            catch (System.Exception e)
+            {
+                #if UNITY_EDITOR
+                Debug.Log($"{nameof(CameraController)}: {e.Message}, hit collider most likely not valid.");
+                #endif
+            }
+
         }
     }
 

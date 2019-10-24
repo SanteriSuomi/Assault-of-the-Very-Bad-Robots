@@ -51,7 +51,7 @@ public class RandomLevelGenerator : MonoBehaviour
 
     private void OnEnable()
     {
-        Instantiate(cameraPivot).transform.position = new Vector3(xLength / 2, yLength, zLength / 2);
+        Instantiate(cameraPivot).transform.position = new Vector3(xLength / 2, Mathf.RoundToInt(yLength + yLength), zLength / 2);
     }
 
     private void Start()
