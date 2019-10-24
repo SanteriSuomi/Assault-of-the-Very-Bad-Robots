@@ -28,7 +28,7 @@ public class Enemy : MonoBehaviour, IEnemy
     private void Update()
     {
         // Check if hitpoints are close or less than zero.
-        if (Hitpoints <= Mathf.Epsilon)
+        if (Hitpoints <= 0.5f)
         {
             Die();
             GiveFunds();
