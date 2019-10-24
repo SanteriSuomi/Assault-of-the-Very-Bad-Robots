@@ -3,8 +3,11 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    public static CameraController Instance { get; set; }
+
     private Transform pivot;
     private Camera mainCam;
+
     [SerializeField]
     private float rotateSpeed = 50;
     [SerializeField]
@@ -15,6 +18,18 @@ public class CameraController : MonoBehaviour
     private Vector3 pivotHitPoint;
 
     private bool movePivot;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
 
     private void Start()
     {

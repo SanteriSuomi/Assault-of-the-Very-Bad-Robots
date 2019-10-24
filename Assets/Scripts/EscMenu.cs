@@ -3,20 +3,34 @@ using UnityEngine;
 
 public class EscMenu : MonoBehaviour
 {
+    public static EscMenu Instance { get; set; }
+
     [SerializeField]
     private GameObject escMenuButtons = default;
+    
+    private readonly float isPausedBoolDelay = 0.05f;
 
     private bool isPaused;
 
-    public void HideEscButtons()
+    private void Awake()
     {
-        escMenuButtons.SetActive(false);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+        }
     }
     
     private void Update()
     {
-        if (GameState.Instance.GetState() == GameState.GameStates.PlayMap || GameState.Instance.GetState() == GameState.GameStates.GenerateMap)
+        // Make sure it the game is in the correct state before getting input.
+        if (GameState.Instance.GetState() == GameState.GameStates.PlayMap || 
+            GameState.Instance.GetState() == GameState.GameStates.GenerateMap)
         {
+            // Activate the pause menu.
             if (!isPaused && Input.GetKeyDown(KeyCode.Escape))
             {
                 ActivateEscMenu(true);
@@ -37,12 +51,14 @@ public class EscMenu : MonoBehaviour
 
     private IEnumerator IsPausedDelay()
     {
-        yield return new WaitForSecondsRealtime(0.05f);
+        // Introduce a small delay to prevent accidentally double triggering input.
+        yield return new WaitForSecondsRealtime(isPausedBoolDelay);
         isPaused = true;
     }
 
     private void PauseGame(bool pause)
     {
+        // Pause the game according to the parameter.
         switch (pause)
         {
             case true:
@@ -56,6 +72,7 @@ public class EscMenu : MonoBehaviour
 
     private void PauseAudio(bool pause)
     {
+        // Pause the audio according to the parameter.
         switch (pause)
         {
             case true:
@@ -67,7 +84,7 @@ public class EscMenu : MonoBehaviour
         }
     }
 
-    private void ActivateEscMenu(bool activate)
+    public void ActivateEscMenu(bool activate)
     {
         escMenuButtons.SetActive(activate);
     }

@@ -18,15 +18,17 @@ public class Enemy : MonoBehaviour, IEnemy
 
     private void Awake()
     {
+        // Apply the serialized values for this enemy instance.
         Name = name;
         Hitpoints = hitpoints;
-        FundAmount = fundAmount;
         Damage = damage;
+        FundAmount = fundAmount;
     }
 
     private void Update()
     {
-        if (Hitpoints <= 0.1f)
+        // Check if hitpoints are close or less than zero.
+        if (Hitpoints <= Mathf.Epsilon)
         {
             Die();
             GiveFunds();
@@ -40,6 +42,7 @@ public class Enemy : MonoBehaviour, IEnemy
 
     private void GiveFunds()
     {
+        // Give funds to the player.
         PlayManager.Instance.Funds += fundAmount;
     }
 }

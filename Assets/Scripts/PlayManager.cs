@@ -57,6 +57,7 @@ public class PlayManager : MonoBehaviour
 
     public void GameReset()
     {
+        // Reset all the game variables back to zero.
         hasGameStarted = false;
         setHealth = false;
         hasCountdownPlayed = false;
@@ -68,8 +69,9 @@ public class PlayManager : MonoBehaviour
 
     private void GameStart()
     {
+        // Variable which stores whether the main game has started or not.
         hasGameStarted = true;
-
+        // Only set the health and other required variables once.
         if (!setHealth)
         {
             setHealth = true;
@@ -145,12 +147,9 @@ public class PlayManager : MonoBehaviour
         if (enemyBasicTimer >= time)
         {
             enemyBasicTimer = 0;
-            GameObject spawnedEnemy = Instantiate(enemy);
-            NavMeshAgent enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
-            EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
-            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint;
-            enemyAgent.enabled = true;
-            enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
+
+            InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
+            SetEnemyPath(spawnedEnemy, enemyAgent);
         }
     }
 
@@ -160,12 +159,23 @@ public class PlayManager : MonoBehaviour
         if (enemyStrongTimer >= time)
         {
             enemyStrongTimer = 0;
-            GameObject spawnedEnemy = Instantiate(enemy);
-            NavMeshAgent enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
-            EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
-            spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint;
-            enemyAgent.enabled = true;
-            enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
+
+            InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
+            SetEnemyPath(spawnedEnemy, enemyAgent);
         }
+    }
+
+    private void InitializeEnemy(GameObject enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent)
+    {
+        spawnedEnemy = Instantiate(enemy);
+        enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
+        EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
+    }
+
+    private void SetEnemyPath(GameObject spawnedEnemy, NavMeshAgent enemyAgent)
+    {
+        spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint;
+        enemyAgent.enabled = true;
+        enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
     }
 }
