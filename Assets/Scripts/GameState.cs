@@ -14,7 +14,7 @@ public class GameState : MonoBehaviour
     public delegate void PlayMapMenu();
     public event PlayMapMenu PlayMapMenuEvent;
     #endregion
-    // Main game loop has started event.
+    // Event for notifying playmanager that game has started.
     public delegate void GameStarted();
     public event GameStarted GameStartedEvent;
 
@@ -88,10 +88,10 @@ public class GameState : MonoBehaviour
 
     private static void ClearEntities()
     {
-        // Check if there is active entities.
+        // Check if there is active entities in the scene.
         if (EntityData.Instance.ActiveMapEntityList.Count > 0)
         {
-            // Destroy every entity in the list.
+            // Destroy all entities in the list.
             foreach (GameObject entity in EntityData.Instance.ActiveMapEntityList)
             {
                 Destroy(entity);
@@ -103,6 +103,7 @@ public class GameState : MonoBehaviour
     #if UNITY_EDITOR
     private void StateDebug()
     {
+        // Switch for debugging states.
         switch (currentState)
         {
             case GameStates.Menu:

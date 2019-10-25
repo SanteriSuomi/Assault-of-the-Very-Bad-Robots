@@ -21,8 +21,8 @@ public class TowerPlacer : MonoBehaviour
 
     private void Awake()
     {
-        // Only check for collisions in layer 0 (default) and layer 11 (level)
-        layerMask = (1 << 0) | (1 << 11);
+        // Only check for collisions in layer 0 (default) and layer 11 (level).
+        layerMask = (1 << 0) | (1 << 10)| (1 << 11);
         mainCam = Camera.main;
     }
 
@@ -70,6 +70,7 @@ public class TowerPlacer : MonoBehaviour
     {
         if (isPlacing)
         {
+            CheckPlacerCancel(check: true);
             RaycastHit hit = RaycastGround();
             hit = UpdateTowerPosition(hit);
             hit = ChangeTowerColor(hit);
@@ -77,14 +78,35 @@ public class TowerPlacer : MonoBehaviour
         }
     }
 
+    private void CheckPlacerCancel(bool check)
+    {
+        if (check)
+        {
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                isPlacing = false;
+                towerType.IsPlacing(enable: false);
+                Destroy(towerPrefab);
+            }
+        }
+        else
+        {
+            isPlacing = false;
+            towerType.IsPlacing(enable: false);
+            Destroy(towerPrefab);
+        }
+
+    }
+
     private RaycastHit UpdateTowerPosition(RaycastHit hit)
     {
-        if (towerPrefab != null)
+        if (towerPrefab != null && hit.collider.CompareTag(levelTag))
         {
-            hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 1, Mathf.Round(hit.point.z));
+            hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 1.75f, Mathf.Round(hit.point.z));
             towerPrefab.transform.position = hitPosGrid;
         }
 
+        hitPosGrid.y = 0;
         return hit;
     }
 
@@ -100,24 +122,31 @@ public class TowerPlacer : MonoBehaviour
         // Only allow placing turrets on level prefabs.
         if (Input.GetMouseButtonDown(0) && hit.collider.CompareTag(levelTag))
         {
-            for (int i = 0; i < towerRenderer.Length; i++)
-            {
-                if (towerRenderer[i] != null)
-                {
-                    towerRenderer[i].material.SetColor("_BaseColor", defaultColor[i]);
-                }
-            }
-
-            hitPosGrid.y = 0;
-            if (towerPrefab != null)
-            {
-                towerPrefab.transform.position = hitPosGrid + new Vector3(0, towerPrefab.transform.localScale.y, 0);
-                PlayManager.Instance.Funds -= towerType.Cost;
-                EntityData.Instance.ActiveMapEntityList.Add(towerPrefab);
-            }
-
+            SetDefaultColor();
+            PositionTower();
             isPlacing = false;
             towerType.IsPlacing(enable: false);
+        }
+    }
+
+    private void SetDefaultColor()
+    {
+        for (int i = 0; i < towerRenderer.Length; i++)
+        {
+            if (towerRenderer[i] != null)
+            {
+                towerRenderer[i].material.SetColor("_BaseColor", defaultColor[i]);
+            }
+        }
+    }
+
+    private void PositionTower()
+    {
+        if (towerPrefab != null)
+        {
+            towerPrefab.transform.position = hitPosGrid + new Vector3(0, towerPrefab.transform.localScale.y, 0);
+            PlayManager.Instance.Funds -= towerType.Cost;
+            EntityData.Instance.ActiveMapEntityList.Add(towerPrefab);
         }
     }
 
@@ -137,11 +166,11 @@ public class TowerPlacer : MonoBehaviour
 
     private void SetColor(Color color)
     {
-        foreach (var item in towerRenderer)
+        foreach (Renderer renderer in towerRenderer)
         {
-            if (item != null)
+            if (renderer != null)
             {
-                item.material.SetColor("_BaseColor", color);
+                renderer.material.SetColor("_BaseColor", color);
             }
         }
     }

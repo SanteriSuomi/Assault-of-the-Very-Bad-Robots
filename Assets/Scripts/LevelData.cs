@@ -3,7 +3,7 @@
 public class LevelData : MonoBehaviour
 {
     public static LevelData Instance { get; set; }
-
+    // Enemy agent start point in the map.
     private Vector3 agentStartPoint;
     public Vector3 AgentStartPoint
     {
@@ -17,7 +17,7 @@ public class LevelData : MonoBehaviour
             #endif
         }
     }
-
+    // Enemy agent end point in the map.
     private Vector3 agentEndPoint;
     public Vector3 AgentEndPoint
     {

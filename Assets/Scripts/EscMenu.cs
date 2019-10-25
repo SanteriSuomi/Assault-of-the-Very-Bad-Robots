@@ -8,9 +8,7 @@ public class EscMenu : MonoBehaviour
     [SerializeField]
     private GameObject escMenuButtons = default;
     
-    private readonly float isPausedBoolDelay = 0.01f;
-
-    private bool isPaused;
+    private bool isPaused = false;
 
     private void Awake()
     {
@@ -38,7 +36,7 @@ public class EscMenu : MonoBehaviour
                 PauseAudio(true);
                 StartCoroutine(IsPausedDelay());
             }
-
+            // Deactivate the pause menu.
             if (isPaused && Input.GetKeyDown(KeyCode.Escape))
             {
                 ActivateEscMenu(false);
@@ -48,11 +46,10 @@ public class EscMenu : MonoBehaviour
             }
         }
     }
-
     private IEnumerator IsPausedDelay()
     {
-        // Introduce a small delay to prevent accidentally double triggering input.
-        yield return new WaitForSecondsRealtime(isPausedBoolDelay);
+        // Introduce a frame delay to prevent accidentally double triggering input.
+        yield return null;
         isPaused = true;
     }
 

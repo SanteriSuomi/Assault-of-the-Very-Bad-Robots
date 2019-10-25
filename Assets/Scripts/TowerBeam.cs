@@ -7,23 +7,23 @@ public class TowerBeam : MonoBehaviour, ITower
     public float Damage { get; set; }
 
     [SerializeField]
-    private new string name = "Beam Tower";
+    private new string name = "Tower";
     [SerializeField]
     private int cost = 10;
     [SerializeField]
     private float damage = 10;
 
     [SerializeField]
-    private float damageTimerAmount = 1;
-    private float timer;
-    [SerializeField]
-    private float checkRadius = 3.25f;
-
-    int layerMask;
-
-    [SerializeField]
     private Transform turret = default;
     private LineRenderer lineRenderer;
+
+    [SerializeField]
+    private float damageTimerAmount = 1;
+    [SerializeField]
+    private float checkRadius = 3.25f;
+    private float timer;
+
+    int layerMask;
 
     private bool isPlacing;
 
@@ -62,12 +62,12 @@ public class TowerBeam : MonoBehaviour, ITower
     {
         // Get an array of collisions in the radius.
         Collider[] collisions = Physics.OverlapSphere(transform.position, checkRadius, layerMask);
-        // Make enemy null at the start.
+        // Make enemy is null at the start.
         IEnemy enemy = null;
         // Make sure collisions array isn't empty (there is indeed an object in the radius).
         if (collisions.Length > 0)
         {
-            // Get the first enemy.
+            // Get the first enemy collision.
             enemy = collisions[0].GetComponent<IEnemy>();
         }
         // Make sure enemy isn't null.
@@ -102,7 +102,7 @@ public class TowerBeam : MonoBehaviour, ITower
 
     private void Laser(Collider target)
     {
-        // Get the enemy position, and draw the line renderer between the tower and the enemy.
+        // Get the enemy position in the sphere.
         Vector3 enemyPos = target.transform.position;
         // Set laser starting position to the turret.
         lineRenderer.SetPosition(0, turret.position + new Vector3(0, 0.4f, 0));
@@ -120,9 +120,11 @@ public class TowerBeam : MonoBehaviour, ITower
         #endif
     }
 
+    #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         // Draw a radius sphere for debugging.
         Gizmos.DrawWireSphere(transform.position, checkRadius);
     }
+    #endif
 }
