@@ -167,6 +167,7 @@ public class PlayManager : MonoBehaviour
 
     private void UpdateHealthFundTimeText()
     {
+        // Updating the necessary data for gameplay.
         healthText.text = $"{Health}";
         fundsText.text = $"{Funds}";
         // Time text timer.

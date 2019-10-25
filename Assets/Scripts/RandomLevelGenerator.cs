@@ -55,28 +55,38 @@ public class RandomLevelGenerator : MonoBehaviour
 
     private void OnEnable()
     {
+        // Initialize the camera pivot to the correct position in the middle of the map.
         Instantiate(cameraPivot).transform.position = new Vector3(xLength / 2, Mathf.RoundToInt(yLength + yLength), zLength / 2);
     }
 
     private void Start()
     {
+        // Start the game with a generated map.
         GenerateMap();
     }
 
     public void GenerateMap()
     {
+        // When starting to generate a new map, introduce a small delay.
         StartCoroutine(GenerateMapTimer());
     }
 
     private IEnumerator GenerateMapTimer()
     {
         yield return null;
+        // Clear the current map.
         ClearMap();
+        // Initialize a new random seed.
         InitializeSeed();
+        // Generate the necessary level blocks.
         GenerateMapBlocks();
+        // Generate the enemy agent path on the level blocks.
         GenerateMapPath();
+        // Generate a navmesh for the enemy agents.
         GenerateNavMesh();
+        // Force a garbage collection for smoother gameplay.
         ForceCleanUp();
+        // Event for hiding the generating map text.
         GeneratingTextHideEvent.Invoke();
     }
 
@@ -85,14 +95,16 @@ public class RandomLevelGenerator : MonoBehaviour
     {
         try
         {
+            // Instantiate the X row of level blocks.
             for (int xRow = 0; xRow < xLength; xRow++)
             {
                 GameObject xObject = Instantiate(levelPathPrefab);
                 xObject.transform.parent = levelPrefabParent;
                 xObject.layer = 9;
                 xObject.transform.position = new Vector3(xRow, 0, 0);
+                // Add objects to the multi-dimensional array of level blocks.
                 map[xRow, 0, 0] = xObject;
-
+                // For every X row, instantiate a Z row.
                 for (int zRow = 0; zRow < zLength; zRow++)
                 {
                     GameObject zObject = Instantiate(levelPathPrefab);
@@ -100,12 +112,13 @@ public class RandomLevelGenerator : MonoBehaviour
                     zObject.layer = 9;
                     zObject.transform.position = new Vector3(xRow, 0, zRow);
                     map[xRow, 0, zRow] = zObject;
-
+                    // For every X and Z row, instantiate Y row.
                     for (float yRow = 0; yRow < yLength; yRow += 0.5f)
                     {
                         GameObject yObject = Instantiate(levelPrefab);
                         yObject.transform.parent = levelPrefabParent;
                         yObject.layer = 11;
+                        // Make sure the objects above the level ground are carving for the navmesh.
                         yObject.AddComponent<NavMeshObstacle>().carving = true;
                         yObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
                         map[xRow, Mathf.RoundToInt(yRow + yRow), zRow] = yObject;
@@ -218,7 +231,7 @@ public class RandomLevelGenerator : MonoBehaviour
 
         enemyBase = Instantiate(shipPrefab);
         enemyBase.transform.rotation = Quaternion.Euler(0, 270, 0);
-        enemyBase.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0.08f, 0, -2);
+        enemyBase.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0.08f, 0, -2.15f);
     }
 
     private void SpawnBase(Vector3 agentEndPoint)

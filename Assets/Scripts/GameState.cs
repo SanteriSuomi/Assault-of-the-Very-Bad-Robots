@@ -68,18 +68,15 @@ public class GameState : MonoBehaviour
         {
             case GameStates.Menu:
                 MainMenuEvent.Invoke();
-
                 break;
             case GameStates.GenerateMap:
                 GenerateMenuEvent.Invoke();
                 // When entering this state, clear all alive entities in the game.
                 ClearEntities();
-
                 break;
             case GameStates.PlayMap:
                 PlayMapMenuEvent.Invoke();
                 GameStartedEvent.Invoke();
-
                 break;
             default:
                 break;

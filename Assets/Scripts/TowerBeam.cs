@@ -60,16 +60,7 @@ public class TowerBeam : MonoBehaviour, ITower
 
     private void CheckCollision()
     {
-        // Get an array of collisions in the radius.
-        Collider[] collisions = Physics.OverlapSphere(transform.position, checkRadius, layerMask);
-        // Make enemy is null at the start.
-        IEnemy enemy = null;
-        // Make sure collisions array isn't empty (there is indeed an object in the radius).
-        if (collisions.Length > 0)
-        {
-            // Get the first enemy collision.
-            enemy = collisions[0].GetComponent<IEnemy>();
-        }
+        GetComponents(out Collider[] collisions, out IEnemy enemy);
         // Make sure enemy isn't null.
         if (enemy != null)
         {
@@ -78,13 +69,7 @@ public class TowerBeam : MonoBehaviour, ITower
             // Shoot out the laser at the enemy.
             Laser(target: collisions[0]);
             // Only damage the target with a specific intervals.
-            timer += Time.deltaTime;
-            if (timer >= damageTimerAmount)
-            {
-                timer = 0;
-                // Damage the enemy.
-                DealDamage(enemy);
-            }
+            DamageTimer(enemy);
         }
         // Check if there is no objects within radius.
         else if (collisions.Length <= 0)
@@ -92,6 +77,31 @@ public class TowerBeam : MonoBehaviour, ITower
             timer = 0;
             // Disable the line renderer.
             LineRenderer(enable: false);
+        }
+    }
+
+    private void GetComponents(out Collider[] collisions, out IEnemy enemy)
+    {
+        // Get an array of collisions in the radius.
+        collisions = Physics.OverlapSphere(transform.position, checkRadius, layerMask);
+        // Make enemy is null at the start.
+        enemy = null;
+        // Make sure collisions array isn't empty (there is indeed an object in the radius).
+        if (collisions.Length > 0)
+        {
+            // Get the first enemy collision.
+            enemy = collisions[0].GetComponent<IEnemy>();
+        }
+    }
+
+    private void DamageTimer(IEnemy enemy)
+    {
+        timer += Time.deltaTime;
+        if (timer >= damageTimerAmount)
+        {
+            timer = 0;
+            // Damage the enemy.
+            DealDamage(enemy);
         }
     }
 

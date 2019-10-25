@@ -35,6 +35,11 @@ public class MenuController : MonoBehaviour
         }
         // Get all the images in the child objects.
         menuButtonImages = menuButtons.GetComponentsInChildren<RawImage>();
+        RegisterAwakeEvents();
+    }
+
+    private void RegisterAwakeEvents()
+    {
         // Register events from other scripts.
         GameState.Instance.MainMenuEvent += ActivateMainMenu;
         GameState.Instance.GenerateMenuEvent += ActivateGenerateMenu;
@@ -69,31 +74,46 @@ public class MenuController : MonoBehaviour
     {
         // Alpha must be 1.0f at the beginning.
         float alphaMax = 1.0f;
-        // Get all the color data from the menu elements.
-        Color menuBGColor = menuBackground.color;
-        Color buttonPlayColor = menuButtonImages[0].color;
-        Color buttonExitColor = menuButtonImages[1].color;
+        GetColoComponents(out Color menuBGColor, out Color buttonPlayColor, out Color buttonExitColor);
         // Gradually go down with a for loop.
-        for (float i = alphaMax; i > 0; i -= 1f * Time.deltaTime)
+        for (float currentAlpha = alphaMax; currentAlpha > 0; currentAlpha -= 1f * Time.deltaTime)
         {
-            // Assign the new alpha values.
-            menuBGColor.a = i;
-            menuBackground.color = menuBGColor;
-            buttonPlayColor.a = i;
-            menuButtonImages[0].color = buttonPlayColor;
-            buttonExitColor.a = i;
-            menuButtonImages[1].color = buttonExitColor;
-            // Deactivate the tutorial text inbetween.
-            if (i > 0.2f && i < 0.3f)
-            {
-                tutorialText.SetActive(false);
-            }
-
+            // Change the color component's alpha.
+            ChangeAlpha(ref menuBGColor, ref buttonPlayColor, ref buttonExitColor, currentAlpha);
+            // Deactivate the tutorial text between values.
+            DeactivateTutorialText(currentAlpha);
             yield return null;
         }
         // Deactivate the background at the end.
         menuBackground.gameObject.SetActive(false);
+    }
 
+    private void GetColoComponents(out Color menuBGColor, out Color buttonPlayColor, out Color buttonExitColor)
+    {
+        // Get all the color data from the menu elements.
+        menuBGColor = menuBackground.color;
+        buttonPlayColor = menuButtonImages[0].color;
+        buttonExitColor = menuButtonImages[1].color;
+    }
+
+    private void ChangeAlpha(ref Color menuBGColor, ref Color buttonPlayColor, ref Color buttonExitColor, float currentAlpha)
+    {
+        // Assign the new alpha values.
+        menuBGColor.a = currentAlpha;
+        menuBackground.color = menuBGColor;
+        buttonPlayColor.a = currentAlpha;
+        menuButtonImages[0].color = buttonPlayColor;
+        buttonExitColor.a = currentAlpha;
+        menuButtonImages[1].color = buttonExitColor;
+    }
+
+    private void DeactivateTutorialText(float i)
+    {
+        // Deactivate the tutorial text inbetween.
+        if (i > 0.2f && i < 0.3f)
+        {
+            tutorialText.SetActive(false);
+        }
     }
 
     private void ActivatePlayMenu()
@@ -115,7 +135,7 @@ public class MenuController : MonoBehaviour
         // Make sure game isn't paused or muted, as it's exiting the pause menu.
         Time.timeScale = 1;
         AudioListener.volume = 1;
-
+        // Hide/show the required menu elements.
         HideTowerButtons();
         HideHealthFundsText();
         ShowGenerateButtons();

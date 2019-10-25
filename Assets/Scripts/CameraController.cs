@@ -100,22 +100,13 @@ public class CameraController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-            // Get a ray from mouse position to the world position.
-            Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
-            // Raycast that ray, and get the hit data.
-            Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask);
+            // Cast the ray.
+            RaycastHit hit = CastRay();
 
             try
             {
-                // Only collide with layers 9 (walkable) and 11 (level).
-                if (hit.collider.gameObject.layer == 9 
-                || hit.collider.gameObject.layer == 11) 
-                {
-                    // Pivot hitpoint is the raycast hitpoint.
-                    pivotHitPoint = hit.point + new Vector3(0, -0.08f, 0);
-                    // Indicate that hitpoint has been updated.
-                    movePivot = true;
-                }
+                // Change the pivot position.
+                ChangePivotPoint(hit);
             }
             catch (System.Exception e)
             {
@@ -124,6 +115,28 @@ public class CameraController : MonoBehaviour
                 #endif
             }
 
+        }
+    }
+
+    private RaycastHit CastRay()
+    {
+        // Get a ray from mouse position to the world position.
+        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
+        // Raycast that ray, and get the hit data.
+        Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask);
+        return hit;
+    }
+
+    private void ChangePivotPoint(RaycastHit hit)
+    {
+        // Only collide with layers 9 (walkable) and 11 (level).
+        if (hit.collider.gameObject.layer == 9
+        || hit.collider.gameObject.layer == 11)
+        {
+            // Pivot hitpoint is the raycast hitpoint.
+            pivotHitPoint = hit.point + new Vector3(0, -0.08f, 0);
+            // Indicate that hitpoint has been updated.
+            movePivot = true;
         }
     }
 
