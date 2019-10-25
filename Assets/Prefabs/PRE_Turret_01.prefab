@@ -403,7 +403,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6571013975042129096}
   - component: {fileID: -7986311782458170251}
-  - component: {fileID: 2180819582203620895}
   m_Layer: 10
   m_Name: PRE_Turret_01
   m_TagString: Untagged
@@ -442,21 +441,9 @@ MonoBehaviour:
   name: Beam Tower
   cost: 10
   damage: 10
-  damageTimerAmount: 1.2
+  damageTimerAmount: 1.1
+  checkRadius: 3.25
   turret: {fileID: 5755208542684306722}
---- !u!135 &2180819582203620895
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7884597597889203931}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 3.25
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8624407810129112519
 GameObject:
   m_ObjectHideFlags: 0

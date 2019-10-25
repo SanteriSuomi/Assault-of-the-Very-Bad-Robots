@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5857006182694740369}
   - component: {fileID: 3710976643001511909}
   - component: {fileID: 8831095849230367702}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MSH_Enemy_01_Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 3487639604674656850}
   - component: {fileID: 3603767646200862024}
   - component: {fileID: 4206974053313786432}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MSH_Enemy_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 3720132265166838126}
   - component: {fileID: 9126985491743814457}
   - component: {fileID: 4244379351062539310}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MSH_Enemy_01_Wheel_Back_Middle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -247,7 +247,7 @@ GameObject:
   - component: {fileID: 282085898981039681}
   - component: {fileID: 2555213902019170328}
   - component: {fileID: 2381278919988498106}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MSH_Enemy_01_Top
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -325,7 +325,7 @@ GameObject:
   - component: {fileID: 3095792657888411154}
   - component: {fileID: 8072576733432748177}
   - component: {fileID: 3969065400144550011}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MSH_Enemy_01_Wheel_Front_Middle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -403,7 +403,7 @@ GameObject:
   - component: {fileID: 1806665425103362260}
   - component: {fileID: 6099913518352172693}
   - component: {fileID: 8998206518714380365}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MSH_Enemy_01_Wheel_Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -485,7 +485,7 @@ GameObject:
   - component: {fileID: -8469749606236254243}
   - component: {fileID: -7492912689545529813}
   - component: {fileID: 5828208918428821878}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: PRE_Enemy_Basic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -606,7 +606,7 @@ GameObject:
   - component: {fileID: 4190379673839763849}
   - component: {fileID: 8364505191940302812}
   - component: {fileID: 2427787496508917856}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MSH_Enemy_01_Wheel_Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}

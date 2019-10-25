@@ -31,11 +31,12 @@ public class PlayManager : MonoBehaviour
     private int funds = 10;
 
     [SerializeField]
-    private int enemyBasicSpawnInterval = 5;
+    private float enemyBasicSpawnInterval = 5;
     [SerializeField]
-    private int enemyStrongSpawnInterval = 25;
+    private float enemyStrongSpawnInterval = 25;
 
-    private float enemyTimer;
+    private float enemyTimerBasic;
+    private float enemyTimerStrong;
     private float textTime;
 
     #region Game Flow Bools
@@ -136,9 +137,8 @@ public class PlayManager : MonoBehaviour
         // Update the health, fund and time info on top of the screen.
         UpdateHealthFundTimeText();
         // Spawn the enemies on intervals.
-        enemyTimer += Time.deltaTime;
-        SpawnEnemy(enemy: enemyBasic, interval: enemyBasicSpawnInterval);
-        SpawnEnemy(enemy: enemyStrong, interval: enemyStrongSpawnInterval);
+        SpawnEnemyBasic(enemy: enemyBasic, interval: enemyBasicSpawnInterval);
+        SpawnEnemyStrong(enemy: enemyStrong, interval: enemyStrongSpawnInterval);
     }
 
     private void UpdateHealthFundTimeText()
@@ -150,11 +150,25 @@ public class PlayManager : MonoBehaviour
         timeText.text = $"Time Survived Against the Very Bad Robots: {Mathf.RoundToInt(textTime)}";
     }
 
-    private void SpawnEnemy(GameObject enemy, float interval)
+    private void SpawnEnemyBasic(GameObject enemy, float interval)
     {
-        if (enemyTimer >= interval)
+        enemyTimerBasic += Time.deltaTime;
+        if (enemyTimerBasic >= interval)
         {
-            enemyTimer = 0;
+            enemyTimerBasic = 0;
+            // Initialize the given parameter gameobject on given intervals and get the navmeshagent.
+            InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
+            // Set the required path for the enemy to travel (leveldata).
+            SetEnemyPath(spawnedEnemy, enemyAgent);
+        }
+    }
+
+    private void SpawnEnemyStrong(GameObject enemy, float interval)
+    {
+        enemyTimerStrong += Time.deltaTime;
+        if (enemyTimerStrong >= interval)
+        {
+            enemyTimerStrong = 0;
             // Initialize the given parameter gameobject on given intervals and get the navmeshagent.
             InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
             // Set the required path for the enemy to travel (leveldata).
