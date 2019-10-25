@@ -10,6 +10,9 @@ public class PlayManager : MonoBehaviour
     public int Health { get; set; }
     public int Funds { get; set; }
 
+    public delegate void GameMenuHide();
+    public event GameMenuHide GameMenuHideEvent;
+
     [SerializeField]
     private TextMeshProUGUI gameStartedCountdownText = default;
     [SerializeField]
@@ -22,6 +25,9 @@ public class PlayManager : MonoBehaviour
     private GameObject enemyBasic = default;
     [SerializeField]
     private GameObject enemyStrong = default;
+
+    [SerializeField]
+    private GameObject gameOverScreen = default;
 
     [SerializeField]
     private int gameStartCountdownTime = 3;
@@ -62,10 +68,12 @@ public class PlayManager : MonoBehaviour
 
     public void GameReset()
     {
-        // Reset all the game variables back to zero.
+        // Reset most of the game variables back to zero.
         hasGameStarted = false;
         hasCountdownPlayed = false;
         continueGame = false;
+        enemyTimerBasic = 0;
+        enemyTimerStrong = 0;
         textTime = 0;
         Funds = funds;
         Health = health;
@@ -130,10 +138,10 @@ public class PlayManager : MonoBehaviour
         // Reset the game if base health reaches zero or less.
         if (Health <= 0)
         {
-            // When dead, reset the game.
-            hasGameResetted = false;
-            GameReset();
+            // Start a delay and show an ending screen before changing state.
+            StartCoroutine(ResetDelay());
         }
+
         // Update the health, fund and time info on top of the screen.
         UpdateHealthFundTimeText();
         // Spawn the enemies on intervals.
@@ -141,13 +149,29 @@ public class PlayManager : MonoBehaviour
         SpawnEnemyStrong(enemy: enemyStrong, interval: enemyStrongSpawnInterval);
     }
 
+    private IEnumerator ResetDelay()
+    {
+        // Show the game over screen.
+        gameOverScreen.SetActive(true);
+        yield return new WaitForSeconds(2.5f);
+        gameOverScreen.SetActive(false);
+        // When dead, make sure reset is false, so game can be resetted again.
+        hasGameResetted = false;
+        // Make sure to start the game only from the play map button.
+        hasGameStarted = false;
+        // Invoke an event to hide the game menus.
+        GameMenuHideEvent.Invoke();
+        // Set the state to the generate menu.
+        GameState.Instance.SetState(2);
+    }
+
     private void UpdateHealthFundTimeText()
     {
-        healthText.text = $"Health: {Health}";
-        fundsText.text = $"Funds: {Funds}";
+        healthText.text = $"{Health}";
+        fundsText.text = $"{Funds}";
         // Time text timer.
         textTime += Time.deltaTime;
-        timeText.text = $"Time Survived Against the Very Bad Robots: {Mathf.RoundToInt(textTime)}";
+        timeText.text = $"{Mathf.RoundToInt(textTime)}";
     }
 
     private void SpawnEnemyBasic(GameObject enemy, float interval)

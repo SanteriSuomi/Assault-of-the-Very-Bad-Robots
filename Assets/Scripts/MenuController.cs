@@ -20,7 +20,7 @@ public class MenuController : MonoBehaviour
     private GameObject towerButtons = default;
     [SerializeField]
     private GameObject healthFundsText = default;
-    private Image[] menuButtonImages;
+    private RawImage[] menuButtonImages;
 
     private void Awake()
     {
@@ -33,12 +33,17 @@ public class MenuController : MonoBehaviour
             Instance = this;
         }
 
-        menuButtonImages = menuButtons.GetComponentsInChildren<Image>();
+        menuButtonImages = menuButtons.GetComponentsInChildren<RawImage>();
 
         GameState.Instance.MainMenuEvent += ActivateMainMenu;
         GameState.Instance.GenerateMenuEvent += ActivateGenerateMenu;
         GameState.Instance.PlayMapMenuEvent += ActivatePlayMenu;
         RandomLevelGenerator.Instance.GeneratingTextHideEvent += HideGeneratingText;
+    }
+
+    private void Start()
+    {
+        PlayManager.Instance.GameMenuHideEvent += DisablePlayMenu;
     }
 
     #region Button & Event Methods
@@ -103,6 +108,12 @@ public class MenuController : MonoBehaviour
         HideHealthFundsText();
 
         ShowGenerateButtons();
+    }
+    
+    private void DisablePlayMenu()
+    {
+        HideTowerButtons();
+        HideHealthFundsText();
     }
     
     public void ShowGeneratingText()

@@ -8,7 +8,7 @@ public class EscMenu : MonoBehaviour
     [SerializeField]
     private GameObject escMenuButtons = default;
     
-    private readonly float isPausedBoolDelay = 0.05f;
+    private readonly float isPausedBoolDelay = 0.01f;
 
     private bool isPaused;
 
