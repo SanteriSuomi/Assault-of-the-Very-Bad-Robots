@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class TowerBeam : MonoBehaviour, ITower
+public class Tower : MonoBehaviour, ITower
 {
     public string Name { get; set; }
     public int Cost { get; set; }

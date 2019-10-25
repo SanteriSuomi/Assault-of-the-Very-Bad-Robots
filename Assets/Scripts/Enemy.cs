@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour, IEnemy
     public int FundAmount { get; set; }
 
     [SerializeField]
-    private new string name = "Basic Enemy";
+    private new string name = "Enemy";
     [SerializeField]
     private float hitpoints = 50;
     [SerializeField]
