@@ -21,6 +21,10 @@ public class RandomLevelGenerator : MonoBehaviour
     private NavMeshSurface navMesh = default;
     [SerializeField]
     private GameObject basePrefab = default;
+    [SerializeField]
+    private GameObject shipPrefab = default;
+
+    private GameObject enemyBase;
     private GameObject playerBase;
     private GameObject[,,] map;
 
@@ -135,6 +139,8 @@ public class RandomLevelGenerator : MonoBehaviour
                 Destroy(map[firstPassX, 0, i]);
             }
 
+            SpawnShip();
+
             setAgentStartPoint = false;
 
             int secondPassAmountX = Random.Range(2, xLength - 2);
@@ -203,14 +209,27 @@ public class RandomLevelGenerator : MonoBehaviour
         }
     }
 
+    private void SpawnShip()
+    {
+        if (shipPrefab != null)
+        {
+            Destroy(enemyBase);
+        }
+
+        enemyBase = Instantiate(shipPrefab);
+        enemyBase.transform.rotation = Quaternion.Euler(0, 270, 0);
+        enemyBase.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0.08f, 0, -2);
+    }
+
     private void SpawnBase(Vector3 agentEndPoint)
     {
         if (playerBase != null)
         {
             Destroy(playerBase);
         }
+
         playerBase = Instantiate(basePrefab);
-        playerBase.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
+        playerBase.transform.rotation = Quaternion.Euler(0, 180, 0);
         playerBase.transform.position = agentEndPoint + new Vector3(0, 0, 3.695f);
     }
     #endregion

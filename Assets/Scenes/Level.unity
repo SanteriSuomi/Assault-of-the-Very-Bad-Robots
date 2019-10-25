@@ -3019,6 +3019,8 @@ MonoBehaviour:
   navMesh: {fileID: 1328193214}
   basePrefab: {fileID: 1712844374006779095, guid: 725963379d6ef7a4bbf15a4b68cda25d,
     type: 3}
+  shipPrefab: {fileID: 1264811253083701431, guid: fadf59b08762408418ac42f5f0bba840,
+    type: 3}
   xLength: 24
   zLength: 22
   yLength: 0.5
@@ -5555,7 +5557,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2113367066}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 12, y: 0.2, z: 12}
+  m_LocalPosition: {x: 12, y: 0.5, z: 12}
   m_LocalScale: {x: 20, y: 1, z: 20}
   m_Children: []
   m_Father: {fileID: 844403611}
