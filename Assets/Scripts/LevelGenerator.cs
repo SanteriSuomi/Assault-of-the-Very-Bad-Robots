@@ -2,9 +2,9 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class RandomLevelGenerator : MonoBehaviour
+public class LevelGenerator : MonoBehaviour
 {
-    public static RandomLevelGenerator Instance { get; set; }
+    public static LevelGenerator Instance { get; set; }
 
     public delegate void GeneratingTextHide();
     public event GeneratingTextHide GeneratingTextHideEvent;

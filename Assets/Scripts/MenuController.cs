@@ -44,7 +44,7 @@ public class MenuController : MonoBehaviour
         GameState.Instance.MainMenuEvent += ActivateMainMenu;
         GameState.Instance.GenerateMenuEvent += ActivateGenerateMenu;
         GameState.Instance.PlayMapMenuEvent += ActivatePlayMenu;
-        RandomLevelGenerator.Instance.GeneratingTextHideEvent += HideGeneratingText;
+        LevelGenerator.Instance.GeneratingTextHideEvent += HideGeneratingText;
     }
 
     private void Start()
