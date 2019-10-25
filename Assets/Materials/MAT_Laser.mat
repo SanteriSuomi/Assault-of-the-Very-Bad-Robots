@@ -21,14 +21,14 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: MAT_Laser
-  m_Shader: {fileID: 4800000, guid: b7839dad95683814aa64166edc107ae2, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 2658b9a181a3a954c9b3687ea79e8dec,
+    type: 3}
   m_ShaderKeywords: _EMISSION _RECEIVE_SHADOWS_OFF
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3050
-  stringTagMap:
-    RenderType: Transparent
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
   disabledShaderPasses:
   - SHADOWCASTER
   m_SavedProperties:
@@ -63,6 +63,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Vector1_64E971B: 6.5
+    - Vector1_6F03EA85: 0.5
+    - Vector1_E31EDE73: 1
     - _AlphaClip: 0
     - _Blend: 0
     - _BlendOp: 0
@@ -100,6 +103,7 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 0
     m_Colors:
+    - Color_DDDE0478: {r: 81.61559, g: 0, b: 0, a: 0}
     - _BaseColor: {r: 1, g: 0, b: 0.105882645, a: 1}
     - _BaseColorAddSubDiff: {r: 1, g: 0, b: 0, a: 0}
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
