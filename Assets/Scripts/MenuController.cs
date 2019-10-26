@@ -81,7 +81,7 @@ public class MenuController : MonoBehaviour
             // Change the color component's alpha.
             ChangeAlpha(ref menuBGColor, ref buttonPlayColor, ref buttonExitColor, currentAlpha);
             // Deactivate the tutorial text between values.
-            DeactivateTutorialText(currentAlpha);
+            DeactivateTutorialTextAt(currentAlpha);
             yield return null;
         }
         // Deactivate the background at the end.
@@ -107,7 +107,7 @@ public class MenuController : MonoBehaviour
         menuButtonImages[1].color = buttonExitColor;
     }
 
-    private void DeactivateTutorialText(float i)
+    private void DeactivateTutorialTextAt(float i)
     {
         // Deactivate the tutorial text inbetween.
         if (i > 0.2f && i < 0.3f)

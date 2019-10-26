@@ -5,14 +5,14 @@ public class Enemy : MonoBehaviour, IEnemy
     public string Name { get; set; }
     public float Hitpoints { get; set; }
     public int Damage { get; set; }
-    public int FundAmount { get; set; }
+    public float FundAmount { get; set; }
 
     [SerializeField]
     private new string name = "Enemy";
     [SerializeField]
     private float hitpoints = 50;
     [SerializeField]
-    private int fundAmount = 1;
+    private float fundAmount = 1;
     [SerializeField]
     private int damage = 5;
 
@@ -28,7 +28,7 @@ public class Enemy : MonoBehaviour, IEnemy
     private void Update()
     {
         // Check if hitpoints are close or less than zero.
-        if (Hitpoints <= 0.5f)
+        if (Mathf.Approximately(Hitpoints, Mathf.Epsilon))
         {
             Die();
             GiveFunds();

@@ -68,7 +68,10 @@ public class TowerPlacer : MonoBehaviour
         for (int i = 0; i < towerRenderer.Length; i++)
         {
             // Loop through the towerRenderers and get the current color and store it in an array.
-            defaultColor[i] = towerRenderer[i].material.GetColor("_BaseColor");
+            if (towerRenderer[i].material.HasProperty("_BaseColor"))
+            {
+                defaultColor[i] = towerRenderer[i].material.GetColor("_BaseColor");
+            }
         }
     }
 
@@ -154,7 +157,7 @@ public class TowerPlacer : MonoBehaviour
     {
         for (int i = 0; i < towerRenderer.Length; i++)
         {
-            if (towerRenderer[i] != null)
+            if (towerRenderer[i].material.HasProperty("_BaseColor"))
             {
                 // Loop through the towerRenderers and set temporary colors with it's default colors.
                 towerRenderer[i].material.SetColor("_BaseColor", defaultColor[i]);

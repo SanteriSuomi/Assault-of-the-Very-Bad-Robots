@@ -8,7 +8,7 @@ public class PlayManager : MonoBehaviour
     public static PlayManager Instance { get; set; }
 
     public int Health { get; set; }
-    public int Funds { get; set; }
+    public float Funds { get; set; }
 
     public delegate void GameMenuHide();
     public event GameMenuHide GameMenuHideEvent;
@@ -169,7 +169,7 @@ public class PlayManager : MonoBehaviour
     {
         // Updating the necessary data for gameplay.
         healthText.text = $"{Health}";
-        fundsText.text = $"{Funds}";
+        fundsText.text = $"{Mathf.Round(Funds)}";
         // Time text timer.
         textTime += Time.deltaTime;
         timeText.text = $"{Mathf.RoundToInt(textTime)}";
