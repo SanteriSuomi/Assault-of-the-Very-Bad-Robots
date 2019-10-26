@@ -6,6 +6,15 @@ public class Tower : MonoBehaviour, ITower
     public int Cost { get; set; }
     public float Damage { get; set; }
 
+    private enum EnemyType
+    {
+        TowerBeam,
+        TowerGun
+    }
+
+    [SerializeField]
+    private EnemyType enemyType = default;
+
     [SerializeField]
     private new string name = "Tower";
     [SerializeField]
@@ -15,6 +24,8 @@ public class Tower : MonoBehaviour, ITower
 
     [SerializeField]
     private Transform turret = default;
+    [SerializeField]
+    private GameObject bullet = default;
     private LineRenderer lineRenderer;
 
     [SerializeField]
@@ -22,6 +33,8 @@ public class Tower : MonoBehaviour, ITower
     [SerializeField]
     private float checkRadius = 3.25f;
     private float timer;
+    [SerializeField] [Range(0, 1)]
+    private float rotationSpeed = 0.75f;
 
     int layerMask;
 
@@ -39,7 +52,10 @@ public class Tower : MonoBehaviour, ITower
 
     private void Start()
     {
-        lineRenderer = GetComponentInChildren<LineRenderer>();
+        if (enemyType == EnemyType.TowerBeam)
+        {
+            lineRenderer = GetComponentInChildren<LineRenderer>();
+        }
     }
 
     public void IsPlacing(bool enable)
@@ -64,10 +80,20 @@ public class Tower : MonoBehaviour, ITower
         // Make sure enemy isn't null.
         if (enemy != null)
         {
-            // Enable the line renderer (laser).
-            LineRenderer(enable: true);
-            // Shoot out the laser at the enemy.
-            Laser(target: collisions[0]);
+            switch (enemyType)
+            {
+                case EnemyType.TowerBeam:
+                    // Enable the line renderer (laser).
+                    LineRenderer(enable: true);
+                    // Shoot out the laser at the enemy.
+                    Laser(target: collisions[0]);
+                    break;
+                case EnemyType.TowerGun:
+                    RotateTurret(collisions);
+                    break;
+                default:
+                    break;
+            }
             // Only damage the target with a specific intervals.
             DamageTimer(enemy);
         }
@@ -105,9 +131,13 @@ public class Tower : MonoBehaviour, ITower
         }
     }
 
+    #region Beam Tower
     private void LineRenderer(bool enable)
     {
-        lineRenderer.enabled = enable;
+        if (lineRenderer != null)
+        {
+            lineRenderer.enabled = enable;
+        }
     }
 
     private void Laser(Collider target)
@@ -119,6 +149,16 @@ public class Tower : MonoBehaviour, ITower
         // Set the laser ending position to the enemy.
         lineRenderer.SetPosition(1, enemyPos);
     }
+    #endregion
+
+    #region Gun Tower
+    private void RotateTurret(Collider[] collisions)
+    {
+        Vector3 direction = collisions[0].transform.position - turret.position;
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        turret.rotation = Quaternion.Slerp(turret.rotation, rotation, rotationSpeed * Time.deltaTime);
+    }
+    #endregion
 
     private void DealDamage(IEnemy enemy)
     {

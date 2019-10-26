@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
+using System;
 
 public class PlayManager : MonoBehaviour
 {
@@ -169,7 +170,7 @@ public class PlayManager : MonoBehaviour
     {
         // Updating the necessary data for gameplay.
         healthText.text = $"{Health}";
-        fundsText.text = $"{Mathf.Round(Funds)}";
+        fundsText.text = $"{Math.Round(Funds, 2)}";
         // Time text timer.
         textTime += Time.deltaTime;
         timeText.text = $"{Mathf.RoundToInt(textTime)}";

@@ -157,7 +157,7 @@ public class TowerPlacer : MonoBehaviour
     {
         for (int i = 0; i < towerRenderer.Length; i++)
         {
-            if (towerRenderer[i].material.HasProperty("_BaseColor"))
+            if (towerRenderer[i] != null && towerRenderer[i].material.HasProperty("_BaseColor"))
             {
                 // Loop through the towerRenderers and set temporary colors with it's default colors.
                 towerRenderer[i].material.SetColor("_BaseColor", defaultColor[i]);
