@@ -26,6 +26,10 @@ public class Tower : MonoBehaviour, ITower
     private Transform turret = default;
     [SerializeField]
     private GameObject bullet = default;
+    [SerializeField]
+    private Transform bulletHole1 = default;
+    [SerializeField]
+    private Transform bulletHole2 = default;
     private LineRenderer lineRenderer;
 
     [SerializeField]
@@ -35,6 +39,8 @@ public class Tower : MonoBehaviour, ITower
     private float timer;
     [SerializeField] [Range(0, 1)]
     private float rotationSpeed = 0.75f;
+    [SerializeField]
+    private float bulletSpeed = 10;
 
     int layerMask;
 
@@ -80,6 +86,7 @@ public class Tower : MonoBehaviour, ITower
         // Make sure enemy isn't null.
         if (enemy != null)
         {
+            // Do things according to what enemy type this instance is.
             switch (enemyType)
             {
                 case EnemyType.TowerBeam:
@@ -89,7 +96,16 @@ public class Tower : MonoBehaviour, ITower
                     Laser(target: collisions[0]);
                     break;
                 case EnemyType.TowerGun:
+                    // Rotate turret to the enemy.
                     RotateTurret(collisions);
+
+                    GameObject bulletInstance1 = Instantiate(bullet);
+                    bulletInstance1.transform.position = bulletHole1.position;
+                    bulletInstance1.GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * bulletSpeed);
+
+                    GameObject bulletInstance2 = Instantiate(bullet);
+                    bulletInstance2.transform.position = bulletHole2.position;
+                    bulletInstance2.GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * bulletSpeed);
                     break;
                 default:
                     break;
