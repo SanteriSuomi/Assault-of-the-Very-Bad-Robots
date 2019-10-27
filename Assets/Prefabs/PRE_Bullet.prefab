@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3066397685346386074}
   - component: {fileID: 3066397685346386073}
   - component: {fileID: 5050180042038843042}
+  - component: {fileID: -4251490175001018053}
   m_Layer: 0
   m_Name: PRE_Bullet
   m_TagString: Untagged
@@ -29,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 3066397685346386072}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 0.095, y: 0.095, z: 0.095}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -109,3 +110,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-4251490175001018053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3066397685346386072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4054bb2e524f70a4189d276e1dc8c4dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletDestroyTime: 3.5

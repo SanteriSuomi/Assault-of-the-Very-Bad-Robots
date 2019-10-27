@@ -117,7 +117,7 @@ public class TowerPlacer : MonoBehaviour
     private RaycastHit UpdateTowerPosition(RaycastHit hit)
     {
         // Only update the tower placing position on level blocks.
-        if (towerPrefab != null && hit.collider.CompareTag(levelTag))
+        if (towerPrefab != null && hit.collider.CompareTag(levelTag) && hit.normal.y > 0.5f)
         {
             // Calculate a grid with rounding from the hit point.
             hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 1.75f, Mathf.Round(hit.point.z));
@@ -141,7 +141,7 @@ public class TowerPlacer : MonoBehaviour
     private void PlaceTower(RaycastHit hit)
     {
         // Only allow placing turrets on level blocks.
-        if (Input.GetMouseButtonDown(0) && hit.collider.CompareTag(levelTag))
+        if (Input.GetMouseButtonDown(0) && hit.collider.CompareTag(levelTag) && hit.normal.y > 0.5f)
         {
             // When tower is placed, set it's color to default.
             SetDefaultColor();
@@ -181,7 +181,7 @@ public class TowerPlacer : MonoBehaviour
     private RaycastHit ChangeTowerColor(RaycastHit hit)
     {
         // Set colors on the tower depending hit collider.
-        if (hit.collider.CompareTag(levelTag))
+        if (hit.collider.CompareTag(levelTag) && hit.normal.y > 0.5f)
         {
             SetColor(Color.green);
         }

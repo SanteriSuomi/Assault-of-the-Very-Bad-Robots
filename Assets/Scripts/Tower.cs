@@ -37,10 +37,14 @@ public class Tower : MonoBehaviour, ITower
     [SerializeField]
     private float checkRadius = 3.25f;
     private float timer;
-    [SerializeField] [Range(0, 1)]
+    [SerializeField]
+    [Range(0, 1)]
     private float rotationSpeed = 0.75f;
     [SerializeField]
     private float bulletSpeed = 10;
+    [SerializeField]
+    private float bulletShootTime = 0.5f;
+    private float bulletShootTimer;
 
     int layerMask;
 
@@ -58,9 +62,14 @@ public class Tower : MonoBehaviour, ITower
 
     private void Start()
     {
+        // Get necessary components depending on the tower type.
         if (enemyType == EnemyType.TowerBeam)
         {
             lineRenderer = GetComponentInChildren<LineRenderer>();
+        }
+        else if (enemyType == EnemyType.TowerGun)
+        {
+            turret.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
         }
     }
 
@@ -98,14 +107,8 @@ public class Tower : MonoBehaviour, ITower
                 case EnemyType.TowerGun:
                     // Rotate turret to the enemy.
                     RotateTurret(collisions);
-
-                    GameObject bulletInstance1 = Instantiate(bullet);
-                    bulletInstance1.transform.position = bulletHole1.position;
-                    bulletInstance1.GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * bulletSpeed);
-
-                    GameObject bulletInstance2 = Instantiate(bullet);
-                    bulletInstance2.transform.position = bulletHole2.position;
-                    bulletInstance2.GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * bulletSpeed);
+                    // Instantiate bullets with a delay.
+                    ShootBullet();
                     break;
                 default:
                     break;
@@ -170,9 +173,34 @@ public class Tower : MonoBehaviour, ITower
     #region Gun Tower
     private void RotateTurret(Collider[] collisions)
     {
+        // Get the direction vector of the enemy and turret position.
         Vector3 direction = collisions[0].transform.position - turret.position;
+        // Create a quaternion rotation from this direction.
         Quaternion rotation = Quaternion.LookRotation(direction);
+        // Smoothly rotate turret towards target.
         turret.rotation = Quaternion.Slerp(turret.rotation, rotation, rotationSpeed * Time.deltaTime);
+    }
+
+    private void ShootBullet()
+    {
+        // Shoot bullet on intervals.
+        bulletShootTimer += Time.deltaTime;
+        if (bulletShootTimer >= bulletShootTime)
+        {
+            bulletShootTimer = 0;
+            // Instantiate bullets at bullet holes.
+            InstantiateBullet(atBulletHole: bulletHole1);
+            InstantiateBullet(atBulletHole: bulletHole2);
+        }
+    }
+
+    private void InstantiateBullet(Transform atBulletHole)
+    {
+        GameObject bulletInstance = Instantiate(bullet);
+        // Make initial position the bullet hole.
+        bulletInstance.transform.position = atBulletHole.position;
+        // Apply velocity forward relative to the bullet hole position.
+        bulletInstance.GetComponent<Rigidbody>().velocity = atBulletHole.transform.forward * bulletSpeed;
     }
     #endregion
 
@@ -186,7 +214,7 @@ public class Tower : MonoBehaviour, ITower
         #endif
     }
 
-    #if UNITY_EDITOR
+      #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         // Draw a radius sphere for debugging.
