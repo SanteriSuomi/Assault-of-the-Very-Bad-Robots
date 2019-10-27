@@ -595,6 +595,7 @@ MonoBehaviour:
   hitpoints: 50
   fundAmount: 2
   damage: 5
+  explosionPrefab: {fileID: 100006, guid: e076683e0305e35498b8e8834978c0fa, type: 3}
 --- !u!1 &7708543501488793908
 GameObject:
   m_ObjectHideFlags: 0

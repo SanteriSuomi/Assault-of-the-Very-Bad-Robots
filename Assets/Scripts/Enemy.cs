@@ -15,6 +15,8 @@ public class Enemy : MonoBehaviour, IEnemy
     private float fundAmount = 1;
     [SerializeField]
     private int damage = 5;
+    [SerializeField]
+    private GameObject explosionPrefab = default;
 
     private void Awake()
     {
@@ -30,9 +32,15 @@ public class Enemy : MonoBehaviour, IEnemy
         // Check if hitpoints are close or less than zero.
         if (Mathf.Approximately(Hitpoints, Mathf.Epsilon) || Hitpoints <= Mathf.Epsilon)
         {
+            Explosion();
             Die();
             GiveFunds();
         }
+    }
+
+    private void Explosion()
+    {
+        Instantiate(explosionPrefab).transform.position = transform.position;
     }
 
     public void Die()
