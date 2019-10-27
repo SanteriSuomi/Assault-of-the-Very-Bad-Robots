@@ -4829,7 +4829,7 @@ MonoBehaviour:
   funds: 10
   enemyBasicSpawnInterval: 5.5
   enemyStrongSpawnInterval: 22
-  spawnIntervalDecreaseTime: 2.5
+  spawnIntervalDecreaseTime: 2
   spawnIntervalDecrease: 0.05
   minSpawnInterval: 0.2
 --- !u!1 &1912862142
