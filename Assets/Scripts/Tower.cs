@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class Tower : MonoBehaviour, ITower
 {
@@ -31,6 +32,7 @@ public class Tower : MonoBehaviour, ITower
     [SerializeField]
     private Transform bulletHole2 = default;
     private LineRenderer lineRenderer;
+    private AudioSource audioSource;
 
     [SerializeField]
     private float damageTimerAmount = 1;
@@ -49,6 +51,7 @@ public class Tower : MonoBehaviour, ITower
     int layerMask;
 
     private bool isPlacing;
+    private bool playGunShot;
 
     private void Awake()
     {
@@ -62,13 +65,15 @@ public class Tower : MonoBehaviour, ITower
 
     private void Start()
     {
-        // Get necessary components depending on the tower type.
+        audioSource = GetComponent<AudioSource>();
+        // Initialize some stuff depending on the tower type.
         if (enemyType == EnemyType.TowerBeam)
         {
             lineRenderer = GetComponentInChildren<LineRenderer>();
         }
         else if (enemyType == EnemyType.TowerGun)
         {
+            // Gun tower should be correct rotation (facing enemy ship).
             turret.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
         }
     }
@@ -108,11 +113,13 @@ public class Tower : MonoBehaviour, ITower
                     // Rotate turret to the enemy.
                     RotateTurret(collisions);
                     // Instantiate bullets with a delay.
-                    ShootBullet();
+                    ShootBullet(collisions);
                     break;
                 default:
                     break;
             }
+            // Play the shooting audio.
+            PlayAudio();
             // Only damage the target with a specific intervals.
             DamageTimer(enemy);
         }
@@ -120,11 +127,14 @@ public class Tower : MonoBehaviour, ITower
         else if (collisions.Length <= 0)
         {
             timer = 0;
+            // Make sure audio isn't playing when enemy is not in range.
+            audioSource.Stop();
             // Disable the line renderer.
             LineRenderer(enable: false);
         }
     }
 
+    
     private void GetComponents(out Collider[] collisions, out IEnemy enemy)
     {
         // Get an array of collisions in the radius.
@@ -162,7 +172,7 @@ public class Tower : MonoBehaviour, ITower
     #region Gun Tower
     private void RotateTurret(Collider[] collisions)
     {
-        // Get the direction vector of the enemy and turret position.
+        // Get the direction vector of the enemy position.
         Vector3 direction = collisions[0].transform.position - turret.position;
         // Create a quaternion rotation from this direction.
         Quaternion rotation = Quaternion.LookRotation(direction);
@@ -170,13 +180,19 @@ public class Tower : MonoBehaviour, ITower
         turret.rotation = Quaternion.Slerp(turret.rotation, rotation, rotationSpeed * Time.deltaTime);
     }
 
-    private void ShootBullet()
+    private void ShootBullet(Collider[] collisions)
     {
         // Shoot bullet on intervals.
         bulletShootTimer += Time.deltaTime;
-        if (bulletShootTimer >= bulletShootTime)
+        #if UNITY_EDITOR
+        Debug.Log(Vector3.Dot(turret.forward, (turret.position - collisions[0].transform.position).normalized));
+        #endif
+        // Make sure turret is facing target before shooting.
+        if (bulletShootTimer >= bulletShootTime && Vector3.Dot(turret.forward, (turret.position - collisions[0].transform.position).normalized) <= -0.95f)
         {
             bulletShootTimer = 0;
+            // Signal that gunshot can be played.
+            playGunShot = true;
             // Instantiate bullets at bullet holes.
             InstantiateBullet(atBulletHole: bulletHole1);
             InstantiateBullet(atBulletHole: bulletHole2);
@@ -192,6 +208,20 @@ public class Tower : MonoBehaviour, ITower
         bulletInstance.GetComponent<Rigidbody>().velocity = atBulletHole.transform.forward * bulletSpeed;
     }
     #endregion
+
+    private void PlayAudio()
+    {
+        // Handle audio differently for different enemy types.
+        if (enemyType == EnemyType.TowerBeam && !audioSource.isPlaying)
+        {
+            audioSource.Play();
+        }
+        else if (enemyType == EnemyType.TowerGun && playGunShot)
+        {
+            playGunShot = false;
+            audioSource.Play();
+        }
+    }
 
     private void DamageTimer(IEnemy enemy)
     {

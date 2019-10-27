@@ -148,7 +148,6 @@ public class PlayManager : MonoBehaviour
             // Start a delay and show an ending screen before changing state.
             StartCoroutine(ResetDelay());
         }
-
         // Update the health, fund and time info on top of the screen.
         UpdateHealthFundTimeText();
         // Spawn the enemies on intervals.
@@ -156,8 +155,8 @@ public class PlayManager : MonoBehaviour
         SpawnEnemyStrong(enemy: enemyStrong, interval: enemyStrongSpawnInterval);
         // Decrease spawn interval every X seconds, while capping it.
         if (!decreasedInterval 
-            && enemyBasicSpawnInterval >= enemyBasicSpawnInterval / 12 
-            && enemyStrongSpawnInterval >= enemyStrongSpawnInterval / 12)
+            && enemyBasicSpawnInterval >= enemyBasicSpawnInterval / 12.5f 
+            && enemyStrongSpawnInterval >= enemyStrongSpawnInterval / 12.5f)
         {
             decreasedInterval = true;
             StartCoroutine(DecreaseSpawnInterval());

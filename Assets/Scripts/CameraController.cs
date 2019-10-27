@@ -90,7 +90,7 @@ public class CameraController : MonoBehaviour
             // Rotate towards the pivot position.
             gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, pivot.position, moveSpeed * delta);
         }
-        else if (Input.GetKey(KeyCode.S) && gameObject.transform.position.y < 30)
+        else if (Input.GetKey(KeyCode.S) && gameObject.transform.position.y < 25)
         {
             gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, pivot.position, -1 * moveSpeed * delta);
         }
