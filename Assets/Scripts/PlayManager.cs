@@ -45,12 +45,17 @@ public class PlayManager : MonoBehaviour
     private float enemyTimerBasic;
     private float enemyTimerStrong;
     private float textTime;
+    [SerializeField]
+    private float spawnIntervalDecreaseTime = 15;
+    [SerializeField]
+    private float spawnIntervalDecrease = 0.975f;
 
     #region Game Flow Bools
     private bool hasGameStarted = false;
     private bool hasGameResetted = false;
     private bool hasCountdownPlayed = false;
     private bool continueGame = false;
+    private bool decreasedInterval = false;
     #endregion
 
     private void Awake()
@@ -73,6 +78,7 @@ public class PlayManager : MonoBehaviour
         hasGameStarted = false;
         hasCountdownPlayed = false;
         continueGame = false;
+        decreasedInterval = false;
         enemyTimerBasic = 0;
         enemyTimerStrong = 0;
         textTime = 0;
@@ -148,6 +154,14 @@ public class PlayManager : MonoBehaviour
         // Spawn the enemies on intervals.
         SpawnEnemyBasic(enemy: enemyBasic, interval: enemyBasicSpawnInterval);
         SpawnEnemyStrong(enemy: enemyStrong, interval: enemyStrongSpawnInterval);
+        // Decrease spawn interval every X seconds, while capping it.
+        if (!decreasedInterval 
+            && enemyBasicSpawnInterval >= enemyBasicSpawnInterval / 12 
+            && enemyStrongSpawnInterval >= enemyStrongSpawnInterval / 12)
+        {
+            decreasedInterval = true;
+            StartCoroutine(DecreaseSpawnInterval());
+        }
     }
 
     private IEnumerator ResetDelay()
@@ -218,5 +232,19 @@ public class PlayManager : MonoBehaviour
         enemyAgent.enabled = true;
         // Start moving to the end point.
         enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
+    }
+
+    private IEnumerator DecreaseSpawnInterval()
+    {
+        // Wait 15 seconds every time before decreasing interval.
+        yield return new WaitForSeconds(spawnIntervalDecreaseTime);
+        // Decrease both interval with percentage.
+        enemyBasicSpawnInterval *= spawnIntervalDecrease;
+        enemyStrongSpawnInterval *= spawnIntervalDecrease;
+        decreasedInterval = false;
+
+        #if UNITY_EDITOR
+        Debug.Log($"Decreased spawn interval, new interval: {enemyBasicSpawnInterval}, {enemyStrongSpawnInterval}.");
+        #endif
     }
 }

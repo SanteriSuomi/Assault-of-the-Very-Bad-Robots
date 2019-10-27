@@ -131,7 +131,8 @@ public class CameraController : MonoBehaviour
     {
         // Only collide with layers 9 (walkable) and 11 (level).
         if (hit.collider.gameObject.layer == 9
-        || hit.collider.gameObject.layer == 11)
+        || hit.collider.gameObject.layer == 11
+        && hit.normal.y > 0.5f)
         {
             // Pivot hitpoint is the raycast hitpoint.
             pivotHitPoint = hit.point + new Vector3(0, -0.08f, 0);

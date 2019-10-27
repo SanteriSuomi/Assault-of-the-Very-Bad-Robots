@@ -445,9 +445,13 @@ MonoBehaviour:
   damage: 10
   turret: {fileID: 5755208542684306722}
   bullet: {fileID: 3066397685346386072, guid: 3b120f854ddab1e4a96374c05b1f45fe, type: 3}
-  damageTimerAmount: 1.2
-  checkRadius: 3.25
-  rotationSpeed: 0.75
+  bulletHole1: {fileID: 0}
+  bulletHole2: {fileID: 0}
+  damageTimerAmount: 1
+  checkRadius: 3
+  rotationSpeed: 0
+  bulletSpeed: 0
+  bulletShootTime: 0
 --- !u!135 &871060783143573871
 SphereCollider:
   m_ObjectHideFlags: 0

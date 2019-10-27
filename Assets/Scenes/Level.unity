@@ -4297,9 +4297,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 447edd53dbc92c74fb986406ac350e52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: 80
-  moveSpeed: 55
-  pivotStep: 8.5
+  rotateSpeed: 90
+  moveSpeed: 40
+  pivotStep: 10
 --- !u!20 &1687258584
 Camera:
   m_ObjectHideFlags: 0
@@ -4697,9 +4697,11 @@ MonoBehaviour:
   gameOverScreen: {fileID: 1207923912}
   gameStartCountdownTime: 3
   health: 100
-  funds: 100
-  enemyBasicSpawnInterval: 6
-  enemyStrongSpawnInterval: 30
+  funds: 10
+  enemyBasicSpawnInterval: 6.5
+  enemyStrongSpawnInterval: 26
+  spawnIntervalDecreaseTime: 15
+  spawnIntervalDecrease: 0.95
 --- !u!1 &1912862142
 GameObject:
   m_ObjectHideFlags: 0

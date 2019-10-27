@@ -77,7 +77,7 @@ public class TowerPlacer : MonoBehaviour
 
     private void Update()
     {
-        // Make sure it's being placed.
+        // Make sure tower is being placed.
         if (isPlacing)
         {
             // Check if placing should be cancelled.
@@ -111,7 +111,6 @@ public class TowerPlacer : MonoBehaviour
             towerType.IsPlacing(enable: false);
             Destroy(towerPrefab);
         }
-
     }
 
     private RaycastHit UpdateTowerPosition(RaycastHit hit)

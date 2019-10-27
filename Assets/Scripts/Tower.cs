@@ -139,17 +139,6 @@ public class Tower : MonoBehaviour, ITower
         }
     }
 
-    private void DamageTimer(IEnemy enemy)
-    {
-        timer += Time.deltaTime;
-        if (timer >= damageTimerAmount)
-        {
-            timer = 0;
-            // Damage the enemy.
-            DealDamage(enemy);
-        }
-    }
-
     #region Beam Tower
     private void LineRenderer(bool enable)
     {
@@ -204,13 +193,24 @@ public class Tower : MonoBehaviour, ITower
     }
     #endregion
 
+    private void DamageTimer(IEnemy enemy)
+    {
+        timer += Time.deltaTime;
+        if (timer >= damageTimerAmount)
+        {
+            timer = 0;
+            // Damage the enemy.
+            DealDamage(enemy);
+        }
+    }
+
     private void DealDamage(IEnemy enemy)
     {
         // Subtract hitpoints from the target enemy.
         enemy.Hitpoints -= Damage;
 
         #if UNITY_EDITOR
-        Debug.Log($"Dealt {Damage} to {enemy.Name}, it now has {enemy.Hitpoints} Hitpoints left.");
+        Debug.Log($"{gameObject.name} dealt {Damage} damage to {enemy.Name}, it now has {enemy.Hitpoints} Hitpoints left.");
         #endif
     }
 
