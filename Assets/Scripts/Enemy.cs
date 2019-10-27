@@ -32,10 +32,18 @@ public class Enemy : MonoBehaviour, IEnemy
         // Check if hitpoints are close or less than zero.
         if (Mathf.Approximately(Hitpoints, Mathf.Epsilon) || Hitpoints <= Mathf.Epsilon)
         {
-            Explosion();
+            // Start death process.
             Die();
+            // Give funds to the player.
             GiveFunds();
         }
+    }
+
+    public void Die()
+    {
+        // Start an explosion.
+        Explosion();
+        Destroy(gameObject);
     }
 
     private void Explosion()
@@ -43,14 +51,8 @@ public class Enemy : MonoBehaviour, IEnemy
         Instantiate(explosionPrefab).transform.position = transform.position;
     }
 
-    public void Die()
-    {
-        Destroy(gameObject);
-    }
-
     private void GiveFunds()
     {
-        // Give funds to the player.
         PlayManager.Instance.Funds += fundAmount;
     }
 }

@@ -7,6 +7,7 @@ public class Explosion : MonoBehaviour
 
     private void Start()
     {
+        // Destroy explosion on a timer.
         Destroy(gameObject, destroyTime);
     }
 }
