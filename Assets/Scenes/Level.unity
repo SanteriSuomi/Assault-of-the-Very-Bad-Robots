@@ -3455,7 +3455,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.058333334
+  m_VoxelSize: 0.074999996
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 0}
 --- !u!4 &1328193215
@@ -4827,10 +4827,11 @@ MonoBehaviour:
   gameStartCountdownTime: 3
   health: 100
   funds: 10
-  enemyBasicSpawnInterval: 6.25
-  enemyStrongSpawnInterval: 23.45
-  spawnIntervalDecreaseTime: 15
-  spawnIntervalDecrease: 0.95
+  enemyBasicSpawnInterval: 5.5
+  enemyStrongSpawnInterval: 22
+  spawnIntervalDecreaseTime: 2.5
+  spawnIntervalDecrease: 0.05
+  minSpawnInterval: 0.2
 --- !u!1 &1912862142
 GameObject:
   m_ObjectHideFlags: 0

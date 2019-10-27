@@ -49,6 +49,8 @@ public class PlayManager : MonoBehaviour
     private float spawnIntervalDecreaseTime = 15;
     [SerializeField]
     private float spawnIntervalDecrease = 0.975f;
+    [SerializeField]
+    private float minSpawnInterval = 0.2f;
 
     #region Game Flow Bools
     private bool hasGameStarted = false;
@@ -155,10 +157,10 @@ public class PlayManager : MonoBehaviour
         SpawnEnemyStrong(enemy: enemyStrong, interval: enemyStrongSpawnInterval);
         // Decrease spawn interval every X seconds, while capping it.
         if (!decreasedInterval 
-            && enemyBasicSpawnInterval >= enemyBasicSpawnInterval / 12.5f 
-            && enemyStrongSpawnInterval >= enemyStrongSpawnInterval / 12.5f)
+            && enemyBasicSpawnInterval >= minSpawnInterval)
         {
             decreasedInterval = true;
+            // Decrease spawn interval.
             StartCoroutine(DecreaseSpawnInterval());
         }
     }
@@ -238,8 +240,8 @@ public class PlayManager : MonoBehaviour
         // Wait 15 seconds every time before decreasing interval.
         yield return new WaitForSeconds(spawnIntervalDecreaseTime);
         // Decrease both interval with percentage.
-        enemyBasicSpawnInterval *= spawnIntervalDecrease;
-        enemyStrongSpawnInterval *= spawnIntervalDecrease;
+        enemyBasicSpawnInterval -= spawnIntervalDecrease;
+        enemyStrongSpawnInterval -= spawnIntervalDecrease;
         decreasedInterval = false;
 
         #if UNITY_EDITOR

@@ -29,9 +29,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.185, z: 0}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
-  m_Children: []
+  m_Children:
+  - {fileID: 8845565797705262687}
   m_Father: {fileID: 3909117128315799413}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2975525342175593537
 MeshFilter:
@@ -118,11 +119,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1187588446348794876}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.0014313653, y: 0.58465135, z: 0.013492528}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.0047712172, y: 1.3321711, z: 0.04497509}
+  m_LocalScale: {x: 3.333333, y: 3.333333, z: 3.333333}
   m_Children:
   - {fileID: 8169164171337337238}
-  m_Father: {fileID: 3909117128315799413}
+  m_Father: {fileID: 2587433458738282979}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2317882125427747010
@@ -519,13 +520,13 @@ MonoBehaviour:
   enemyType: 1
   name: Gun Tower
   cost: 20
-  damage: 15
-  turret: {fileID: 8845565797705262687}
+  damage: 3.5
+  turret: {fileID: 2587433458738282979}
   bullet: {fileID: 3066397685346386072, guid: 3b120f854ddab1e4a96374c05b1f45fe, type: 3}
   bulletHole1: {fileID: 1712061335621097867}
   bulletHole2: {fileID: 6734040212037515472}
-  damageTimerAmount: 1.3
-  checkRadius: 3.75
+  damageTimerAmount: 0.3
+  checkRadius: 3.8
   rotationSpeed: 1
   bulletSpeed: 15
   bulletShootTime: 1
@@ -669,7 +670,6 @@ Transform:
   m_LocalPosition: {x: -0.000079055084, y: -0, z: -0.024698678}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 8845565797705262687}
   - {fileID: 2587433458738282979}
   m_Father: {fileID: 6954035776916560327}
   m_RootOrder: 0

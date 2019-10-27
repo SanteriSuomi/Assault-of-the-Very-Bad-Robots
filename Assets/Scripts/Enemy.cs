@@ -53,6 +53,9 @@ public class Enemy : MonoBehaviour, IEnemy
 
     private void GiveFunds()
     {
-        PlayManager.Instance.Funds += fundAmount;
+        if (PlayManager.Instance.Funds < 30)
+        {
+            PlayManager.Instance.Funds += fundAmount;
+        }
     }
 }
