@@ -448,7 +448,7 @@ MonoBehaviour:
   bullet: {fileID: 3066397685346386072, guid: 3b120f854ddab1e4a96374c05b1f45fe, type: 3}
   bulletHole1: {fileID: 0}
   bulletHole2: {fileID: 0}
-  damageTimerAmount: 0.25
+  damageTimerAmount: 0.26
   checkRadius: 3.3
   rotationSpeed: 0
   bulletSpeed: 0
