@@ -31,9 +31,10 @@ public class TowerPlacer : MonoBehaviour
         // This method is activated from the button and initializes the needed properties.
         towerPrefab = Instantiate(tower);
         towerType = towerPrefab.GetComponent<ITower>();
+        // Check if player has funds.
+        CheckCost();
         // Make sure to signal the tower that it is being placed.
         towerType.IsPlacing(enable: true);
-        CheckCost();
         towerRenderer = towerPrefab.GetComponentsInChildren<Renderer>();
         // Store the default colors of the tower.
         GetDefaultColors();
@@ -64,6 +65,7 @@ public class TowerPlacer : MonoBehaviour
 
     private void GetDefaultColors()
     {
+        // Initialize the defaultcolors.
         defaultColor = new Color[towerRenderer.Length];
         for (int i = 0; i < towerRenderer.Length; i++)
         {
@@ -119,7 +121,7 @@ public class TowerPlacer : MonoBehaviour
         if (towerPrefab != null && hit.collider.CompareTag(levelTag) && hit.normal.y > 0.5f)
         {
             // Calculate a grid with rounding from the hit point.
-            hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 1.75f, Mathf.Round(hit.point.z));
+            hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 2, Mathf.Round(hit.point.z));
             // Update the tower to the calculated grid.
             towerPrefab.transform.position = hitPosGrid;
         }

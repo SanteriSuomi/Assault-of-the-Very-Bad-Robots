@@ -13,7 +13,7 @@ public class LevelData : MonoBehaviour
             agentStartPoint = value;
 
             #if UNITY_EDITOR
-            Debug.Log(agentStartPoint);
+            Debug.Log($"Agent Start Point: {agentStartPoint}");
             #endif
         }
     }
@@ -26,8 +26,8 @@ public class LevelData : MonoBehaviour
         {
             agentEndPoint = value;
 
-            #if UNITY_EDITOR
-            Debug.Log(agentEndPoint);
+#if UNITY_EDITOR
+            Debug.Log($"Agent End Point: {agentEndPoint}");
             #endif
         }
     }

@@ -129,7 +129,7 @@ public class CameraController : MonoBehaviour
 
     private void ChangePivotPoint(RaycastHit hit)
     {
-        // Only collide with layers 9 (walkable) and 11 (level).
+        // Only collide with layers 9 (walkable) and 11 (level), and make sure it's a surface side.
         if (hit.collider.gameObject.layer == 9
         || hit.collider.gameObject.layer == 11
         && hit.normal.y > 0.5f)

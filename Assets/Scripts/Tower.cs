@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Linq;
 
 public class Tower : MonoBehaviour, ITower
 {
@@ -65,6 +65,11 @@ public class Tower : MonoBehaviour, ITower
 
     private void Start()
     {
+        InitializeTower();
+    }
+
+    private void InitializeTower()
+    {
         audioSource = GetComponent<AudioSource>();
         // Initialize some stuff depending on the tower type.
         if (enemyType == EnemyType.TowerBeam)
@@ -126,15 +131,22 @@ public class Tower : MonoBehaviour, ITower
         // Check if there is no objects within radius.
         else if (collisions.Length <= 0)
         {
-            timer = 0;
-            // Make sure audio isn't playing when enemy is not in range.
-            audioSource.Stop();
+            ResetTower();
+        }
+    }
+
+    private void ResetTower()
+    {
+        timer = 0;
+        // Make sure audio isn't playing when enemy is not in range.
+        audioSource.Stop();
+        if (enemyType == EnemyType.TowerBeam)
+        {
             // Disable the line renderer.
             LineRenderer(enable: false);
         }
     }
 
-    
     private void GetComponents(out Collider[] collisions, out IEnemy enemy)
     {
         // Get an array of collisions in the radius.
@@ -144,8 +156,12 @@ public class Tower : MonoBehaviour, ITower
         // Make sure collisions array isn't empty (there is indeed an object in the radius).
         if (collisions.Length > 0)
         {
-            // Get the first enemy collision.
-            enemy = collisions[0].GetComponent<IEnemy>();
+            // If multiply enemies in range, target the one with the lowest HP.
+            enemy = collisions.OrderBy(h => h.GetComponent<IEnemy>().Hitpoints).First().GetComponent<IEnemy>();
+
+            #if UNITY_EDITOR
+            Debug.Log($"{gameObject.name} target has {enemy.Hitpoints} hitpoints.");
+            #endif
         }
     }
 
