@@ -525,7 +525,7 @@ MonoBehaviour:
   bullet: {fileID: 3066397685346386072, guid: 3b120f854ddab1e4a96374c05b1f45fe, type: 3}
   bulletHole1: {fileID: 1712061335621097867}
   bulletHole2: {fileID: 6734040212037515472}
-  damageTimerAmount: 0.31
+  damageTimerAmount: 0.3
   checkRadius: 3.8
   rotationSpeed: 1
   bulletSpeed: 15

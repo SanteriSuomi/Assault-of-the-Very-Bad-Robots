@@ -26,7 +26,6 @@ public class PlayManager : MonoBehaviour
     private GameObject enemyBasic = default;
     [SerializeField]
     private GameObject enemyStrong = default;
-
     [SerializeField]
     private GameObject gameOverScreen = default;
 
@@ -39,9 +38,10 @@ public class PlayManager : MonoBehaviour
 
     [SerializeField]
     private float enemyBasicSpawnInterval = 5;
+    private float enemyBasicSpawnIntervalDefault;
     [SerializeField]
     private float enemyStrongSpawnInterval = 25;
-
+    private float enemyStrongSpawnIntervalDefault;
     private float enemyTimerBasic;
     private float enemyTimerStrong;
     private float textTime;
@@ -72,6 +72,9 @@ public class PlayManager : MonoBehaviour
         }
 
         GameState.Instance.GameStartedEvent += GameStart;
+        // Store the default spawn intervals to reset them later.
+        enemyBasicSpawnIntervalDefault = enemyBasicSpawnInterval;
+        enemyStrongSpawnIntervalDefault = enemyStrongSpawnInterval;
     }
 
     public void GameReset()
@@ -83,6 +86,8 @@ public class PlayManager : MonoBehaviour
         decreasedInterval = false;
         enemyTimerBasic = 0;
         enemyTimerStrong = 0;
+        enemyBasicSpawnInterval = enemyBasicSpawnIntervalDefault;
+        enemyStrongSpawnInterval = enemyStrongSpawnIntervalDefault;
         textTime = 0;
         Funds = funds;
         Health = health;

@@ -4827,11 +4827,11 @@ MonoBehaviour:
   gameStartCountdownTime: 3
   health: 100
   funds: 10
-  enemyBasicSpawnInterval: 5.5
-  enemyStrongSpawnInterval: 16.5
+  enemyBasicSpawnInterval: 5
+  enemyStrongSpawnInterval: 15
   spawnIntervalDecreaseTime: 1.75
   spawnIntervalDecrease: 0.05
-  minSpawnInterval: 0.2
+  minSpawnInterval: 0.25
 --- !u!1 &1912862142
 GameObject:
   m_ObjectHideFlags: 0
