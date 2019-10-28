@@ -101,7 +101,7 @@ public class Tower : MonoBehaviour, ITower
 
     private void CheckCollision()
     {
-        GetComponents(out Collider[] collisions, out IEnemy enemy);
+        GetComponents(out Collider[] collisions, out Vector3 enemyPos, out IEnemy enemy);
         // Make sure enemy isn't null.
         if (enemy != null)
         {
@@ -112,13 +112,13 @@ public class Tower : MonoBehaviour, ITower
                     // Enable the line renderer (laser).
                     LineRenderer(enable: true);
                     // Shoot out the laser at the enemy.
-                    Laser(target: collisions[0]);
+                    Laser(target: enemyPos);
                     break;
                 case EnemyType.TowerGun:
                     // Rotate turret to the enemy.
-                    RotateTurret(collisions);
+                    RotateTurret(target: enemyPos);
                     // Instantiate bullets with a delay.
-                    ShootBullet(collisions);
+                    ShootBullet(target: enemyPos);
                     break;
                 default:
                     break;
@@ -128,9 +128,10 @@ public class Tower : MonoBehaviour, ITower
             // Only damage the target with a specific intervals.
             DamageTimer(enemy);
         }
-        // Check if there is no objects within radius.
+        // If there are no enemies in range...
         else if (collisions.Length <= 0)
         {
+            // Reset the "condition" of the tower.
             ResetTower();
         }
     }
@@ -147,20 +148,22 @@ public class Tower : MonoBehaviour, ITower
         }
     }
 
-    private void GetComponents(out Collider[] collisions, out IEnemy enemy)
+    private void GetComponents(out Collider[] collisions, out Vector3 enemyPos, out IEnemy enemy)
     {
         // Get an array of collisions in the radius.
         collisions = Physics.OverlapSphere(transform.position, checkRadius, layerMask);
-        // Make enemy is null at the start.
+        // Make sure enemy variables are null at the start.
         enemy = null;
+        enemyPos = Vector3.zero;
         // Make sure collisions array isn't empty (there is indeed an object in the radius).
         if (collisions.Length > 0)
         {
             // If multiply enemies in range, target the one with the lowest HP.
             enemy = collisions.OrderBy(h => h.GetComponent<IEnemy>().Hitpoints).First().GetComponent<IEnemy>();
-
+            // Cast the enemy interface down to the class and get the object position.
+            enemyPos = (enemy as Enemy).transform.position;
             #if UNITY_EDITOR
-            Debug.Log($"{gameObject.name} target has {enemy.Hitpoints} hitpoints.");
+            Debug.Log($"{gameObject.name}'s target has {enemy.Hitpoints} hitpoints.");
             #endif
         }
     }
@@ -174,37 +177,35 @@ public class Tower : MonoBehaviour, ITower
         }
     }
 
-    private void Laser(Collider target)
+    private void Laser(Vector3 target)
     {
-        // Get the enemy position in the sphere.
-        Vector3 enemyPos = target.transform.position;
         // Set laser starting position to the turret.
         lineRenderer.SetPosition(0, turret.position + new Vector3(0, 0.4f, 0));
         // Set the laser ending position to the enemy.
-        lineRenderer.SetPosition(1, enemyPos);
+        lineRenderer.SetPosition(1, target);
     }
     #endregion
 
     #region Gun Tower
-    private void RotateTurret(Collider[] collisions)
+    private void RotateTurret(Vector3 target)
     {
         // Get the direction vector of the enemy position.
-        Vector3 direction = collisions[0].transform.position - turret.position;
+        Vector3 direction = target - turret.position;
         // Create a quaternion rotation from this direction.
         Quaternion rotation = Quaternion.LookRotation(direction);
         // Smoothly rotate turret towards target.
         turret.rotation = Quaternion.Slerp(turret.rotation, rotation, rotationSpeed * Time.deltaTime);
     }
 
-    private void ShootBullet(Collider[] collisions)
+    private void ShootBullet(Vector3 target)
     {
         // Shoot bullet on intervals.
         bulletShootTimer += Time.deltaTime;
         #if UNITY_EDITOR
-        Debug.Log(Vector3.Dot(turret.forward, (turret.position - collisions[0].transform.position).normalized));
+        Debug.Log(Vector3.Dot(turret.forward, (turret.position - target).normalized));
         #endif
         // Make sure turret is facing target before shooting.
-        if (bulletShootTimer >= bulletShootTime && Vector3.Dot(turret.forward, (turret.position - collisions[0].transform.position).normalized) <= -0.95f)
+        if (bulletShootTimer >= bulletShootTime && Vector3.Dot(turret.forward, (turret.position - target).normalized) <= -0.95f)
         {
             bulletShootTimer = 0;
             // Signal that gunshot can be played.
@@ -254,7 +255,6 @@ public class Tower : MonoBehaviour, ITower
     {
         // Subtract hitpoints from the target enemy.
         enemy.Hitpoints -= Damage;
-
         #if UNITY_EDITOR
         Debug.Log($"{gameObject.name} dealt {Damage} damage to {enemy.Name}, it now has {enemy.Hitpoints} Hitpoints left.");
         #endif
