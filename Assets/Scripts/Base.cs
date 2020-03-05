@@ -2,35 +2,38 @@
 using UnityEngine;
 using TMPro;
 
-public class Base : MonoBehaviour
+namespace AOTVBR
 {
-    private TextMeshProUGUI damageText;
-
-    private void Awake()
+    public class Base : MonoBehaviour
     {
-        damageText = GameObject.Find("BaseDamageText").GetComponent<TextMeshProUGUI>();
-    }
+        private TextMeshProUGUI damageText;
 
-    private void OnTriggerEnter(Collider collision)
-    {
-        // Retrieve the enemy interface component.
-        IEnemy enemy = collision.gameObject.GetComponent<IEnemy>();
-        // Make sure it's an enemy by checking for null.
-        if (enemy != null)
+        private void Awake()
         {
-            // Subtract health from the player.
-            PlayManager.Instance.Health -= enemy.Damage;
-            // Show a damage text that shows up for a small time.
-            StartCoroutine(DamageText(enemy));
+            damageText = GameObject.Find("BaseDamageText").GetComponent<TextMeshProUGUI>();
         }
-    }
 
-    private IEnumerator DamageText(IEnemy enemy)
-    {
-        damageText.text = $"{enemy.Name} has dealt {enemy.Damage} to your base!";
-        enemy.Die();
-        yield return new WaitForSeconds(2.5f);
-        // Reset the text by making it empty.
-        damageText.text = string.Empty;
-    }
+        private void OnTriggerEnter(Collider collision)
+        {
+            // Retrieve the enemy interface component.
+            IEnemy enemy = collision.gameObject.GetComponent<IEnemy>();
+            // Make sure it's an enemy by checking for null.
+            if (enemy != null)
+            {
+                // Subtract health from the player.
+                PlayManager.Instance.Health -= enemy.Damage;
+                // Show a damage text that shows up for a small time.
+                StartCoroutine(DamageText(enemy));
+            }
+        }
+
+        private IEnumerator DamageText(IEnemy enemy)
+        {
+            damageText.text = $"{enemy.Name} has dealt {enemy.Damage} to your base!";
+            enemy.Die();
+            yield return new WaitForSeconds(2.5f);
+            // Reset the text by making it empty.
+            damageText.text = string.Empty;
+        }
+    } 
 }
