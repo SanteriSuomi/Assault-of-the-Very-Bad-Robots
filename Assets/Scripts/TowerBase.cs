@@ -2,7 +2,7 @@
 
 namespace AOTVBR
 {
-    public abstract class TowerBase : MonoBehaviour, ITower
+    public abstract class TowerBase : MonoBehaviour
     {
         protected enum EnemyType
         {

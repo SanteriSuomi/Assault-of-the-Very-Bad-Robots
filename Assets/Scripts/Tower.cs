@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace AOTVBR
 {
-    public class Tower : TowerBase, IHasName
+    public class Tower : TowerBase
     {
         [SerializeField]
         private Transform turret = default;
@@ -64,7 +64,7 @@ namespace AOTVBR
 
         private void CheckCollision()
         {
-            GetComponents(out Collider[] collisions, out Vector3 enemyPos, out IDamageable enemy);
+            GetComponents(out Collider[] collisions, out Vector3 enemyPos, out EnemyBase enemy);
             // Make sure enemy isn't null.
             if (enemy != null)
             {
@@ -111,7 +111,7 @@ namespace AOTVBR
             }
         }
 
-        private void GetComponents(out Collider[] collisions, out Vector3 enemyPos, out IDamageable enemy)
+        private void GetComponents(out Collider[] collisions, out Vector3 enemyPos, out EnemyBase enemy)
         {
             // Get an array of collisions in the radius.
             collisions = Physics.OverlapSphere(transform.position, checkRadius, attackableEnemiesLayers);
@@ -122,7 +122,7 @@ namespace AOTVBR
             if (collisions.Length > 0)
             {
                 // If multiply enemies in range, target the one with the lowest HP.
-                enemy = collisions.OrderBy(h => h.GetComponent<IDamageable>().Hitpoints).First().GetComponent<IDamageable>();
+                enemy = collisions.OrderBy(h => h.GetComponent<EnemyBase>().Hitpoints).First().GetComponent<EnemyBase>();
                 // Cast the enemy interface down to the class and get the object position.
                 enemyPos = (enemy as Enemy).transform.position;
                 #if UNITY_EDITOR
@@ -203,7 +203,7 @@ namespace AOTVBR
             }
         }
 
-        private void DamageTimer(IDamageable enemy)
+        private void DamageTimer(EnemyBase enemy)
         {
             timer += Time.deltaTime;
             if (timer >= damageTimerAmount)

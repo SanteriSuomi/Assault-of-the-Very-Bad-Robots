@@ -20,7 +20,7 @@ namespace AOTVBR
 
         private void OnTriggerEnter(Collider collision)
         {
-            if (collision.TryGetComponent(out IDamageable enemy))
+            if (collision.TryGetComponent(out EnemyBase enemy))
             {
                 // Subtract health from the player.
                 PlayManager.Instance.Health -= enemy.Damage;
@@ -32,13 +32,9 @@ namespace AOTVBR
             }
         }
 
-        private IEnumerator ShowDamageText(IDamageable enemy)
+        private IEnumerator ShowDamageText(EnemyBase enemy)
         {
-            if (enemy.GetIHasName() != null)
-            {
-                damageText.text = $"{enemy.GetIHasName().Name} has dealt {enemy.Damage} to your base!";
-            }
-
+            damageText.text = $"{enemy.Name} has dealt {enemy.Damage} to your base!";
             enemy.Die();
             yield return showDamageTextWFS;
             damageText.text = string.Empty;
