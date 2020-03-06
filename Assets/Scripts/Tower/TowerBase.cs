@@ -3,9 +3,34 @@ using UnityEngine;
 
 namespace AOTVBR
 {
-    public class Tower : TowerBase
+    public abstract class TowerBase : MonoBehaviour
     {
+        protected enum EnemyType
+        {
+            TowerBeam,
+            TowerGun
+        }
         [SerializeField]
+        protected EnemyType enemyType = default;
+        [SerializeField]
+        protected LayerMask enemyLayers = default;
+
+        [SerializeField]
+        private new string name = "Tower";
+        public string Name { get => name; }
+        [SerializeField]
+        private int cost = 10;
+        public int Cost { get => cost; }
+        [SerializeField]
+        private float damage = 10;
+        public float Damage { get => damage; }
+
+        protected bool isPlacing;
+
+        public void IsPlacing(bool enable) 
+            => isPlacing = enable;
+
+       [SerializeField]
         private Transform turret = default;
         [SerializeField]
         private GameObject bullet = default;
@@ -114,7 +139,7 @@ namespace AOTVBR
         private void GetComponents(out Collider[] collisions, out Vector3 enemyPos, out EnemyBase enemy)
         {
             // Get an array of collisions in the radius.
-            collisions = Physics.OverlapSphere(transform.position, checkRadius, attackableEnemiesLayers);
+            collisions = Physics.OverlapSphere(transform.position, checkRadius, enemyLayers);
             // Make sure enemy variables are null at the start.
             enemy = null;
             enemyPos = Vector3.zero;
@@ -164,9 +189,6 @@ namespace AOTVBR
         {
             // Shoot bullet on intervals.
             bulletShootTimer += Time.deltaTime;
-#if UNITY_EDITOR
-            Debug.Log(Vector3.Dot(turret.forward, (turret.position - target).normalized));
-#endif
             // Make sure turret is facing target before shooting.
             if (bulletShootTimer >= bulletShootTime && Vector3.Dot(turret.forward, (turret.position - target).normalized) <= -0.95f)
             {
@@ -213,9 +235,5 @@ namespace AOTVBR
                 enemy.TakeDamage(Damage);
             }
         }
-
-        #if UNITY_EDITOR
-        private void OnDrawGizmos() => Gizmos.DrawWireSphere(transform.position, checkRadius);
-        #endif
-    } 
+    }
 }
