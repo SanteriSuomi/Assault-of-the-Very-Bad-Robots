@@ -1,7 +1,9 @@
-﻿public interface ITower
+﻿namespace AOTVBR
 {
-    string Name { get; set; }
-    int Cost { get; set; }
-    float Damage { get; set; }
-    void IsPlacing(bool enable);
+    public interface ITower
+    {
+        int Cost { get; set; }
+        float Damage { get; set; }
+        void IsPlacing(bool enable);
+    } 
 }

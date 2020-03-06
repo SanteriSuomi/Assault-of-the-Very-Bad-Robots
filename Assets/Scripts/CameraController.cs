@@ -1,155 +1,130 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+namespace AOTVBR
 {
-    public static CameraController Instance { get; set; }
-
-    private Transform pivot;
-    private Camera mainCam;
-
-    [SerializeField]
-    private float rotateSpeed = 50;
-    [SerializeField]
-    private float moveSpeed = 50;
-    [SerializeField]
-    private float pivotStep = 8;
-
-    private Vector3 pivotHitPoint;
-
-    private int layerMask;
-
-    private bool movePivot;
-
-    private void Awake()
+    public class CameraController : Singleton<CameraController>
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
-        // Layermask for raycast, only check collisions with layers 9 and 11 (walkable and level).
-        layerMask = (1 << 9) | (1 << 11);
-    }
+        private Transform pivot;
+        private Camera mainCamera;
+        private Coroutine pivotMoveCoroutine;
+        [SerializeField]
+        private LayerMask rayLayerMask = default;
+        [SerializeField]
+        private Vector3 cameraPosRelativeToPivot = new Vector3(0, 17.5f, -8.25f);
+        [SerializeField]
+        private Vector3 pivotHitPointOffset = new Vector3(0, -0.08f, 0);
 
-    private void Start()
-    {
-        pivot = GameObject.FindGameObjectWithTag("CameraPivot").transform;
-        mainCam = GetComponent<Camera>();
-        // Initialize the maincam to the current pivot position and parent it.
-        InitializeCameraToPivot();
-    }
+        [SerializeField]
+        private float rotateSpeed = 50;
+        [SerializeField]
+        private float moveSpeed = 50;
+        [SerializeField]
+        private float pivotMoveSpeed = 8;
+        [SerializeField]
+        private float clampCameraAbove = 5;
+        [SerializeField]
+        private float clampCameraBelow = 25;
+        [SerializeField]
+        private float rayMaxDistance = 100;
+        [SerializeField]
+        private float pivotPlacementMinNormal = 0.5f;
 
-    private void InitializeCameraToPivot()
-    {
-        // Position the camera so that the pivot is in the middle of the screen.
-        mainCam.transform.position = pivot.position + new Vector3(0, 17.5f, -8.25f);
-        // Parent camera to the pivot.
-        mainCam.transform.parent = pivot;
-    }
-
-    private void Update()
-    {
-        // Calculate the deltaTime.
-        float delta = Time.deltaTime;
-        // Camera rotation.
-        InputRotate(delta);
-        // Camera zoom.
-        InputZoom(delta);
-        // Move the camera pivot according to user input.
-        GetMouseHitForPivot();
-        // If the hitpoint has been updated.
-        if (movePivot)
+        protected override void Awake()
         {
-            // Start a coroutine for smooth movement. 
-            StartCoroutine(SmoothPivotMove(delta));
+            mainCamera = GetComponent<Camera>();
+            pivot = GameObject.FindGameObjectWithTag("CameraPivot").transform;
+            InitializeCameraPivot();
         }
-    }
 
-    private void InputRotate(float delta)
-    {
-        if (Input.GetKey(KeyCode.A))
+        private void InitializeCameraPivot()
         {
-            // Rotate around the pivot position.
-            gameObject.transform.RotateAround(pivot.position, pivot.up, rotateSpeed * delta);
+            mainCamera.transform.position = pivot.position + cameraPosRelativeToPivot;
+            mainCamera.transform.parent = pivot.transform;
         }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            gameObject.transform.RotateAround(pivot.position, -pivot.up, rotateSpeed * delta);
-        }
-    }
 
-    private void InputZoom(float delta)
-    {
-        // Make sure to clamp the Y position to above 5 && below 30.
-        if (Input.GetKey(KeyCode.W) && gameObject.transform.position.y > 5)
+        private void Update()
         {
-            // Rotate towards the pivot position.
-            gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, pivot.position, moveSpeed * delta);
+            Rotate();
+            Zoom();
+            MovePivot();
         }
-        else if (Input.GetKey(KeyCode.S) && gameObject.transform.position.y < 25)
-        {
-            gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, pivot.position, -1 * moveSpeed * delta);
-        }
-    }
 
-    private void GetMouseHitForPivot()
-    {
-        if (Input.GetMouseButtonDown(1))
+        private void Rotate()
         {
-            // Cast the ray.
-            RaycastHit hit = CastRay();
-
-            try
+            if (Input.GetKey(KeyCode.A))
             {
-                // Change the pivot position.
-                ChangePivotPoint(hit);
+                RotateAroundAxis(pivot.up);
             }
-            catch (System.Exception e)
+            else if (Input.GetKey(KeyCode.D))
             {
-                #if UNITY_EDITOR
-                Debug.Log($"{nameof(CameraController)}: {e.Message}, hit collider most likely not valid.");
-                #endif
+                RotateAroundAxis(-pivot.up);
+            }
+        }
+
+        private void RotateAroundAxis(Vector3 axis)
+            => transform.RotateAround(pivot.position, axis, rotateSpeed * Time.deltaTime);
+
+        private void Zoom()
+        {
+            if (Input.GetKey(KeyCode.W) && transform.position.y > clampCameraAbove)
+            {
+                MoveTowards(moveSpeed * Time.deltaTime);
+            }
+            else if (Input.GetKey(KeyCode.S) && transform.position.y < clampCameraBelow)
+            {
+                MoveTowards(-moveSpeed * Time.deltaTime);
+            }
+        }
+
+        private void MoveTowards(float distanceDelta)
+            => transform.position = Vector3.MoveTowards(transform.position, pivot.position, distanceDelta);
+
+        private void MovePivot()
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
+                RaycastHit hit = CastRayFromCamera();
+                (bool, Vector3) value = CheckSurfaceNormal(hit);
+                if (value.Item1)
+                {
+                    if (pivotMoveCoroutine != null)
+                    {
+                        StopCoroutine(pivotMoveCoroutine);
+                    }
+
+                    pivotMoveCoroutine = StartCoroutine(SmoothPivotMove(value.Item2));
+                }
+            }
+        }
+
+        private RaycastHit CastRayFromCamera()
+        {
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            Physics.Raycast(ray, out RaycastHit hit, rayMaxDistance, rayLayerMask);
+            return hit;
+        }
+
+        private (bool, Vector3) CheckSurfaceNormal(RaycastHit hit)
+        {
+            if (hit.normal.y > pivotPlacementMinNormal)
+            {
+                Vector3 newPivotPosition = hit.point + pivotHitPointOffset;
+                return (true, newPivotPosition);
             }
 
+            return (false, Vector3.zero);
         }
-    }
 
-    private RaycastHit CastRay()
-    {
-        // Get a ray from mouse position to the world position.
-        Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
-        // Raycast that ray, and get the hit data.
-        Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask);
-        return hit;
-    }
-
-    private void ChangePivotPoint(RaycastHit hit)
-    {
-        // Only collide with layers 9 (walkable) and 11 (level), and make sure it's a surface side.
-        if (hit.collider.gameObject.layer == 9
-        || hit.collider.gameObject.layer == 11
-        && hit.normal.y > 0.5f)
+        private IEnumerator SmoothPivotMove(Vector3 newPivotPosition)
         {
-            // Pivot hitpoint is the raycast hitpoint.
-            pivotHitPoint = hit.point + new Vector3(0, -0.08f, 0);
-            // Indicate that hitpoint has been updated.
-            movePivot = true;
+            float maxTimer = 0;
+            while (!Utility.PosEqual(pivot.position, newPivotPosition) && maxTimer <= 2.5f)
+            {
+                maxTimer += Time.deltaTime;
+                pivot.position = Vector3.Lerp(pivot.position, newPivotPosition, pivotMoveSpeed * Time.deltaTime);
+                yield return null;
+            }
         }
-    }
-
-    private IEnumerator SmoothPivotMove(float delta)
-    {
-        // Get the distance between current pivot position and the new hit position.
-        float distance = Vector3.Distance(pivot.transform.position, pivotHitPoint);
-        // Smoothly lerp the pivot to the position.
-        pivot.transform.position = Vector3.Lerp(pivot.transform.position, pivotHitPoint, pivotStep * delta);
-        // Stop the coroutine when the current distance is close to the desired position.
-        yield return new WaitUntil(() => Mathf.Approximately(distance, Mathf.Epsilon));
-        // Indicate that we aren't moving anymore.
-        movePivot = false;
     }
 }

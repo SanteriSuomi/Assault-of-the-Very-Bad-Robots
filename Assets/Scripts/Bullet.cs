@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
-public class Bullet : MonoBehaviour
+namespace AOTVBR
 {
-    [SerializeField]
-    private float bulletDestroyTime = 3;
-
-    private void Start()
+    public class Bullet : MonoBehaviour
     {
-        // Destroy bullet on delay.
-        Destroy(gameObject, bulletDestroyTime);
-    }
+        [SerializeField]
+        private float bulletDestroyTime = 3;
+
+        private void OnEnable() 
+            => Destroy(gameObject, bulletDestroyTime);
+    } 
 }

@@ -557,7 +557,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -4428,9 +4428,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 447edd53dbc92c74fb986406ac350e52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rayLayerMask:
+    serializedVersion: 2
+    m_Bits: 2560
+  cameraPosRelativeToPivot: {x: 0, y: 17.5, z: -8.25}
+  pivotHitPointOffset: {x: 0, y: -0.08, z: 0}
   rotateSpeed: 90
   moveSpeed: 40
-  pivotStep: 10
+  pivotMoveSpeed: 8
+  clampCameraAbove: 5
+  clampCameraBelow: 25
+  rayMaxDistance: 200
+  pivotPlacementMinNormal: 0.5
 --- !u!20 &1687258584
 Camera:
   m_ObjectHideFlags: 0

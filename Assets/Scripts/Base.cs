@@ -1,39 +1,48 @@
 ﻿using System.Collections;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 namespace AOTVBR
 {
     public class Base : MonoBehaviour
     {
         private TextMeshProUGUI damageText;
+        private WaitForSeconds showDamageTextWFS;
+        [SerializeField]
+        private float showDamageTextDelay = 2.5f;
+        private bool isShowingDamageText;
 
         private void Awake()
         {
             damageText = GameObject.Find("BaseDamageText").GetComponent<TextMeshProUGUI>();
+            showDamageTextWFS = new WaitForSeconds(showDamageTextDelay);
         }
 
         private void OnTriggerEnter(Collider collision)
         {
-            // Retrieve the enemy interface component.
-            IEnemy enemy = collision.gameObject.GetComponent<IEnemy>();
-            // Make sure it's an enemy by checking for null.
-            if (enemy != null)
+            if (collision.TryGetComponent(out IDamageable enemy))
             {
                 // Subtract health from the player.
                 PlayManager.Instance.Health -= enemy.Damage;
-                // Show a damage text that shows up for a small time.
-                StartCoroutine(DamageText(enemy));
+                if (!isShowingDamageText)
+                {
+                    isShowingDamageText = true;
+                    StartCoroutine(ShowDamageText(enemy));
+                }
             }
         }
 
-        private IEnumerator DamageText(IEnemy enemy)
+        private IEnumerator ShowDamageText(IDamageable enemy)
         {
-            damageText.text = $"{enemy.Name} has dealt {enemy.Damage} to your base!";
+            if (enemy.GetIHasName() != null)
+            {
+                damageText.text = $"{enemy.GetIHasName().Name} has dealt {enemy.Damage} to your base!";
+            }
+
             enemy.Die();
-            yield return new WaitForSeconds(2.5f);
-            // Reset the text by making it empty.
+            yield return showDamageTextWFS;
             damageText.text = string.Empty;
+            isShowingDamageText = false;
         }
-    } 
+    }
 }

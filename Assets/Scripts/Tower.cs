@@ -1,270 +1,221 @@
-﻿using UnityEngine;
-using System.Linq;
+﻿using System.Linq;
+using UnityEngine;
 
-public class Tower : MonoBehaviour, ITower
+namespace AOTVBR
 {
-    public string Name { get; set; }
-    public int Cost { get; set; }
-    public float Damage { get; set; }
-
-    private enum EnemyType
+    public class Tower : TowerBase, IHasName
     {
-        TowerBeam,
-        TowerGun
-    }
+        [SerializeField]
+        private Transform turret = default;
+        [SerializeField]
+        private GameObject bullet = default;
+        [SerializeField]
+        private Transform bulletHole1 = default;
+        [SerializeField]
+        private Transform bulletHole2 = default;
+        private LineRenderer lineRenderer;
+        private AudioSource audioSource;
 
-    [SerializeField]
-    private EnemyType enemyType = default;
+        [SerializeField]
+        private float damageTimerAmount = 1;
+        [SerializeField]
+        private float checkRadius = 3.25f;
+        private float timer;
+        [SerializeField]
+        [Range(0, 1)]
+        private float rotationSpeed = 0.75f;
+        [SerializeField]
+        private float bulletSpeed = 10;
+        [SerializeField]
+        private float bulletShootTime = 0.5f;
+        private float bulletShootTimer;
 
-    [SerializeField]
-    private new string name = "Tower";
-    [SerializeField]
-    private int cost = 10;
-    [SerializeField]
-    private float damage = 10;
+        private bool playGunShot;
 
-    [SerializeField]
-    private Transform turret = default;
-    [SerializeField]
-    private GameObject bullet = default;
-    [SerializeField]
-    private Transform bulletHole1 = default;
-    [SerializeField]
-    private Transform bulletHole2 = default;
-    private LineRenderer lineRenderer;
-    private AudioSource audioSource;
-
-    [SerializeField]
-    private float damageTimerAmount = 1;
-    [SerializeField]
-    private float checkRadius = 3.25f;
-    private float timer;
-    [SerializeField]
-    [Range(0, 1)]
-    private float rotationSpeed = 0.75f;
-    [SerializeField]
-    private float bulletSpeed = 10;
-    [SerializeField]
-    private float bulletShootTime = 0.5f;
-    private float bulletShootTimer;
-
-    int layerMask;
-
-    private bool isPlacing;
-    private bool playGunShot;
-
-    private void Awake()
-    {
-        // Initialize properties with the serialized values.
-        Name = name;
-        Cost = cost;
-        Damage = damage;
-        // Only check for collisions with layer 12 (enemy).
-        layerMask = 1 << 12;
-    }
-
-    private void Start()
-    {
-        InitializeTower();
-    }
-
-    private void InitializeTower()
-    {
-        audioSource = GetComponent<AudioSource>();
-        // Initialize some stuff depending on the tower type.
-        if (enemyType == EnemyType.TowerBeam)
+        private void Start()
         {
-            lineRenderer = GetComponentInChildren<LineRenderer>();
+            InitializeTower();
         }
-        else if (enemyType == EnemyType.TowerGun)
-        {
-            // Gun tower should be correct rotation (facing enemy ship).
-            turret.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
-        }
-    }
 
-    public void IsPlacing(bool enable)
-    {
-        // Public method for informing this instance of the tower that it is being placed currently.
-        isPlacing = enable;
-    }
-
-    private void Update()
-    {
-        // Make sure this tower isn't current being placed.
-        if (!isPlacing)
+        private void InitializeTower()
         {
-            // Check for collisions within a radius.
-            CheckCollision();
-        }
-    }
-
-    private void CheckCollision()
-    {
-        GetComponents(out Collider[] collisions, out Vector3 enemyPos, out IEnemy enemy);
-        // Make sure enemy isn't null.
-        if (enemy != null)
-        {
-            // Do things according to what enemy type this instance is.
-            switch (enemyType)
+            audioSource = GetComponent<AudioSource>();
+            // Initialize some stuff depending on the tower type.
+            if (enemyType == EnemyType.TowerBeam)
             {
-                case EnemyType.TowerBeam:
-                    // Enable the line renderer (laser).
-                    LineRenderer(enable: true);
-                    // Shoot out the laser at the enemy.
-                    Laser(target: enemyPos);
-                    break;
-                case EnemyType.TowerGun:
-                    // Rotate turret to the enemy.
-                    RotateTurret(target: enemyPos);
-                    // Instantiate bullets with a delay.
-                    ShootBullet(target: enemyPos);
-                    break;
-                default:
-                    break;
+                lineRenderer = GetComponentInChildren<LineRenderer>();
             }
-            // Play the shooting audio.
-            PlayAudio();
-            // Only damage the target with a specific intervals.
-            DamageTimer(enemy);
+            else if (enemyType == EnemyType.TowerGun)
+            {
+                // Gun tower should be correct rotation (facing enemy ship).
+                turret.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
+            }
         }
-        // If there are no enemies in range...
-        else if (collisions.Length <= 0)
+
+        private void Update()
         {
-            // Reset the "condition" of the tower.
-            ResetTower();
+            // Make sure this tower isn't current being placed.
+            if (!isPlacing)
+            {
+                // Check for collisions within a radius.
+                CheckCollision();
+            }
         }
-    }
 
-    private void ResetTower()
-    {
-        timer = 0;
-        // Make sure audio isn't playing when enemy is not in range.
-        audioSource.Stop();
-        if (enemyType == EnemyType.TowerBeam)
+        private void CheckCollision()
         {
-            // Disable the line renderer.
-            LineRenderer(enable: false);
+            GetComponents(out Collider[] collisions, out Vector3 enemyPos, out IDamageable enemy);
+            // Make sure enemy isn't null.
+            if (enemy != null)
+            {
+                // Do things according to what enemy type this instance is.
+                switch (enemyType)
+                {
+                    case EnemyType.TowerBeam:
+                        // Enable the line renderer (laser).
+                        LineRenderer(enable: true);
+                        // Shoot out the laser at the enemy.
+                        Laser(target: enemyPos);
+                        break;
+                    case EnemyType.TowerGun:
+                        // Rotate turret to the enemy.
+                        RotateTurret(target: enemyPos);
+                        // Instantiate bullets with a delay.
+                        ShootBullet(target: enemyPos);
+                        break;
+                    default:
+                        break;
+                }
+                // Play the shooting audio.
+                PlayAudio();
+                // Only damage the target with a specific intervals.
+                DamageTimer(enemy);
+            }
+            // If there are no enemies in range...
+            else if (collisions.Length <= 0)
+            {
+                // Reset the "condition" of the tower.
+                ResetTower();
+            }
         }
-    }
 
-    private void GetComponents(out Collider[] collisions, out Vector3 enemyPos, out IEnemy enemy)
-    {
-        // Get an array of collisions in the radius.
-        collisions = Physics.OverlapSphere(transform.position, checkRadius, layerMask);
-        // Make sure enemy variables are null at the start.
-        enemy = null;
-        enemyPos = Vector3.zero;
-        // Make sure collisions array isn't empty (there is indeed an object in the radius).
-        if (collisions.Length > 0)
-        {
-            // If multiply enemies in range, target the one with the lowest HP.
-            enemy = collisions.OrderBy(h => h.GetComponent<IEnemy>().Hitpoints).First().GetComponent<IEnemy>();
-            // Cast the enemy interface down to the class and get the object position.
-            enemyPos = (enemy as Enemy).transform.position;
-            #if UNITY_EDITOR
-            Debug.Log($"{gameObject.name}'s target has {enemy.Hitpoints} hitpoints.");
-            #endif
-        }
-    }
-
-    #region Beam Tower
-    private void LineRenderer(bool enable)
-    {
-        if (lineRenderer != null)
-        {
-            lineRenderer.enabled = enable;
-        }
-    }
-
-    private void Laser(Vector3 target)
-    {
-        // Set laser starting position to the turret.
-        lineRenderer.SetPosition(0, turret.position + new Vector3(0, 0.4f, 0));
-        // Set the laser ending position to the enemy.
-        lineRenderer.SetPosition(1, target);
-    }
-    #endregion
-
-    #region Gun Tower
-    private void RotateTurret(Vector3 target)
-    {
-        // Get the direction vector of the enemy position.
-        Vector3 direction = target - turret.position;
-        // Create a quaternion rotation from this direction.
-        Quaternion rotation = Quaternion.LookRotation(direction);
-        // Smoothly rotate turret towards target.
-        turret.rotation = Quaternion.Slerp(turret.rotation, rotation, rotationSpeed * Time.deltaTime);
-    }
-
-    private void ShootBullet(Vector3 target)
-    {
-        // Shoot bullet on intervals.
-        bulletShootTimer += Time.deltaTime;
-        #if UNITY_EDITOR
-        Debug.Log(Vector3.Dot(turret.forward, (turret.position - target).normalized));
-        #endif
-        // Make sure turret is facing target before shooting.
-        if (bulletShootTimer >= bulletShootTime && Vector3.Dot(turret.forward, (turret.position - target).normalized) <= -0.95f)
-        {
-            bulletShootTimer = 0;
-            // Signal that gunshot can be played.
-            playGunShot = true;
-            // Instantiate bullets at bullet holes.
-            InstantiateBullet(atBulletHole: bulletHole1);
-            InstantiateBullet(atBulletHole: bulletHole2);
-        }
-    }
-
-    private void InstantiateBullet(Transform atBulletHole)
-    {
-        GameObject bulletInstance = Instantiate(bullet);
-        // Make initial position the bullet hole.
-        bulletInstance.transform.position = atBulletHole.position;
-        // Apply velocity forward relative to the bullet hole position.
-        bulletInstance.GetComponent<Rigidbody>().velocity = atBulletHole.transform.forward * bulletSpeed;
-    }
-    #endregion
-
-    private void PlayAudio()
-    {
-        // Handle audio differently for different enemy types.
-        if (enemyType == EnemyType.TowerBeam && !audioSource.isPlaying)
-        {
-            audioSource.Play();
-        }
-        else if (enemyType == EnemyType.TowerGun && playGunShot)
-        {
-            playGunShot = false;
-            audioSource.Play();
-        }
-    }
-
-    private void DamageTimer(IEnemy enemy)
-    {
-        timer += Time.deltaTime;
-        if (timer >= damageTimerAmount)
+        private void ResetTower()
         {
             timer = 0;
-            // Damage the enemy.
-            DealDamage(enemy);
+            // Make sure audio isn't playing when enemy is not in range.
+            audioSource.Stop();
+            if (enemyType == EnemyType.TowerBeam)
+            {
+                // Disable the line renderer.
+                LineRenderer(enable: false);
+            }
         }
-    }
 
-    private void DealDamage(IEnemy enemy)
-    {
-        // Subtract hitpoints from the target enemy.
-        enemy.Hitpoints -= Damage;
+        private void GetComponents(out Collider[] collisions, out Vector3 enemyPos, out IDamageable enemy)
+        {
+            // Get an array of collisions in the radius.
+            collisions = Physics.OverlapSphere(transform.position, checkRadius, attackableEnemiesLayers);
+            // Make sure enemy variables are null at the start.
+            enemy = null;
+            enemyPos = Vector3.zero;
+            // Make sure collisions array isn't empty (there is indeed an object in the radius).
+            if (collisions.Length > 0)
+            {
+                // If multiply enemies in range, target the one with the lowest HP.
+                enemy = collisions.OrderBy(h => h.GetComponent<IDamageable>().Hitpoints).First().GetComponent<IDamageable>();
+                // Cast the enemy interface down to the class and get the object position.
+                enemyPos = (enemy as Enemy).transform.position;
+                #if UNITY_EDITOR
+                Debug.Log($"{gameObject.name}'s target has {enemy.Hitpoints} hitpoints.");
+                #endif
+            }
+        }
+
+        #region Beam Tower
+        private void LineRenderer(bool enable)
+        {
+            if (lineRenderer != null)
+            {
+                lineRenderer.enabled = enable;
+            }
+        }
+
+        private void Laser(Vector3 target)
+        {
+            // Set laser starting position to the turret.
+            lineRenderer.SetPosition(0, turret.position + new Vector3(0, 0.4f, 0));
+            // Set the laser ending position to the enemy.
+            lineRenderer.SetPosition(1, target);
+        }
+        #endregion
+
+        #region Gun Tower
+        private void RotateTurret(Vector3 target)
+        {
+            // Get the direction vector of the enemy position.
+            Vector3 direction = target - turret.position;
+            // Create a quaternion rotation from this direction.
+            Quaternion rotation = Quaternion.LookRotation(direction);
+            // Smoothly rotate turret towards target.
+            turret.rotation = Quaternion.Slerp(turret.rotation, rotation, rotationSpeed * Time.deltaTime);
+        }
+
+        private void ShootBullet(Vector3 target)
+        {
+            // Shoot bullet on intervals.
+            bulletShootTimer += Time.deltaTime;
+#if UNITY_EDITOR
+            Debug.Log(Vector3.Dot(turret.forward, (turret.position - target).normalized));
+#endif
+            // Make sure turret is facing target before shooting.
+            if (bulletShootTimer >= bulletShootTime && Vector3.Dot(turret.forward, (turret.position - target).normalized) <= -0.95f)
+            {
+                bulletShootTimer = 0;
+                // Signal that gunshot can be played.
+                playGunShot = true;
+                // Instantiate bullets at bullet holes.
+                InstantiateBullet(atBulletHole: bulletHole1);
+                InstantiateBullet(atBulletHole: bulletHole2);
+            }
+        }
+
+        private void InstantiateBullet(Transform atBulletHole)
+        {
+            GameObject bulletInstance = Instantiate(bullet);
+            // Make initial position the bullet hole.
+            bulletInstance.transform.position = atBulletHole.position;
+            // Apply velocity forward relative to the bullet hole position.
+            bulletInstance.GetComponent<Rigidbody>().velocity = atBulletHole.transform.forward * bulletSpeed;
+        }
+        #endregion
+
+        private void PlayAudio()
+        {
+            // Handle audio differently for different enemy types.
+            if (enemyType == EnemyType.TowerBeam && !audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+            else if (enemyType == EnemyType.TowerGun && playGunShot)
+            {
+                playGunShot = false;
+                audioSource.Play();
+            }
+        }
+
+        private void DamageTimer(IDamageable enemy)
+        {
+            timer += Time.deltaTime;
+            if (timer >= damageTimerAmount)
+            {
+                timer = 0;
+                // Damage the enemy.
+                enemy.TakeDamage(Damage);
+            }
+        }
+
         #if UNITY_EDITOR
-        Debug.Log($"{gameObject.name} dealt {Damage} damage to {enemy.Name}, it now has {enemy.Hitpoints} Hitpoints left.");
+        private void OnDrawGizmos() => Gizmos.DrawWireSphere(transform.position, checkRadius);
         #endif
-    }
-
-      #if UNITY_EDITOR
-    private void OnDrawGizmos()
-    {
-        // Draw a radius sphere for debugging.
-        Gizmos.DrawWireSphere(transform.position, checkRadius);
-    }
-    #endif
+    } 
 }

@@ -1,61 +1,66 @@
 ﻿using UnityEngine;
 
-public class Enemy : MonoBehaviour, IEnemy
+namespace AOTVBR
 {
-    public string Name { get; set; }
-    public float Hitpoints { get; set; }
-    public int Damage { get; set; }
-    public float FundAmount { get; set; }
-
-    [SerializeField]
-    private new string name = "Enemy";
-    [SerializeField]
-    private float hitpoints = 50;
-    [SerializeField]
-    private float fundAmount = 1;
-    [SerializeField]
-    private int damage = 5;
-    [SerializeField]
-    private GameObject explosionPrefab = default;
-
-    private void Awake()
+    public class Enemy : MonoBehaviour, IDamageable, IDoDamage, ICanGiveFunds, IHasName
     {
-        // Apply the serialized values for this enemy instance.
-        Name = name;
-        Hitpoints = hitpoints;
-        Damage = damage;
-        FundAmount = fundAmount;
-    }
+        [SerializeField]
+        private new string name = "Enemy";
+        public string Name { get; set; }
 
-    private void Update()
-    {
-        // Check if hitpoints are close or less than zero.
-        if (Mathf.Approximately(Hitpoints, Mathf.Epsilon) || Hitpoints <= Mathf.Epsilon)
+        public IHasName GetIHasName() => this;
+
+        [SerializeField]
+        private float hitpoints = 50;
+        public float Hitpoints { get; set; }
+
+        [SerializeField]
+        private int damage = 5;
+        public int Damage { get; set; }
+
+        [SerializeField]
+        private float fundAmount = 1;
+        public float FundAmount { get; set; }
+
+        private static float maxFunds = 30;
+
+        [SerializeField]
+        private GameObject explosionPrefab = default;
+
+        private void Awake()
         {
-            // Start death process.
-            Die();
-            // Give funds to the player.
-            GiveFunds();
+            // Apply the serialized values for this enemy instance.
+            Name = name;
+            Hitpoints = hitpoints;
+            Damage = damage;
+            FundAmount = fundAmount;
         }
-    }
 
-    public void Die()
-    {
-        // Start an explosion.
-        Explosion();
-        Destroy(gameObject);
-    }
-
-    private void Explosion()
-    {
-        Instantiate(explosionPrefab).transform.position = transform.position;
-    }
-
-    private void GiveFunds()
-    {
-        if (PlayManager.Instance.Funds < 30)
+        public void TakeDamage(float damage)
         {
-            PlayManager.Instance.Funds += fundAmount;
+            Hitpoints -= damage;
+            if (Utility.FloatEqual(Hitpoints, 0))
+            {
+                Die();
+                GiveFunds();
+            }
         }
-    }
+
+        public void Die()
+        {
+            Explosion();
+            Destroy(gameObject);
+        }
+
+        private void Explosion() 
+            => Instantiate(explosionPrefab).transform.position = transform.position;
+
+        public void GiveFunds()
+        {
+            if (PlayManager.Instance.Funds < maxFunds)
+            {
+                PlayManager.Instance.Funds += fundAmount;
+            }
+        }
+    } 
 }

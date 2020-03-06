@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 
-public class DontDestroyOnLoad : MonoBehaviour
+namespace AOTVBR
 {
-    // Don't destroy gameObjects this script is attached to on game awake.
-    private void Awake()
+    public class DontDestroyOnLoad : MonoBehaviour
     {
-        DontDestroyOnLoad(gameObject);
-    }
+        private void Awake() => DontDestroyOnLoad(gameObject);
+    } 
 }
