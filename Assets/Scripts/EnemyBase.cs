@@ -1,23 +1,24 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace AOTVBR
 {
-    public abstract class EnemyBase : MonoBehaviour
+    public abstract class EnemyBase : MonoBehaviour, IComparable<EnemyBase>
     {
         [SerializeField]
-        protected new string name = "Enemy";
+        private new string name = "Enemy";
         public string Name { get => name; }
 
         [SerializeField]
-        protected float hitpoints = 50;
+        private float hitpoints = 50;
         public float Hitpoints { get => hitpoints; }
 
         [SerializeField]
-        protected int damage = 5;
+        private int damage = 5;
         public int Damage { get => damage; }
 
         [SerializeField]
-        protected float fundAmount = 1;
+        private float fundAmount = 1;
         public float FundAmount { get => fundAmount; }
 
         private const float MaxFunds = 30;
@@ -41,7 +42,7 @@ namespace AOTVBR
             Destroy(gameObject);
         }
 
-        protected virtual void Explosion() 
+        protected virtual void Explosion()
             => Instantiate(explosionPrefab).transform.position = transform.position;
 
         protected virtual void FundPlayer()
@@ -51,5 +52,17 @@ namespace AOTVBR
                 PlayManager.Instance.Funds += fundAmount;
             }
         }
-    } 
+
+        /// <summary>
+        /// Compare hitpoints equality.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int CompareTo(EnemyBase other)
+        {
+            if (Mathf.Approximately(Hitpoints, other.Hitpoints)) return 0;
+            else if (Hitpoints > other.Hitpoints) return 1;
+            else return -1;
+        }
+    }
 }

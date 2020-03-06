@@ -36,7 +36,7 @@ namespace AOTVBR
             // Check if player has funds.
             CheckCost();
             // Make sure to signal the tower that it is being placed.
-            towerType.IsPlacing(enable: true);
+            towerType.IsCurrentPlacing(enable: true);
             towerRenderer = towerPrefab.GetComponentsInChildren<Renderer>();
             // Store the default colors of the tower.
             GetDefaultColors();
@@ -105,14 +105,14 @@ namespace AOTVBR
                 if (Input.GetKeyDown(KeyCode.C))
                 {
                     isPlacing = false;
-                    towerType.IsPlacing(enable: false);
+                    towerType.IsCurrentPlacing(enable: false);
                     Destroy(towerPrefab);
                 }
             }
             else
             {
                 isPlacing = false;
-                towerType.IsPlacing(enable: false);
+                towerType.IsCurrentPlacing(enable: false);
                 Destroy(towerPrefab);
             }
         }
@@ -152,7 +152,7 @@ namespace AOTVBR
                 PositionTower();
                 // Make sure placing bools are resetted.
                 isPlacing = false;
-                towerType.IsPlacing(enable: false);
+                towerType.IsCurrentPlacing(enable: false);
             }
         }
 

@@ -407,7 +407,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6571013975042129096}
-  - component: {fileID: -7986311782458170251}
+  - component: {fileID: 3228426317253179051}
   - component: {fileID: -5600195842730260347}
   - component: {fileID: 8073259992900978347}
   m_Layer: 10
@@ -433,7 +433,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-7986311782458170251
+--- !u!114 &3228426317253179051
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -442,25 +442,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 7884597597889203931}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f446529828472047ada8ea182f839f2, type: 3}
+  m_Script: {fileID: 11500000, guid: 6eaf2806eead84744af280b842e6d092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyType: 0
-  attackableEnemiesLayers:
+  turret: {fileID: 5755208542684306722}
+  enemyLayers:
     serializedVersion: 2
     m_Bits: 4096
   name: Beam Tower
   cost: 10
-  damage: 2.75
-  turret: {fileID: 5755208542684306722}
-  bullet: {fileID: 3066397685346386072, guid: 3b120f854ddab1e4a96374c05b1f45fe, type: 3}
-  bulletHole1: {fileID: 0}
-  bulletHole2: {fileID: 0}
+  damage: 2.9
   damageTimerAmount: 0.25
   checkRadius: 3.3
-  rotationSpeed: 0
-  bulletSpeed: 0
-  bulletShootTime: 0
+  laserOnPositionOffset: {x: 0, y: 0.4, z: 0}
 --- !u!82 &-5600195842730260347
 AudioSource:
   m_ObjectHideFlags: 0

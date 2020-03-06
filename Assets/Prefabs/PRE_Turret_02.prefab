@@ -263,7 +263,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1712061335621097867}
   m_Layer: 10
-  m_Name: BarrelHole
+  m_Name: BulletRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -281,7 +281,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 951813905466080828}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4950830269487756435
 GameObject:
@@ -293,7 +293,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6734040212037515472}
   m_Layer: 10
-  m_Name: BarrelHole (1)
+  m_Name: BulletLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -311,7 +311,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 951813905466080828}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5051698521350479693
 GameObject:
@@ -424,8 +424,8 @@ Transform:
   m_LocalPosition: {x: 0.3421914, y: 0.001968503, z: 0.09084225}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1712061335621097867}
   - {fileID: 6734040212037515472}
+  - {fileID: 1712061335621097867}
   m_Father: {fileID: 8169164171337337238}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -485,7 +485,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6954035776916560327}
-  - component: {fileID: 1493214533689276051}
+  - component: {fileID: 775878453701827681}
   - component: {fileID: -159913201743704448}
   - component: {fileID: 6458417308362637685}
   m_Layer: 10
@@ -510,7 +510,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1493214533689276051
+--- !u!114 &775878453701827681
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -519,25 +519,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 6258573468421254100}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f446529828472047ada8ea182f839f2, type: 3}
+  m_Script: {fileID: 11500000, guid: 95ba44673a8f4314a99abfabd1e1415d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyType: 1
-  attackableEnemiesLayers:
+  turret: {fileID: 2587433458738282979}
+  enemyLayers:
     serializedVersion: 2
     m_Bits: 4096
   name: Gun Tower
   cost: 20
-  damage: 3.5
-  turret: {fileID: 2587433458738282979}
-  bullet: {fileID: 3066397685346386072, guid: 3b120f854ddab1e4a96374c05b1f45fe, type: 3}
-  bulletHole1: {fileID: 1712061335621097867}
-  bulletHole2: {fileID: 6734040212037515472}
+  damage: 3.65
   damageTimerAmount: 0.3
   checkRadius: 3.8
+  bulletHoleLeft: {fileID: 6734040212037515472}
+  bulletHoleRight: {fileID: 1712061335621097867}
   rotationSpeed: 1
   bulletSpeed: 15
   bulletShootTime: 1
+  minimumDotProductToFire: -0.95
 --- !u!82 &-159913201743704448
 AudioSource:
   m_ObjectHideFlags: 0
