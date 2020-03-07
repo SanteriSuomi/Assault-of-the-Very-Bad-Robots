@@ -1,46 +1,10 @@
 ﻿using UnityEngine;
 
-public class LevelData : MonoBehaviour
+namespace AOTVBR
 {
-    public static LevelData Instance { get; set; }
-    // Enemy agent start point in the map.
-    private Vector3 agentStartPoint;
-    public Vector3 AgentStartPoint
+    public class LevelData : Singleton<LevelData>
     {
-        get { return agentStartPoint; }
-        set
-        {
-            agentStartPoint = value;
-
-            #if UNITY_EDITOR
-            Debug.Log($"Agent Start Point: {agentStartPoint}");
-            #endif
-        }
-    }
-    // Enemy agent end point in the map.
-    private Vector3 agentEndPoint;
-    public Vector3 AgentEndPoint
-    {
-        get { return agentEndPoint; }
-        set
-        {
-            agentEndPoint = value;
-
-#if UNITY_EDITOR
-            Debug.Log($"Agent End Point: {agentEndPoint}");
-            #endif
-        }
-    }
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
-    }
+        public Vector3 AgentStartPoint { get; set; }
+        public Vector3 AgentEndPoint { get; set; }
+    } 
 }

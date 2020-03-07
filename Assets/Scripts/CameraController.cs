@@ -119,10 +119,12 @@ namespace AOTVBR
         private IEnumerator SmoothPivotMove(Vector3 newPivotPosition)
         {
             float maxTimer = 0;
-            while (!Utility.PosEqual(pivot.position, newPivotPosition) && maxTimer <= 2.5f)
+            while (!Utility.PosEqual(pivot.position, newPivotPosition) 
+                && maxTimer <= 2.5f)
             {
                 maxTimer += Time.deltaTime;
-                pivot.position = Vector3.Lerp(pivot.position, newPivotPosition, pivotMoveSpeed * Time.deltaTime);
+                pivot.position = Vector3.Lerp(pivot.position, newPivotPosition, 
+                    pivotMoveSpeed * Time.deltaTime);
                 yield return null;
             }
         }

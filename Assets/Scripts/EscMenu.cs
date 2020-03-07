@@ -1,88 +1,77 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class EscMenu : MonoBehaviour
+namespace AOTVBR
 {
-    public static EscMenu Instance { get; set; }
-
-    [SerializeField]
-    private GameObject escMenuButtons = default;
-    
-    private bool isPaused = false;
-
-    private void Awake()
+    public class EscMenu : Singleton<EscMenu>
     {
-        if (Instance != null && Instance != this)
+        [SerializeField]
+        private GameObject escMenuButtons = default;
+
+        private bool isPaused;
+
+        private void Update()
         {
-            Destroy(gameObject);
+            if (GameState.Instance.GetState() == GameStates.PlayMap
+                || GameState.Instance.GetState() == GameStates.GenerateMap)
+                return;
+
+            EscapeMenuInput();
         }
-        else
+
+        private void EscapeMenuInput()
         {
-            Instance = this;
-        }
-    }
-    
-    private void Update()
-    {
-        // Make sure it the game is in the correct state before getting input.
-        if (GameState.Instance.GetState() == GameState.GameStates.PlayMap || 
-            GameState.Instance.GetState() == GameState.GameStates.GenerateMap)
-        {
-            // Activate the pause menu.
-            if (!isPaused && Input.GetKeyDown(KeyCode.Escape))
+            bool pressedEscape = Input.GetKeyDown(KeyCode.Escape);
+            if (isPaused && pressedEscape)
             {
-                ActivateEscMenu(true);
-                PauseGame(true);
-                PauseAudio(true);
-                StartCoroutine(IsPausedDelay());
-            }
-            // Deactivate the pause menu.
-            if (isPaused && Input.GetKeyDown(KeyCode.Escape))
-            {
-                ActivateEscMenu(false);
+                EnableEscMenu(false);
                 PauseGame(false);
                 PauseAudio(false);
                 isPaused = false;
             }
+            else if (pressedEscape)
+            {
+                EnableEscMenu(true);
+                PauseGame(true);
+                PauseAudio(true);
+                StartCoroutine(IsPauseTrueDelay());
+            }
         }
-    }
-    private IEnumerator IsPausedDelay()
-    {
-        // Introduce a frame delay to prevent accidentally double triggering input.
-        yield return null;
-        isPaused = true;
-    }
 
-    private void PauseGame(bool pause)
-    {
-        // Pause the game according to the parameter.
-        switch (pause)
+        private IEnumerator IsPauseTrueDelay()
         {
-            case true:
-                Time.timeScale = 0;
-                break;
-            case false:
-                Time.timeScale = 1;
-                break;
+            // Introduce a frame delay to prevent accidentally double triggering input.
+            yield return null;
+            isPaused = true;
         }
-    }
 
-    private void PauseAudio(bool pause)
-    {
-        // Pause the audio according to the parameter.
-        switch (pause)
+        private void PauseGame(bool pause)
         {
-            case true:
-                AudioListener.volume = 0;
-                break;
-            case false:
-                AudioListener.volume = 1;
-                break;
+            switch (pause)
+            {
+                case true:
+                    Time.timeScale = 0;
+                    break;
+                case false:
+                    Time.timeScale = 1;
+                    break;
+            }
         }
-    }
 
-    public void ActivateEscMenu(bool activate)
-    {
-        escMenuButtons.SetActive(activate);
+        private void PauseAudio(bool pause)
+        {
+            switch (pause)
+            {
+                case true:
+                    AudioListener.volume = 0;
+                    break;
+                case false:
+                    AudioListener.volume = 1;
+                    break;
+            }
+        }
+
+        public void EnableEscMenu(bool activate)
+            => escMenuButtons.SetActive(activate);
     }
 }

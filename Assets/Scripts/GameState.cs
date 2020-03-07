@@ -1,121 +1,75 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-public class GameState : MonoBehaviour
+namespace AOTVBR
 {
-    public static GameState Instance { get; set; }
-    // Events that control some menus in the game using menucontroller.
-    #region Menu Events
-    public delegate void MainMenu();
-    public event MainMenu MainMenuEvent;
-
-    public delegate void GenerateMenu();
-    public event GenerateMenu GenerateMenuEvent;
-
-    public delegate void PlayMapMenu();
-    public event PlayMapMenu PlayMapMenuEvent;
-    #endregion
-    // Event for notifying playmanager that game has started.
-    public delegate void GameStarted();
-    public event GameStarted GameStartedEvent;
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
-    }
-
-    private void Start()
-    {
-        // Start the game with the menu state.
-        currentState = GameStates.Menu;
-    }
-
     public enum GameStates
     {
-        // All available states in the game.
         Menu = 1,
         GenerateMap = 2,
         PlayMap = 3
     }
 
-    private GameStates currentState;
-
-    public void SetState(int state)
+    public class GameState : Singleton<GameState>
     {
-        // Set the state with the underlying integer.
-        currentState = (GameStates)state;
-    }
+        public delegate void MainMenu();
+        public event MainMenu MainMenuEvent;
 
-    public GameStates GetState()
-    {
-        // Get the currently running state.
-        return currentState;
-    }
+        public delegate void GenerateMenu();
+        public event GenerateMenu GenerateMenuEvent;
 
-    private void Update()
-    {
-        #if UNITY_EDITOR 
-        StateDebug(); 
-        #endif
+        public delegate void PlayMapMenu();
+        public event PlayMapMenu PlayMapMenuEvent;
 
-        switch (currentState)
+        public delegate void GameStarted();
+        public event GameStarted GameStartedEvent;
+
+        private void Start() 
+            => currentState = GameStates.Menu;
+
+        private GameStates currentState;
+
+        public void SetState(int state) 
+            => currentState = (GameStates)state;
+
+        public GameStates GetState() => currentState;
+
+        private void Update()
         {
-            case GameStates.Menu:
-                MainMenuEvent.Invoke();
-                break;
-            case GameStates.GenerateMap:
-                GenerateMenuEvent.Invoke();
-                // When entering this state, clear all alive entities in the game.
-                ClearEntities();
-                break;
-            case GameStates.PlayMap:
-                PlayMapMenuEvent.Invoke();
-                GameStartedEvent.Invoke();
-                break;
-            default:
-                break;
-        }
-    }
-
-    private static void ClearEntities()
-    {
-        // Check if there is active entities in the scene.
-        if (EntityData.Instance.ActiveMapEntityList.Count > 0)
-        {
-            // Destroy all entities in the list.
-            foreach (GameObject entity in EntityData.Instance.ActiveMapEntityList)
+            switch (currentState)
             {
-                Destroy(entity);
+                case GameStates.Menu:
+                    MainMenuEvent?.Invoke();
+                    break;
+
+                case GameStates.GenerateMap:
+                    GenerateMenuEvent?.Invoke();
+                    ClearEntities();
+                    break;
+
+                case GameStates.PlayMap:
+                    PlayMapMenuEvent?.Invoke();
+                    GameStartedEvent?.Invoke();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        private static void ClearEntities()
+        {
+            List<GameObject> entities = EntityData.Instance.ActiveMapEntityList;
+            if (entities.Count > 0)
+            {
+                for (int i = 0; i < entities.Count - 1; i++)
+                {
+                    if (entities[i] != null)
+                    {
+                        Destroy(entities[i]);
+                    }
+                }
             }
         }
     }
-
-    #region State Debug
-    #if UNITY_EDITOR
-    private void StateDebug()
-    {
-        // Switch for debugging states.
-        switch (currentState)
-        {
-            case GameStates.Menu:
-                Debug.Log("Current State: Menu");
-                break;
-            case GameStates.GenerateMap:
-                Debug.Log("Current State: GenerateMap");
-                break;
-            case GameStates.PlayMap:
-                Debug.Log("Current State: PlayMap");
-                break;
-            default:
-                break;
-        }
-    }
-    #endif
-    #endregion
 }

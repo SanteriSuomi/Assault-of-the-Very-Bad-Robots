@@ -35,28 +35,26 @@ namespace AOTVBR
         /// <returns></returns>
         public T Get()
         {
-            T peekedObject = pool.Peek();
-            CheckObjectInUse(peekedObject);
+            CheckObjectInUse(pool.Peek());
 
             T poppedObject = pool.Dequeue();
             SetObjectActiveState(poppedObject, true);
-
             return poppedObject;
         }
 
         /// <summary>
         /// Return a object to the pool.
         /// </summary>
-        /// <param name="value"></param>
-        public void Return(T value)
+        /// <param name="returnedObject"></param>
+        public void Return(T returnedObject)
         {
-            SetObjectActiveState(value, false);
-            pool.Enqueue(value);
+            SetObjectActiveState(returnedObject, false);
+            pool.Enqueue(returnedObject);
         }
 
         private void CheckObjectInUse(T peekedObject)
         {
-            if (peekedObject == null)
+            if (peekedObject is null)
             {
                 AddNewObjectToPool();
             }

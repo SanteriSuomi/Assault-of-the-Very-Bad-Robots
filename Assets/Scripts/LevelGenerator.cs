@@ -2,357 +2,322 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class LevelGenerator : MonoBehaviour
+namespace AOTVBR
 {
-    public static LevelGenerator Instance { get; set; }
-
-    public delegate void GeneratingTextHide();
-    public event GeneratingTextHide GeneratingTextHideEvent;
-
-    [SerializeField]
-    private GameObject levelPrefab = default;
-    [SerializeField]
-    private Transform levelPrefabParent = default;
-    [SerializeField]
-    private GameObject levelPathPrefab = default;
-    [SerializeField]
-    private GameObject cameraPivot = default;
-    [SerializeField]
-    private NavMeshSurface navMesh = default;
-    [SerializeField]
-    private GameObject basePrefab = default;
-    [SerializeField]
-    private GameObject shipPrefab = default;
-
-    private GameObject enemyBase;
-    private GameObject playerBase;
-    private GameObject[,,] map;
-
-    [SerializeField]
-    private int xLength = 24;
-    [SerializeField]
-    private int zLength = 22;
-    [Tooltip("One Y row is every 0.5.")]
-    [SerializeField]
-    private float yLength = 0.5f;
-    public float YLength { get => yLength; }
-
-    private bool setAgentStartPoint;
-
-    private void Awake()
+    public class LevelGenerator : Singleton<LevelGenerator>
     {
-        if (Instance != null && Instance != this)
+        public delegate void GeneratingTextHide();
+        public event GeneratingTextHide GeneratingTextHideEvent;
+
+        [SerializeField]
+        private GameObject levelPrefab = default;
+        [SerializeField]
+        private Transform levelPrefabParent = default;
+        [SerializeField]
+        private GameObject levelPathPrefab = default;
+        [SerializeField]
+        private GameObject cameraPivot = default;
+        [SerializeField]
+        private NavMeshSurface navMesh = default;
+        [SerializeField]
+        private GameObject basePrefab = default;
+        [SerializeField]
+        private GameObject shipPrefab = default;
+
+        [SerializeField]
+        private Quaternion enemyShipBaseStartRotation = Quaternion.Euler(0, 270, 0);
+        [SerializeField]
+        private Vector3 enemyShipBaseStartPositionOffset = new Vector3(0.08f, 0, -2.15f);
+
+        private GameObject enemyShipBase;
+        private GameObject playerBase;
+        private GameObject[,,] map;
+
+        [SerializeField]
+        private int xLength = 24;
+        [SerializeField]
+        private int zLength = 22;
+        [Tooltip("One Y row is every 0.5.")]
+        [SerializeField]
+        private float yLength = 0.5f;
+        public float YLength { get => yLength; }
+        [SerializeField]
+        private float yInitializationOffset = 0.5f;
+
+        [SerializeField]
+        private int walkableLayerInt = 9;
+        [SerializeField]
+        private int nonWalkableLevelLayerInt = 11;
+
+        private bool hasSetAgentStartPoint;
+
+        protected override void Awake()
+            => map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
+
+        private void OnEnable() => InitializeCamera();
+
+        private void InitializeCamera()
+            => Instantiate(cameraPivot).transform.position = new Vector3(xLength / 2, Mathf.RoundToInt(yLength + yLength), zLength / 2);
+
+        private void Start() => GenerateMap();
+
+        public void GenerateMap() => StartCoroutine(GenerateMapTimer());
+
+        private IEnumerator GenerateMapTimer()
         {
-            Destroy(gameObject);
+            yield return null;
+            ClearCurrentMap();
+            InitializeRandomSeed();
+            GenerateMapBlocks();
+            GenerateMapPath();
+            GenerateNavMesh();
+            ForceCleanUp();
+            GeneratingTextHideEvent.Invoke();
         }
-        else
+
+        #region Generate Map
+        private void GenerateMapBlocks()
         {
-            Instance = this;
-        }
-
-        map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
-    }
-
-    private void OnEnable()
-    {
-        // Initialize the camera pivot to the correct position in the middle of the map.
-        Instantiate(cameraPivot).transform.position = new Vector3(xLength / 2, Mathf.RoundToInt(yLength + yLength), zLength / 2);
-    }
-
-    private void Start()
-    {
-        // Start the game with a generated map.
-        GenerateMap();
-    }
-
-    public void GenerateMap()
-    {
-        // When starting to generate a new map, introduce a small delay.
-        StartCoroutine(GenerateMapTimer());
-    }
-
-    private IEnumerator GenerateMapTimer()
-    {
-        yield return null;
-        // Clear the current map.
-        ClearMap();
-        // Initialize a new random seed.
-        InitializeSeed();
-        // Generate the necessary level blocks.
-        GenerateMapBlocks();
-        // Generate the enemy agent path on the level blocks.
-        GenerateMapPath();
-        // Generate a navmesh for the enemy agents.
-        GenerateNavMesh();
-        // Force a garbage collection for smoother gameplay.
-        ForceCleanUp();
-        // Event for hiding the generating map text.
-        GeneratingTextHideEvent.Invoke();
-    }
-
-    #region Generate Map
-    private void GenerateMapBlocks()
-    {
-        try
-        {
-            // Instantiate the X row of level blocks.
-            for (int xRow = 0; xRow < xLength; xRow++)
+            try
             {
-                InitializeXRow(xRow);
-                // For every X row, instantiate a Z row.
-                for (int zRow = 0; zRow < zLength; zRow++)
+                for (int x = 0; x < xLength; x++)
                 {
-                    InitializeZRow(xRow, zRow);
-                    // For every X and Z row, instantiate Y row.
-                    for (float yRow = 0; yRow < yLength; yRow += 0.5f)
+                    InitializeX(x);
+                    for (int z = 0; z < zLength; z++)
                     {
-                        InitializeYRow(xRow, zRow, yRow);
+                        InitializeZ(x, z);
+                        for (float y = 0; y < yLength; y += yInitializationOffset)
+                        {
+                            InitializeY(x, z, y);
+                        }
                     }
                 }
             }
-        }
-        catch (System.Exception e)
-        {
-            #if UNITY_EDITOR
-            Debug.Log(e);
-            #endif
-        }
-    }
-
-    private void InitializeXRow(int xRow)
-    {
-        GameObject xObject = Instantiate(levelPathPrefab);
-        xObject.transform.parent = levelPrefabParent;
-        xObject.layer = 9;
-        xObject.transform.position = new Vector3(xRow, 0, 0);
-        // Add objects to the multi-dimensional array of level blocks.
-        map[xRow, 0, 0] = xObject;
-    }
-
-    private void InitializeZRow(int xRow, int zRow)
-    {
-        GameObject zObject = Instantiate(levelPathPrefab);
-        zObject.transform.parent = levelPrefabParent;
-        zObject.layer = 9;
-        zObject.transform.position = new Vector3(xRow, 0, zRow);
-        map[xRow, 0, zRow] = zObject;
-    }
-
-    private void InitializeYRow(int xRow, int zRow, float yRow)
-    {
-        GameObject yObject = Instantiate(levelPrefab);
-        yObject.transform.parent = levelPrefabParent;
-        yObject.layer = 11;
-        // Make sure the objects above the level ground are carving for the navmesh.
-        yObject.AddComponent<NavMeshObstacle>().carving = true;
-        yObject.transform.position = new Vector3(xRow, yRow + 0.5f, zRow);
-        map[xRow, Mathf.RoundToInt(yRow + yRow), zRow] = yObject;
-    }
-    #endregion
-
-    #region Generate Path
-    private int thirdPassX;
-    private int fourthPassZ;
-    private int fifthPassX;
-
-    private void GenerateMapPath()
-    {
-        try
-        {
-            GenerateFirstPass(out int firstPassX, out int firstPassAmountZ);
-            // Spawn the enemy ship.
-            SpawnShip();
-            // Indicate that agentStartPoint can be set again.
-            setAgentStartPoint = false;
-            GenerateSecondPass(firstPassX, firstPassAmountZ);
-            GenerateThirdPass(firstPassAmountZ);
-            GenerateFourthPass();
-            Vector3 agentEndPoint = GenerateFifthPassAndGetAgentEndPoint();
-            // Spawn the player base at the agent end point (last point on the path).
-            SpawnBase(agentEndPoint);
-            // Set the enemy agent end point.
-            LevelData.Instance.AgentEndPoint = agentEndPoint;
-        }
-        catch (System.Exception e)
-        {
-            #if UNITY_EDITOR
-            Debug.Log(e);
-            #endif
-            // If the generation algorithm goes off the array, generate the map again.
-            GenerateMap();
-        }
-    }
-
-    private void GenerateFirstPass(out int firstPassX, out int firstPassAmountZ)
-    {
-        // Generate the first pass of the path.
-        // Starting from X position on the array.
-        firstPassX = Random.Range(2, xLength - 2);
-        // Agent start point should be the first position in the path.
-        SetAgentStartPoint(firstPassX);
-        // How much we need to carve in Z axis.
-        firstPassAmountZ = Random.Range(2, zLength / 2);
-        for (int i = 0; i < firstPassAmountZ; i++)
-        {
-            // Carve the path in the array.
-            Destroy(map[firstPassX, 0, i]);
-        }
-    }
-
-    private void GenerateSecondPass(int firstPassX, int firstPassAmountZ)
-    {
-        // Second pass for generating the path.
-        // How much should we generate.
-        int secondPassAmountX = Random.Range(2, xLength - 2);
-        // Direction of the carve on X axis.
-        int secondPassDirection = Random.Range(0, 2);
-        for (int i = 0; i < secondPassAmountX; i++)
-        {
-            // Determine the direction.
-            if (secondPassDirection == 0)
+            catch (System.Exception)
             {
-                // Start the pass at 0.
-                thirdPassX = 0;
-                // Carve the path starting from the firstpass ending position.
-                thirdPassX = firstPassX + i;
-                Destroy(map[firstPassX + i, 0, firstPassAmountZ]);
-            }
-            else
-            {
-                thirdPassX = 0;
-                thirdPassX = firstPassX - i;
-                Destroy(map[firstPassX - i, 0, firstPassAmountZ]);
+                // Ignore exceptions
             }
         }
-    }
 
-    private void GenerateThirdPass(int firstPassAmountZ)
-    {
-        // Third pass amount in Z axis.
-        int thirdPassAmountZ = Random.Range(2, zLength / 2);
-        for (int i = 0; i < thirdPassAmountZ; i++)
+        private void InitializeX(int x)
         {
-            fourthPassZ = 0;
-            // Start the fourth pass at the Z position from first pass.
-            fourthPassZ = firstPassAmountZ + i;
-            Destroy(map[thirdPassX, 0, firstPassAmountZ + i]);
+            GameObject xObj = Instantiate(levelPathPrefab);
+            xObj.transform.SetParent(levelPrefabParent);
+            xObj.layer = walkableLayerInt;
+            xObj.transform.position = new Vector3(x, 0, 0);
+            map[x, 0, 0] = xObj;
         }
-    }
 
-    private void GenerateFourthPass()
-    {
-        // Fourth pass, again in X axis on different direction.
-        int fourthPassAmountX = Random.Range(2, xLength - 2);
-        int fourthPassDirection = Random.Range(0, 2);
-        for (int i = 0; i < fourthPassAmountX; i++)
+        private void InitializeZ(int x, int z)
         {
-            if (fourthPassDirection == 0)
+            GameObject zObj = Instantiate(levelPathPrefab);
+            zObj.transform.SetParent(levelPrefabParent);
+            zObj.layer = walkableLayerInt;
+            zObj.transform.position = new Vector3(x, 0, z);
+            map[x, 0, z] = zObj;
+        }
+
+        private void InitializeY(int x, int z, float y)
+        {
+            GameObject yObj = Instantiate(levelPrefab);
+            yObj.transform.SetParent(levelPrefabParent);
+            yObj.layer = nonWalkableLevelLayerInt;
+            yObj.AddComponent<NavMeshObstacle>().carving = true; // Level blocks that are not the path should not have navmesh.
+            yObj.transform.position = new Vector3(x, y + yInitializationOffset, z);
+            map[x, Mathf.RoundToInt(y + y), z] = yObj;
+        }
+        #endregion
+
+        #region Generate Path
+        private int thirdPathXStartPos;
+        private int fourthPathZCarveAmount;
+        private int fifthPathXStartPos;
+
+        private void GenerateMapPath()
+        {
+            try
             {
-                fifthPassX = 0;
-                fifthPassX = thirdPassX + i;
-                Destroy(map[thirdPassX + i, 0, fourthPassZ]);
+                GenerateFirstPath(out int firstPathXStartPos, out int firstPathZCarveAmount);
+
+                SpawnShip();
+                hasSetAgentStartPoint = false;// Indicate that agentStartPoint can be set again.
+
+                GenerateSecondPath(firstPathXStartPos, firstPathZCarveAmount);
+                GenerateThirdPath(firstPathZCarveAmount);
+                GenerateFourthPath();
+
+                Vector3 agentEndPoint = GenerateFifthPath();
+
+                SpawnBaseAt(agentEndPoint);
+                LevelData.Instance.AgentEndPoint = agentEndPoint;
             }
-            else
+            catch (System.Exception)
             {
-                fifthPassX = thirdPassX - i;
-                Destroy(map[thirdPassX - i, 0, fourthPassZ]);
+                // If there is a problem with the generation, start a new one.
+                GenerateMap();
             }
         }
-    }
 
-    private Vector3 GenerateFifthPassAndGetAgentEndPoint()
-    {
-        // Last generation pass, going to the end of the map in Z axis.
-        // Make sure to generate the path to the end of the map.
-        int fifthPassAmountZ = zLength - fourthPassZ;
-        // Initialize the agent end point with 0.
-        Vector3 agentEndPoint = Vector3.zero;
-        for (int i = 0; i < fifthPassAmountZ; i++)
+        private void GenerateFirstPath(out int firstPathXStartPos, out int firstPathZCarveAmount)
         {
-            Destroy(map[fifthPassX, 0, fourthPassZ + i]);
-            // Make sure the agent end point is the last path block to be generated.
-            agentEndPoint = SetCalculateAgentEndPoint(agentEndPoint, i);
+            firstPathXStartPos = Random.Range(2, xLength - 2);
+            SetAgentStart(firstPathXStartPos);
+            
+            firstPathZCarveAmount = Random.Range(2, zLength / 2);
+            for (int i = 0; i < firstPathZCarveAmount; i++)
+            {
+                Destroy(map[firstPathXStartPos, 0, i]);
+            }
         }
 
-        return agentEndPoint;
-    }
-
-    private void SpawnShip()
-    {
-        // If the ship exists currently, destroy it.
-        if (shipPrefab != null)
+        private void GenerateSecondPath(int firstPathXStartPos, int firstPathZCarveAmount)
         {
-            Destroy(enemyBase);
+            int secondPathXStartPos = Random.Range(2, xLength - 2);
+            int secondPathCarveDirection = Random.Range(0, 2);
+            for (int i = 0; i < secondPathXStartPos; i++)
+            {
+                thirdPathXStartPos = 0;
+                if (secondPathCarveDirection == 0)
+                {
+                    thirdPathXStartPos = firstPathXStartPos + i;
+                    Destroy(map[firstPathXStartPos + i, 0, firstPathZCarveAmount]);
+                }
+                else
+                {
+                    thirdPathXStartPos = firstPathXStartPos - i;
+                    Destroy(map[firstPathXStartPos - i, 0, firstPathZCarveAmount]);
+                }
+            }
         }
 
-        enemyBase = Instantiate(shipPrefab);
-        // Correctly rotate the ship prefab.
-        enemyBase.transform.rotation = Quaternion.Euler(0, 270, 0);
-        enemyBase.transform.position = LevelData.Instance.AgentStartPoint + new Vector3(0.08f, 0, -2.15f);
-    }
-
-    private void SpawnBase(Vector3 agentEndPoint)
-    {
-        if (playerBase != null)
+        private void GenerateThirdPath(int firstPathZCarveAmount)
         {
-            Destroy(playerBase);
+            int thirdPathZCarveAmount = Random.Range(2, zLength / 2);
+            for (int i = 0; i < thirdPathZCarveAmount; i++)
+            {
+                fourthPathZCarveAmount = 0;
+                fourthPathZCarveAmount = firstPathZCarveAmount + i;
+                Destroy(map[thirdPathXStartPos, 0, firstPathZCarveAmount + i]);
+            }
         }
 
-        playerBase = Instantiate(basePrefab);
-        playerBase.transform.rotation = Quaternion.Euler(0, 180, 0);
-        playerBase.transform.position = agentEndPoint + new Vector3(0, 0, 3.695f);
-    }
-    #endregion
-
-    #region Other Map Methods
-    private void ClearMap()
-    {
-        // When generating a new map, destroy all the blocks currently existing.
-        foreach (GameObject block in map)
+        private void GenerateFourthPath()
         {
-            Destroy(block);
-        }
-    }
-
-    private void InitializeSeed()
-    {
-        // Initialize the random seed with a value from system time.
-        Random.InitState((int)System.DateTime.Now.Ticks);
-    }
-
-    private void GenerateNavMesh()
-    {
-        // Build the agent navmesh.
-        navMesh.BuildNavMesh();
-    }
-
-    private void ForceCleanUp()
-    {
-        // Clean all the garbage before starting a game to prevent accidental hitches.
-        System.GC.Collect();
-        // Make sure there is no unused resources loaded.
-        Resources.UnloadUnusedAssets();
-    }
-
-    private void SetAgentStartPoint(int firstPassX)
-    {
-        // Set the start point for the enemy agents.
-        if (!setAgentStartPoint)
-        {
-            setAgentStartPoint = true;
-            LevelData.Instance.AgentStartPoint = map[firstPassX, 0, 0].transform.position;
-        }
-    }
-
-    private Vector3 SetCalculateAgentEndPoint(Vector3 agentEndPoint, int i)
-    {
-        // Calculate the agent endpoint from the fifth pass in the path generation.
-        if (map[fifthPassX, 0, fourthPassZ + i].transform.position.z > agentEndPoint.z)
-        {
-            agentEndPoint = map[fifthPassX, 0, fourthPassZ + i].transform.position;
+            int fourthPathXStartPos = Random.Range(2, xLength - 2);
+            int fourthPathDirection = Random.Range(0, 2);
+            for (int i = 0; i < fourthPathXStartPos; i++)
+            {
+                fifthPathXStartPos = 0;
+                if (fourthPathDirection == 0)
+                {
+                    fifthPathXStartPos = thirdPathXStartPos + i;
+                    Destroy(map[thirdPathXStartPos + i, 0, fourthPathZCarveAmount]);
+                }
+                else
+                {
+                    fifthPathXStartPos = thirdPathXStartPos - i;
+                    Destroy(map[thirdPathXStartPos - i, 0, fourthPathZCarveAmount]);
+                }
+            }
         }
 
-        return agentEndPoint;
+        private Vector3 GenerateFifthPath() // Last path
+        {
+            // Make sure to generate the path to the end of the map.
+            int fifthPassAmountZ = zLength - fourthPathZCarveAmount;
+            Vector3 agentEndPoint = Vector3.zero;
+            for (int i = 0; i < fifthPassAmountZ; i++)
+            {
+                Destroy(map[fifthPathXStartPos, 0, fourthPathZCarveAmount + i]);
+            }
+
+            for (int i = 0; i < fifthPassAmountZ; i++)
+            {
+                agentEndPoint = SetAgentEnd(agentEndPoint, i);
+            }
+
+            return agentEndPoint;
+        }
+
+        private void SpawnShip()
+        {
+            if (shipPrefab != null)
+            {
+                Destroy(enemyShipBase);
+            }
+
+            enemyShipBase = Instantiate(shipPrefab);
+            SetShipTransform();
+
+            void SetShipTransform()
+            {
+                enemyShipBase.transform.rotation = enemyShipBaseStartRotation;
+                enemyShipBase.transform.position =
+                    LevelData.Instance.AgentStartPoint + enemyShipBaseStartPositionOffset;
+            }
+        }
+
+        private void SpawnBaseAt(Vector3 agentEndPoint)
+        {
+            if (playerBase != null)
+            {
+                Destroy(playerBase);
+            }
+
+            playerBase = Instantiate(basePrefab);
+            playerBase.transform.rotation = Quaternion.Euler(0, 180, 0);
+            playerBase.transform.position = agentEndPoint + new Vector3(0, 0, 3.695f);
+        }
+        #endregion
+
+        #region Other Map Methods
+        private void ClearCurrentMap()
+        {
+            // When generating a new map, destroy all the blocks currently existing.
+            foreach (GameObject block in map)
+            {
+                Destroy(block);
+            }
+        }
+
+        private void InitializeRandomSeed()
+        {
+            // Initialize the random seed with a value from system time.
+            Random.InitState((int)System.DateTime.Now.Ticks);
+        }
+
+        private void GenerateNavMesh()
+        {
+            // Build the agent navmesh.
+            navMesh.BuildNavMesh();
+        }
+
+        private void ForceCleanUp()
+        {
+            // Clean all the garbage before starting a game to prevent accidental hitches.
+            System.GC.Collect();
+            // Make sure there is no unused resources loaded.
+            Resources.UnloadUnusedAssets();
+        }
+
+        private void SetAgentStart(int firstPathXStartPos)
+        {
+            if (!hasSetAgentStartPoint)
+            {
+                hasSetAgentStartPoint = true;
+                LevelData.Instance.AgentStartPoint = map[firstPathXStartPos, 0, 0].transform.position;
+            }
+        }
+
+        private Vector3 SetAgentEnd(Vector3 agentEndPoint, int i)
+        {
+            if (map[fifthPathXStartPos, 0, fourthPathZCarveAmount + i].transform.position.z > agentEndPoint.z)
+            {
+                agentEndPoint = map[fifthPathXStartPos, 0, fourthPathZCarveAmount + i].transform.position;
+            }
+
+            return agentEndPoint;
+        }
+        #endregion
     }
-    #endregion
 }

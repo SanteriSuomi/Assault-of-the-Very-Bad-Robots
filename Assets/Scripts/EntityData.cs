@@ -1,21 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class EntityData : MonoBehaviour
+namespace AOTVBR
 {
-    public static EntityData Instance { get; set; }
-    // Stores data for currently active entities on the map (towers, enemies etc).
-    public List<GameObject> ActiveMapEntityList { get; set; } = new List<GameObject>();
-
-    private void Awake()
+    public class EntityData : Singleton<EntityData>
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
-    }
+        // Stores data for currently active entities on the map (towers, enemies etc).
+        public List<GameObject> ActiveMapEntityList { get; } = new List<GameObject>();
+    } 
 }

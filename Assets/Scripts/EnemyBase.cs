@@ -43,7 +43,10 @@ namespace AOTVBR
         }
 
         protected virtual void Explosion()
-            => Instantiate(explosionPrefab).transform.position = transform.position;
+        {
+            Explosion explosion = ExplosionPool.Instance.Get();
+            explosion.transform.position = transform.position;
+        }
 
         protected virtual void GiveFundsToPlayer()
         {
