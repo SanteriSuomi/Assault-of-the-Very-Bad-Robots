@@ -23,7 +23,7 @@ namespace AOTVBR
             if (collision.TryGetComponent(out EnemyBase enemy))
             {
                 // Subtract health from the player.
-                PlayManager.Instance.Health -= enemy.Damage;
+                PlayerManager.Instance.Health -= enemy.Damage;
                 if (!isShowingDamageText)
                 {
                     isShowingDamageText = true;

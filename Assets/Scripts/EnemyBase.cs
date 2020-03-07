@@ -50,9 +50,9 @@ namespace AOTVBR
 
         protected virtual void GiveFundsToPlayer()
         {
-            if (PlayManager.Instance.Funds < MaxFunds)
+            if (PlayerManager.Instance.Funds < MaxFunds)
             {
-                PlayManager.Instance.Funds += fundAmount;
+                PlayerManager.Instance.Funds += fundAmount;
             }
         }
 

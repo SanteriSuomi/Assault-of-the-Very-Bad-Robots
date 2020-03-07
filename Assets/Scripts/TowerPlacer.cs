@@ -47,7 +47,7 @@ namespace AOTVBR
         private void CheckCost()
         {
             // Destroy the prefab if player doesn't have the needed funds.
-            if (towerType.Cost > PlayManager.Instance.Funds)
+            if (towerType.Cost > PlayerManager.Instance.Funds)
             {
                 if (towerPrefab != null)
                 {
@@ -175,7 +175,7 @@ namespace AOTVBR
                 // Place the tower on the surface of the level block aligned with the grid.
                 towerPrefab.transform.position = hitPosGrid + new Vector3(0, towerPrefab.transform.localScale.y, 0);
                 // Deduct funds from the player.
-                PlayManager.Instance.Funds -= towerType.Cost;
+                PlayerManager.Instance.Funds -= towerType.Cost;
                 // Add this tower instance to the entities list to make it easy to find later.
                 EntityData.Instance.ActiveMapEntityList.Add(towerPrefab);
             }

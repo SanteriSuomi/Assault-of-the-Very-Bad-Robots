@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace AOTVBR
 {
@@ -14,13 +13,10 @@ namespace AOTVBR
     {
         public delegate void MainMenu();
         public event MainMenu MainMenuEvent;
-
         public delegate void GenerateMenu();
         public event GenerateMenu GenerateMenuEvent;
-
         public delegate void PlayMapMenu();
         public event PlayMapMenu PlayMapMenuEvent;
-
         public delegate void GameStarted();
         public event GameStarted GameStartedEvent;
 
@@ -59,15 +55,11 @@ namespace AOTVBR
 
         private static void ClearEntities()
         {
-            List<GameObject> entities = EntityData.Instance.ActiveMapEntityList;
-            if (entities.Count > 0)
+            foreach (GameObject entity in EntityData.Instance.ActiveMapEntityList)
             {
-                for (int i = 0; i < entities.Count - 1; i++)
+                if (entity != null)
                 {
-                    if (entities[i] != null)
-                    {
-                        Destroy(entities[i]);
-                    }
+                    Destroy(entity);
                 }
             }
         }

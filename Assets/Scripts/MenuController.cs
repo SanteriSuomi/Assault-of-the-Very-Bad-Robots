@@ -4,11 +4,9 @@ using UnityEngine.UI;
 
 namespace AOTVBR
 {
-    public class MenuController : MonoBehaviour
+    #pragma warning disable CA1822 // Can't mark member as static as it's accessed by unity menu
+    public class MenuController : Singleton<MenuController>
     {
-        public static MenuController Instance { get; set; }
-
-        // Various menu elements.
         [SerializeField]
         private RawImage menuBackground = default;
         [SerializeField]
@@ -24,123 +22,54 @@ namespace AOTVBR
         [SerializeField]
         private GameObject healthFundsText = default;
         private RawImage[] menuButtonImages;
+        private WaitForSeconds hideGeneratingTextWFS;
 
-        private void Awake()
+        [SerializeField]
+        private float tutorialTextDeactivateMin = 0.2f;
+        [SerializeField]
+        private float tutorialTextDeactivateMax = 0.3f;
+        [SerializeField]
+        private float hideGeneratingTextTime = 1;
+
+        protected override void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-            }
-            else
-            {
-                Instance = this;
-            }
+            hideGeneratingTextWFS = new WaitForSeconds(hideGeneratingTextTime);
             // Get all the images in the child objects.
             menuButtonImages = menuButtons.GetComponentsInChildren<RawImage>();
-            RegisterAwakeEvents();
+            RegisterMenuEvents();
         }
 
-        private void RegisterAwakeEvents()
+        private void RegisterMenuEvents()
         {
-            // Register events from other scripts.
             GameState.Instance.MainMenuEvent += ActivateMainMenu;
             GameState.Instance.GenerateMenuEvent += ActivateGenerateMenu;
             GameState.Instance.PlayMapMenuEvent += ActivatePlayMenu;
             LevelGenerator.Instance.GeneratingTextHideEvent += HideGeneratingText;
         }
 
+        // Register this event in start because awake is too early (for some reason).
         private void Start()
-        {
-            // Register this event in start because awake is too early (for some reason).
-            PlayManager.Instance.GameMenuHideEvent += DisablePlayMenu;
-        }
+            => PlayerManager.Instance.GameMenuHideEvent += DisablePlayMenu;
 
         #region Button & Event Methods
         private void ActivateMainMenu()
         {
-            // Main method for activating main menu, through and event.
-            ShowMenuButtons();
+            ShowMainMenuButtons();
             HideGenerateButtons();
         }
 
         private void ActivateGenerateMenu()
         {
-            // Main method for activating generating menu, through and event.
-            // Fade main menu elements when activating generation menu.
             StartCoroutine(FadeOutMainMenu());
-            HideMenuButtons();
+            HideMainMenuButtons();
             ShowGenerateButtons();
-        }
-
-        private IEnumerator FadeOutMainMenu()
-        {
-            // Alpha must be 1.0f at the beginning.
-            float alphaMax = 1.0f;
-            GetColoComponents(out Color menuBGColor, out Color buttonPlayColor, out Color buttonExitColor);
-            // Gradually go down with a for loop.
-            for (float currentAlpha = alphaMax; currentAlpha > 0; currentAlpha -= 1f * Time.deltaTime)
-            {
-                // Change the color component's alpha.
-                ChangeAlpha(ref menuBGColor, ref buttonPlayColor, ref buttonExitColor, currentAlpha);
-                // Deactivate the tutorial text between values.
-                DeactivateTutorialTextAt(currentAlpha);
-                yield return null;
-            }
-            // Deactivate the background at the end.
-            menuBackground.gameObject.SetActive(false);
-        }
-
-        private void GetColoComponents(out Color menuBGColor, out Color buttonPlayColor, out Color buttonExitColor)
-        {
-            // Get all the color data from the menu elements.
-            menuBGColor = menuBackground.color;
-            buttonPlayColor = menuButtonImages[0].color;
-            buttonExitColor = menuButtonImages[1].color;
-        }
-
-        private void ChangeAlpha(ref Color menuBGColor, ref Color buttonPlayColor, ref Color buttonExitColor, float currentAlpha)
-        {
-            // Assign the new alpha values.
-            menuBGColor.a = currentAlpha;
-            menuBackground.color = menuBGColor;
-            buttonPlayColor.a = currentAlpha;
-            menuButtonImages[0].color = buttonPlayColor;
-            buttonExitColor.a = currentAlpha;
-            menuButtonImages[1].color = buttonExitColor;
-        }
-
-        private void DeactivateTutorialTextAt(float i)
-        {
-            // Deactivate the tutorial text inbetween.
-            if (i > 0.2f && i < 0.3f)
-            {
-                tutorialText.SetActive(false);
-            }
         }
 
         private void ActivatePlayMenu()
         {
-            // Main method for activating the main game menu.
             HideGenerateButtons();
             ShowTowerButtons();
             ShowHealthFundsText();
-        }
-
-        public void ReActivateMenu()
-        {
-            // Method for showing the menu again (from a button in the pause menu).
-            // If the current state isn't the correct one already, set it.
-            if (GameState.Instance.GetState() != GameStates.GenerateMap)
-            {
-                GameState.Instance.SetState(2);
-            }
-            // Make sure game isn't paused or muted, as it's exiting the pause menu.
-            Time.timeScale = 1;
-            AudioListener.volume = 1;
-            // Hide/show the required menu elements.
-            HideTowerButtons();
-            HideHealthFundsText();
-            ShowGenerateButtons();
         }
 
         private void DisablePlayMenu()
@@ -149,69 +78,86 @@ namespace AOTVBR
             HideHealthFundsText();
         }
 
-        public void ShowGeneratingText()
-        {
-            generatingText.SetActive(true);
-        }
-
-        private void HideGeneratingText()
-        {
-            StartCoroutine(HideGeneratingTextTimer());
-        }
+        private void HideGeneratingText() 
+            => StartCoroutine(HideGeneratingTextTimer());
 
         private IEnumerator HideGeneratingTextTimer()
         {
-            // Small delay until deactivating the generating text.
-            yield return new WaitForSeconds(1);
+            yield return hideGeneratingTextWFS;
             generatingText.SetActive(false);
         }
 
-        public void ExitGame()
+        public void ShowGeneratingText() 
+            => generatingText.SetActive(true);
+
+        public void ReActivateMenu()
         {
-            Application.Quit(0);
+            // Method for showing the menu again (from a button in the pause menu).
+            // If the current state isn't the correct one already, set it.
+            GameState.Instance.SetState((int)GameStates.GenerateMap);
+
+            Time.timeScale = 1;
+            AudioListener.volume = 1;
+
+            HideTowerButtons();
+            HideHealthFundsText();
+            ShowGenerateButtons();
         }
+
+        public void ExitGame() => Application.Quit();
         #endregion
-        // Single methods for showing/hiding specific UI elements.
+
         #region Private Methods
-        private void ShowTowerButtons()
+        private IEnumerator FadeOutMainMenu()
         {
-            towerButtons.SetActive(true);
+            float alphaMax = 1;
+            Color menuBGColor = menuBackground.color;
+            Color buttonPlayColor = menuButtonImages[0].color;
+            Color buttonExitColor = menuButtonImages[1].color;
+            for (float a = alphaMax; a > 0; a -= 1 * Time.deltaTime)
+            {
+                menuBGColor.a = a;
+                menuBackground.color = menuBGColor;
+                buttonPlayColor.a = a;
+                menuButtonImages[0].color = buttonPlayColor;
+                buttonExitColor.a = a;
+                menuButtonImages[1].color = buttonExitColor;
+
+                if (a > tutorialTextDeactivateMin 
+                    && a < tutorialTextDeactivateMax)
+                {
+                    tutorialText.SetActive(false);
+                }
+
+                yield return null;
+            }
+
+            menuBackground.gameObject.SetActive(false);
         }
 
-        private void HideTowerButtons()
-        {
-            towerButtons.SetActive(false);
-        }
+        private void ShowTowerButtons() 
+            => towerButtons.SetActive(true);
 
-        private void ShowHealthFundsText()
-        {
-            healthFundsText.SetActive(true);
-        }
+        private void HideTowerButtons() 
+            => towerButtons.SetActive(false);
 
-        private void HideHealthFundsText()
-        {
-            healthFundsText.SetActive(false);
-        }
+        private void ShowHealthFundsText() 
+            => healthFundsText.SetActive(true);
 
-        private void ShowMenuButtons()
-        {
-            menuButtons.SetActive(true);
-        }
+        private void HideHealthFundsText() 
+            => healthFundsText.SetActive(false);
 
-        private void HideMenuButtons()
-        {
-            menuButtons.SetActive(false);
-        }
+        private void ShowMainMenuButtons() 
+            => menuButtons.SetActive(true);
 
-        private void ShowGenerateButtons()
-        {
-            generateButtons.SetActive(true);
-        }
+        private void HideMainMenuButtons() 
+            => menuButtons.SetActive(false);
 
-        private void HideGenerateButtons()
-        {
-            generateButtons.SetActive(false);
-        }
+        private void ShowGenerateButtons() 
+            => generateButtons.SetActive(true);
+
+        private void HideGenerateButtons() 
+            => generateButtons.SetActive(false);
         #endregion
-    } 
+    }
 }

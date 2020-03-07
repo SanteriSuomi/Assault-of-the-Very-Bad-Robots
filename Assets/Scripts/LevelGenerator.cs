@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using System;
+using Random = UnityEngine.Random;
 
 namespace AOTVBR
 {
+    #pragma warning disable S1215 // "GC.Collect" should not be called
     public class LevelGenerator : Singleton<LevelGenerator>
     {
         public delegate void GeneratingTextHide();
@@ -29,6 +32,11 @@ namespace AOTVBR
         [SerializeField]
         private Vector3 enemyShipBaseStartPositionOffset = new Vector3(0.08f, 0, -2.15f);
 
+        [SerializeField]
+        private Quaternion playerBaseStartRotation = Quaternion.Euler(0, 180, 0);
+        [SerializeField]
+        private Vector3 playerBaseStartPositionOffset = new Vector3(0, 0, 3.695f);
+
         private GameObject enemyShipBase;
         private GameObject playerBase;
         private GameObject[,,] map;
@@ -49,7 +57,6 @@ namespace AOTVBR
         [SerializeField]
         private int nonWalkableLevelLayerInt = 11;
 
-        private bool hasSetAgentStartPoint;
 
         protected override void Awake()
             => map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
@@ -57,13 +64,16 @@ namespace AOTVBR
         private void OnEnable() => InitializeCamera();
 
         private void InitializeCamera()
-            => Instantiate(cameraPivot).transform.position = new Vector3(xLength / 2, Mathf.RoundToInt(yLength + yLength), zLength / 2);
+            => Instantiate(cameraPivot).transform.position = new Vector3(
+                xLength / 2,
+                Mathf.RoundToInt(yLength + yLength),
+                zLength / 2);
 
         private void Start() => GenerateMap();
 
-        public void GenerateMap() => StartCoroutine(GenerateMapTimer());
+        public void GenerateMap() => StartCoroutine(GenerateMapCoroutine());
 
-        private IEnumerator GenerateMapTimer()
+        private IEnumerator GenerateMapCoroutine()
         {
             yield return null;
             ClearCurrentMap();
@@ -78,24 +88,17 @@ namespace AOTVBR
         #region Generate Map
         private void GenerateMapBlocks()
         {
-            try
+            for (int x = 0; x < xLength; x++)
             {
-                for (int x = 0; x < xLength; x++)
+                InitializeX(x);
+                for (int z = 0; z < zLength; z++)
                 {
-                    InitializeX(x);
-                    for (int z = 0; z < zLength; z++)
+                    InitializeZ(x, z);
+                    for (float y = 0; y < yLength; y += yInitializationOffset)
                     {
-                        InitializeZ(x, z);
-                        for (float y = 0; y < yLength; y += yInitializationOffset)
-                        {
-                            InitializeY(x, z, y);
-                        }
+                        InitializeY(x, z, y);
                     }
                 }
-            }
-            catch (System.Exception)
-            {
-                // Ignore exceptions
             }
         }
 
@@ -139,20 +142,24 @@ namespace AOTVBR
             {
                 GenerateFirstPath(out int firstPathXStartPos, out int firstPathZCarveAmount);
 
+                SetAgentStart(firstPathXStartPos);
                 SpawnShip();
-                hasSetAgentStartPoint = false;// Indicate that agentStartPoint can be set again.
 
                 GenerateSecondPath(firstPathXStartPos, firstPathZCarveAmount);
                 GenerateThirdPath(firstPathZCarveAmount);
                 GenerateFourthPath();
 
-                Vector3 agentEndPoint = GenerateFifthPath();
+                int fifthPassAmountZ = GenerateFifthPath();
+                LevelData.Instance.AgentEndPoint = GetAgentEnd(fifthPassAmountZ);
 
-                SpawnBaseAt(agentEndPoint);
-                LevelData.Instance.AgentEndPoint = agentEndPoint;
+                SpawnBase();
             }
-            catch (System.Exception)
+            catch (IndexOutOfRangeException e)
             {
+                #if UNITY_EDITOR
+                Debug.Log(e);
+                #endif
+
                 // If there is a problem with the generation, start a new one.
                 GenerateMap();
             }
@@ -161,8 +168,6 @@ namespace AOTVBR
         private void GenerateFirstPath(out int firstPathXStartPos, out int firstPathZCarveAmount)
         {
             firstPathXStartPos = Random.Range(2, xLength - 2);
-            SetAgentStart(firstPathXStartPos);
-            
             firstPathZCarveAmount = Random.Range(2, zLength / 2);
             for (int i = 0; i < firstPathZCarveAmount; i++)
             {
@@ -221,22 +226,16 @@ namespace AOTVBR
             }
         }
 
-        private Vector3 GenerateFifthPath() // Last path
+        private int GenerateFifthPath() // Last path
         {
             // Make sure to generate the path to the end of the map.
-            int fifthPassAmountZ = zLength - fourthPathZCarveAmount;
-            Vector3 agentEndPoint = Vector3.zero;
-            for (int i = 0; i < fifthPassAmountZ; i++)
+            int fifthPathRemainingZAmount = zLength - fourthPathZCarveAmount;
+            for (int i = 0; i < fifthPathRemainingZAmount; i++)
             {
                 Destroy(map[fifthPathXStartPos, 0, fourthPathZCarveAmount + i]);
             }
 
-            for (int i = 0; i < fifthPassAmountZ; i++)
-            {
-                agentEndPoint = SetAgentEnd(agentEndPoint, i);
-            }
-
-            return agentEndPoint;
+            return fifthPathRemainingZAmount;
         }
 
         private void SpawnShip()
@@ -257,7 +256,7 @@ namespace AOTVBR
             }
         }
 
-        private void SpawnBaseAt(Vector3 agentEndPoint)
+        private void SpawnBase()
         {
             if (playerBase != null)
             {
@@ -265,55 +264,53 @@ namespace AOTVBR
             }
 
             playerBase = Instantiate(basePrefab);
-            playerBase.transform.rotation = Quaternion.Euler(0, 180, 0);
-            playerBase.transform.position = agentEndPoint + new Vector3(0, 0, 3.695f);
+            SetBaseTransform();
+
+            void SetBaseTransform()
+            {
+                playerBase.transform.rotation = playerBaseStartRotation;
+                playerBase.transform.position = 
+                    LevelData.Instance.AgentEndPoint + playerBaseStartPositionOffset;
+            }
         }
         #endregion
 
         #region Other Map Methods
         private void ClearCurrentMap()
         {
-            // When generating a new map, destroy all the blocks currently existing.
-            foreach (GameObject block in map)
+            foreach (GameObject mapBlock in map)
             {
-                Destroy(block);
+                if (mapBlock != null)
+                {
+                    Destroy(mapBlock);
+                }
             }
         }
 
         private void InitializeRandomSeed()
-        {
-            // Initialize the random seed with a value from system time.
-            Random.InitState((int)System.DateTime.Now.Ticks);
-        }
+            => Random.InitState((int)DateTime.Now.Ticks);
 
         private void GenerateNavMesh()
-        {
-            // Build the agent navmesh.
-            navMesh.BuildNavMesh();
-        }
+            => navMesh.BuildNavMesh();
 
         private void ForceCleanUp()
         {
-            // Clean all the garbage before starting a game to prevent accidental hitches.
-            System.GC.Collect();
-            // Make sure there is no unused resources loaded.
+            GC.Collect();
             Resources.UnloadUnusedAssets();
         }
 
-        private void SetAgentStart(int firstPathXStartPos)
-        {
-            if (!hasSetAgentStartPoint)
-            {
-                hasSetAgentStartPoint = true;
-                LevelData.Instance.AgentStartPoint = map[firstPathXStartPos, 0, 0].transform.position;
-            }
-        }
+        private void SetAgentStart(int firstPathXStartPos) 
+            => LevelData.Instance.AgentStartPoint = map[firstPathXStartPos, 0, 0].transform.position;
 
-        private Vector3 SetAgentEnd(Vector3 agentEndPoint, int i)
+        private Vector3 GetAgentEnd(int fifthPathZCarveAmount)
         {
-            if (map[fifthPathXStartPos, 0, fourthPathZCarveAmount + i].transform.position.z > agentEndPoint.z)
+            Vector3 agentEndPoint = Vector3.zero;
+            for (int i = 0; i < fifthPathZCarveAmount; i++)
             {
-                agentEndPoint = map[fifthPathXStartPos, 0, fourthPathZCarveAmount + i].transform.position;
+                if (map[fifthPathXStartPos, 0, fourthPathZCarveAmount + i].transform.position.z > agentEndPoint.z)
+                {
+                    agentEndPoint = map[fifthPathXStartPos, 0, fourthPathZCarveAmount + i].transform.position;
+                }
             }
 
             return agentEndPoint;

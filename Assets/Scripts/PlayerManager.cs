@@ -1,15 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
-using System;
 
 namespace AOTVBR
 {
-    public class PlayManager : MonoBehaviour
+    public class PlayerManager : Singleton<PlayerManager>
     {
-        public static PlayManager Instance { get; set; }
-
         public int Health { get; set; }
         public float Funds { get; set; }
 
@@ -30,6 +28,7 @@ namespace AOTVBR
         private GameObject enemyStrong = default;
         [SerializeField]
         private GameObject gameOverScreen = default;
+        private WaitForSeconds countdownLoopWFS;
 
         [SerializeField]
         private int gameStartCountdownTime = 3;
@@ -40,39 +39,30 @@ namespace AOTVBR
 
         [SerializeField]
         private float enemyBasicSpawnInterval = 5;
-        private float enemyBasicSpawnIntervalDefault;
         [SerializeField]
         private float enemyStrongSpawnInterval = 25;
-        private float enemyStrongSpawnIntervalDefault;
-        private float enemyTimerBasic;
-        private float enemyTimerStrong;
-        private float textTime;
         [SerializeField]
         private float spawnIntervalDecreaseTime = 15;
         [SerializeField]
         private float spawnIntervalDecrease = 0.975f;
         [SerializeField]
         private float minSpawnInterval = 0.2f;
+        [SerializeField]
+        private float countdownLoopInterval = 1;
+        private float enemyBasicSpawnIntervalDefault;
+        private float enemyStrongSpawnIntervalDefault;
+        private float enemyTimerBasic;
+        private float enemyTimerStrong;
+        private float textTime;
 
-        #region Game Flow Bools
-        private bool hasGameStarted = false;
-        private bool hasGameResetted = false;
-        private bool hasCountdownPlayed = false;
-        private bool continueGame = false;
-        private bool decreasedInterval = false;
+        #region Game Flow
+        private bool hasGameResetted;
+        private bool decreasedInterval;
         #endregion
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-            }
-            else
-            {
-                Instance = this;
-            }
-
+            countdownLoopWFS = new WaitForSeconds(countdownLoopInterval);
             GameState.Instance.GameStartedEvent += GameStart;
             // Store the default spawn intervals to reset them later.
             enemyBasicSpawnIntervalDefault = enemyBasicSpawnInterval;
@@ -82,15 +72,14 @@ namespace AOTVBR
         public void GameReset()
         {
             // Reset most of the game variables back to zero.
-            hasGameStarted = false;
-            hasCountdownPlayed = false;
-            continueGame = false;
+            StopCoroutine(nameof(UpdateLoop));
+            StopCoroutine(nameof(CountdownLoop));
             decreasedInterval = false;
             enemyTimerBasic = 0;
             enemyTimerStrong = 0;
+            textTime = 0;
             enemyBasicSpawnInterval = enemyBasicSpawnIntervalDefault;
             enemyStrongSpawnInterval = enemyStrongSpawnIntervalDefault;
-            textTime = 0;
             Funds = funds;
             Health = health;
         }
@@ -99,48 +88,36 @@ namespace AOTVBR
         {
             if (!hasGameResetted)
             {
-                // Make sure to reset the game only at the end.
                 hasGameResetted = true;
-                // Make sure the game variables have been resetted.
                 GameReset();
             }
-            // Variable which stores whether the main game has started or not.
-            hasGameStarted = true;
+
+            StartCoroutine(UpdateLoop());
         }
 
-        private void Update()
+        private IEnumerator UpdateLoop()
         {
-            if (hasGameStarted)
+            yield return StartCoroutine(CountdownLoop());
+            Debug.Log("asd");
+            while (enabled)
             {
-                // Play a countdown text once.
-                if (!hasCountdownPlayed)
-                {
-                    hasCountdownPlayed = true;
-                    StartCoroutine(PlayMapCountdown());
-                }
-                // Continue the game to the main game loop after the countdown.
-                if (continueGame)
-                {
-                    GameLoop();
-                }
+                GameLoop();
             }
+
+            yield return null;
         }
 
-        private IEnumerator PlayMapCountdown()
+        private IEnumerator CountdownLoop()
         {
-            // Make cursor invisible and lock it to the screen.
             CursorLock(false, CursorLockMode.Locked);
-            // Countdown text timer.
             for (int i = gameStartCountdownTime; i >= 0; i--)
             {
                 gameStartedCountdownText.text = i.ToString();
-                yield return new WaitForSeconds(1);
+                yield return countdownLoopWFS;
             }
-            // Reset the countdown text by making it empty string.
+
             gameStartedCountdownText.text = string.Empty;
             CursorLock(true, CursorLockMode.None);
-            // Signal that we can continue the game.
-            continueGame = true;
         }
 
         private void CursorLock(bool cursorVisible, CursorLockMode cursorLock)
@@ -181,7 +158,7 @@ namespace AOTVBR
             // When dead, make sure reset is false, so game can be resetted again.
             hasGameResetted = false;
             // Make sure to start the game only from the play map button.
-            hasGameStarted = false;
+            StopCoroutine(nameof(UpdateLoop));
             // Invoke an event to hide the game menus.
             GameMenuHideEvent.Invoke();
             // Set the state to the generate menu.
@@ -250,10 +227,6 @@ namespace AOTVBR
             enemyBasicSpawnInterval -= spawnIntervalDecrease;
             enemyStrongSpawnInterval -= spawnIntervalDecrease;
             decreasedInterval = false;
-
-#if UNITY_EDITOR
-            Debug.Log($"Decreased spawn interval, new interval: {enemyBasicSpawnInterval}, {enemyStrongSpawnInterval}.");
-#endif
         }
-    } 
+    }
 }

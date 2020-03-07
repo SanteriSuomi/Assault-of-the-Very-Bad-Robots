@@ -7,6 +7,7 @@ namespace AOTVBR
     {
         [SerializeField]
         private GameObject escMenuButtons = default;
+        private Coroutine IsPauseTrueDelayCoroutine;
 
         private bool isPaused;
 
@@ -14,9 +15,9 @@ namespace AOTVBR
         {
             if (GameState.Instance.GetState() == GameStates.PlayMap
                 || GameState.Instance.GetState() == GameStates.GenerateMap)
-                return;
-
-            EscapeMenuInput();
+            {
+                EscapeMenuInput();
+            }
         }
 
         private void EscapeMenuInput()
@@ -34,7 +35,12 @@ namespace AOTVBR
                 EnableEscMenu(true);
                 PauseGame(true);
                 PauseAudio(true);
-                StartCoroutine(IsPauseTrueDelay());
+                if (IsPauseTrueDelayCoroutine != null)
+                {
+                    StopCoroutine(IsPauseTrueDelayCoroutine);
+                }
+
+                IsPauseTrueDelayCoroutine = StartCoroutine(IsPauseTrueDelay());
             }
         }
 

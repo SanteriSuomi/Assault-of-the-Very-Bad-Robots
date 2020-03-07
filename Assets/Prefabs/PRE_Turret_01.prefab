@@ -449,9 +449,10 @@ MonoBehaviour:
   enemyLayers:
     serializedVersion: 2
     m_Bits: 4096
+  nearEnemiesArrayLength: 5
   name: Beam Tower
   cost: 10
-  damage: 2.9
+  damage: 2.8
   damageTimerAmount: 0.25
   checkRadius: 3.3
   laserOnPositionOffset: {x: 0, y: 0.4, z: 0}

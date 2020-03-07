@@ -1199,7 +1199,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 281806504}
-        m_MethodName: ActivateEscMenu
+        m_MethodName: EnableEscMenu
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3184,9 +3184,16 @@ MonoBehaviour:
     type: 3}
   shipPrefab: {fileID: 1264811253083701431, guid: fadf59b08762408418ac42f5f0bba840,
     type: 3}
+  enemyShipBaseStartRotation: {x: 0, y: 0.70710677, z: 0, w: -0.70710677}
+  enemyShipBaseStartPositionOffset: {x: 0.08, y: 0, z: -2.15}
+  playerBaseStartRotation: {x: 0, y: 1, z: 0, w: -0.00000004371139}
+  playerBaseStartPositionOffset: {x: 0, y: 0, z: 3.695}
   xLength: 24
   zLength: 22
   yLength: 0.5
+  yInitializationOffset: 0.5
+  walkableLayerInt: 9
+  nonWalkableLevelLayerInt: 11
 --- !u!4 &1245602450
 Transform:
   m_ObjectHideFlags: 0
@@ -3237,6 +3244,9 @@ MonoBehaviour:
   generatingText: {fileID: 2103493690}
   towerButtons: {fileID: 1188305907}
   healthFundsText: {fileID: 1091298332}
+  tutorialTextDeactivateMin: 0.2
+  tutorialTextDeactivateMax: 0.3
+  hideGeneratingTextTime: 1
 --- !u!4 &1293018335
 Transform:
   m_ObjectHideFlags: 0
@@ -4933,7 +4943,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1787197900}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 528548f73abd3ef409c3a0c8510e35be, type: 3}
+  m_Script: {fileID: 11500000, guid: dcfb3db2ec17e7246ac9c62f127133d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gameStartedCountdownText: {fileID: 1912862144}
@@ -4948,11 +4958,12 @@ MonoBehaviour:
   gameStartCountdownTime: 3
   health: 100
   funds: 10
-  enemyBasicSpawnInterval: 5.5
-  enemyStrongSpawnInterval: 13.75
-  spawnIntervalDecreaseTime: 1.75
-  spawnIntervalDecrease: 0.05
+  enemyBasicSpawnInterval: 5
+  enemyStrongSpawnInterval: 25
+  spawnIntervalDecreaseTime: 15
+  spawnIntervalDecrease: 0.975
   minSpawnInterval: 0.2
+  countdownLoopInterval: 1
 --- !u!1 &1912862142
 GameObject:
   m_ObjectHideFlags: 0

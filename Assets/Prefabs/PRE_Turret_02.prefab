@@ -526,16 +526,17 @@ MonoBehaviour:
   enemyLayers:
     serializedVersion: 2
     m_Bits: 4096
+  nearEnemiesArrayLength: 5
   name: Gun Tower
   cost: 20
-  damage: 3.65
+  damage: 3.55
   damageTimerAmount: 0.3
   checkRadius: 3.8
   bulletHoleLeft: {fileID: 6734040212037515472}
   bulletHoleRight: {fileID: 1712061335621097867}
   rotationSpeed: 1
   bulletSpeed: 15
-  bulletShootTime: 1
+  bulletShootInterval: 1
   minimumDotProductToFire: -0.95
 --- !u!82 &-159913201743704448
 AudioSource:
