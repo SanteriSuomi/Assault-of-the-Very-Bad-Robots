@@ -14,6 +14,9 @@ namespace AOTVBR
         public static bool FloatEqual(float x, float y) 
             => FastAbs(x - y) < 0.01f;
 
+        public static bool SafeFloatEqual(float x, float y) 
+            => FastAbs(x - y) <= (FastAbs(x) + FastAbs(y) + 1) * float.Epsilon;
+
         public static float FastAbs(float x) 
             => x > 0 ? x : -x;
     }

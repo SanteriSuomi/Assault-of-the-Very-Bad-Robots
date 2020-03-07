@@ -2,5 +2,5 @@
 {
     public class TowerGunBulletPool : ObjectPool<Bullet>
     {
-    } 
+    }
 }

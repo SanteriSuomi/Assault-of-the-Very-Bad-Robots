@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -11,6 +12,10 @@ namespace AOTVBR
         [SerializeField]
         protected LayerMask enemyLayers = default;
         protected AudioSource audioSource;
+
+        [SerializeField]
+        private int nearEnemiesArrayLength = 5;
+        private Collider[] nearEnemies;
 
         [SerializeField]
         private new string name = "Tower";
@@ -35,6 +40,7 @@ namespace AOTVBR
 
         private void Start()
         {
+            nearEnemies = new Collider[nearEnemiesArrayLength];
             audioSource = GetComponent<AudioSource>();
             StartCoroutine(DetectionLoop());
         }
@@ -69,30 +75,34 @@ namespace AOTVBR
 
         private (bool, EnemyBase) GetEnemyInRadius()
         {
-            Collider[] enemyCollisions = Physics.OverlapSphere(transform.position, checkRadius, enemyLayers);
-            if (enemyCollisions.Length == 1)
+            int nearEnemiesAmount = Physics.OverlapSphereNonAlloc(transform.position, checkRadius, 
+                nearEnemies, enemyLayers);
+            if (nearEnemiesAmount == 1)
             {
-                return (true, enemyCollisions[0].GetComponent<EnemyBase>());
+                return (true, nearEnemies[0].GetComponent<EnemyBase>());
             }
-            else if (enemyCollisions.Length > 1)
+            else if (nearEnemiesAmount > 1)
             {
-                EnemyBase[] enemies = GetEnemies(enemyCollisions);
-                EnemyBase lowestEnemy = enemies.Min();
+                EnemyBase lowestEnemy = GetEnemiesInRadius(nearEnemies).Min();
                 return (true, lowestEnemy);
             }
 
             return (false, null);
         }
 
-        private EnemyBase[] GetEnemies(Collider[] enemyCollisions)
+        private List<EnemyBase> GetEnemiesInRadius(Collider[] enemyCollisions)
         {
-            EnemyBase[] enemies = new EnemyBase[enemyCollisions.Length];
+            List<EnemyBase> activeEnemyList = new List<EnemyBase>(nearEnemiesArrayLength);
             for (int i = 0; i < enemyCollisions.Length - 1; i++)
             {
-                enemies[i] = enemyCollisions[i].GetComponent<EnemyBase>();
+                if (enemyCollisions[i] != null
+                    && enemyCollisions[i].TryGetComponent(out EnemyBase enemy))
+                {
+                    activeEnemyList.Add(enemy);
+                }
             }
 
-            return enemies;
+            return activeEnemyList;
         }
 
         protected abstract void EnemyDetectedEvent(Vector3 enemyPosition);

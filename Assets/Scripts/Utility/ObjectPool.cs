@@ -44,7 +44,6 @@ namespace AOTVBR
             return poppedObject;
         }
 
-
         /// <summary>
         /// Return a object to the pool.
         /// </summary>

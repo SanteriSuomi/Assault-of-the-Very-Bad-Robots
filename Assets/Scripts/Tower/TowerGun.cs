@@ -15,7 +15,7 @@ namespace AOTVBR
         [SerializeField]
         private float bulletSpeed = 10;
         [SerializeField]
-        private float bulletShootTime = 0.5f;
+        private float bulletShootInterval = 1;
         private float bulletShootTimer;
         [SerializeField]
         private float minimumDotProductToFire = -0.95f;
@@ -25,7 +25,7 @@ namespace AOTVBR
         private void Awake()
             => SetInitialRotation();
 
-        private void SetInitialRotation() 
+        private void SetInitialRotation()
             => turret.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
 
         protected override void EnemyDetectedEvent(Vector3 enemyPosition)
@@ -44,23 +44,25 @@ namespace AOTVBR
         private void ShootBullet(Vector3 target)
         {
             bulletShootTimer += Time.deltaTime;
-            Vector3 directionToTarget = (turret.position - target).normalized;
-            if (bulletShootTimer >= bulletShootTime
-                && Vector3.Dot(turret.forward, directionToTarget) <= minimumDotProductToFire)
+            if (bulletShootTimer >= bulletShootInterval)
             {
-                playGunShot = true;
-                bulletShootTimer = 0;
+                Vector3 directionToTarget = (turret.position - target).normalized;
+                if (Vector3.Dot(turret.forward, directionToTarget) <= minimumDotProductToFire)
+                {
+                    playGunShot = true;
+                    bulletShootTimer = 0;
 
-                InstantiateBullet(bulletHoleLeft);
-                InstantiateBullet(bulletHoleRight);
+                    SpawnBulletAt(bulletHoleLeft);
+                    SpawnBulletAt(bulletHoleRight);
+                }
             }
         }
 
-        private void InstantiateBullet(Transform atTransform)
+        private void SpawnBulletAt(Transform transform)
         {
             Bullet bulletObj = TowerGunBulletPool.Instance.Get();
-            bulletObj.transform.position = atTransform.position;
-            bulletObj.Rigidbody.velocity = atTransform.transform.forward * bulletSpeed;
+            bulletObj.transform.position = transform.position;
+            bulletObj.Rigidbody.velocity = transform.forward * bulletSpeed;
         }
 
         protected override void PlayAudio()

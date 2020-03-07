@@ -21,7 +21,7 @@ namespace AOTVBR
         private float fundAmount = 1;
         public float FundAmount { get => fundAmount; }
 
-        private const float MaxFunds = 30;
+        private const float MaxFunds = 30; // TODO: move this somewhere else
 
         [SerializeField]
         protected GameObject explosionPrefab = default;
@@ -32,7 +32,7 @@ namespace AOTVBR
             if (hitpoints <= 0)
             {
                 Die();
-                FundPlayer();
+                GiveFundsToPlayer();
             }
         }
 
@@ -45,7 +45,7 @@ namespace AOTVBR
         protected virtual void Explosion()
             => Instantiate(explosionPrefab).transform.position = transform.position;
 
-        protected virtual void FundPlayer()
+        protected virtual void GiveFundsToPlayer()
         {
             if (PlayManager.Instance.Funds < MaxFunds)
             {
@@ -60,9 +60,11 @@ namespace AOTVBR
         /// <returns></returns>
         public int CompareTo(EnemyBase other)
         {
-            if (Mathf.Approximately(Hitpoints, other.Hitpoints)) return 0;
-            else if (Hitpoints > other.Hitpoints) return 1;
-            else return -1;
+            if (other == null) return 1;
+
+            if (Hitpoints > other.Hitpoints) return 1;
+            else if (Hitpoints < other.Hitpoints) return -1;
+            else return 0;
         }
     }
 }
