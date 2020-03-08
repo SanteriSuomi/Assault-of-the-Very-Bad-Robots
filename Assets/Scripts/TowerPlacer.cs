@@ -20,6 +20,12 @@ namespace AOTVBR
 
         [SerializeField]
         private float outOfFundsTextTime = 1;
+        [SerializeField]
+        private float towerPlaceRaycastLength = 500;
+        [SerializeField]
+        private float towerPosUpdateNormalMinAngle = 0.5f;
+        [SerializeField]
+        private float towerUpdatePosYOffset = 2;
 
         [SerializeField]
         private string towerRendererColorTag = "_BaseColor";
@@ -67,7 +73,7 @@ namespace AOTVBR
         private void SaveDefaultRendererColors()
         {
             defaultColor = new Color[towerRenderer.Length];
-            for (int i = 0; i < towerRenderer.Length - 1; i++)
+            for (int i = 0; i < towerRenderer.Length; i++)
             {
                 if (towerRenderer[i].material.HasProperty(towerRendererColorTag))
                 {
@@ -85,35 +91,18 @@ namespace AOTVBR
 
         private void Update()
         {
-            // Make sure tower is being placed.
-            if (isPlacing)
+            if (isPlacing && currentTower != null)
             {
-                // Check if placing should be cancelled.
-                CheckPlacerCancel(check: true);
-                // Raycast to the ground and store the result.
+                CheckCancelInput();
                 RaycastHit hit = RaycastGround();
-                // Update the tower position to the hit.
-                hit = UpdateTowerPosition(hit);
-                // Change tower color based on the hit collider.
-                hit = ChangeTowerColor(hit);
-                // Place the tower.
+                UpdateTowerPosition(hit);
                 PlaceTower(hit);
             }
         }
 
-        private void CheckPlacerCancel(bool check)
+        private void CheckCancelInput()
         {
-            // If check, check with input, else cancel anyway.
-            if (check)
-            {
-                if (Input.GetKeyDown(KeyCode.C))
-                {
-                    isPlacing = false;
-                    currentTowerType.IsCurrentPlacing(enable: false);
-                    Destroy(currentTower);
-                }
-            }
-            else
+            if (Input.GetKeyDown(KeyCode.C))
             {
                 isPlacing = false;
                 currentTowerType.IsCurrentPlacing(enable: false);
@@ -121,95 +110,77 @@ namespace AOTVBR
             }
         }
 
-        private RaycastHit UpdateTowerPosition(RaycastHit hit)
+        private RaycastHit RaycastGround()
         {
-            // Only update the tower placing position on level blocks.
-            if (currentTower != null && hit.collider.CompareTag(levelTag) && hit.normal.y > 0.5f)
-            {
-                // Calculate a grid with rounding from the hit point.
-                hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 2, Mathf.Round(hit.point.z));
-                // Update the tower to the calculated grid.
-                currentTower.transform.position = hitPosGrid;
-            }
-            // Grid should be 0 if no level blocks hit.
-            hitPosGrid.y = 0;
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            Physics.Raycast(ray, out RaycastHit hit, towerPlaceRaycastLength, towerPlaceRaycastMask);
             return hit;
         }
 
-        private RaycastHit RaycastGround()
+        private void UpdateTowerPosition(RaycastHit hit)
         {
-            // Translate mouse position input to a ray.
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            // Use that ray to raycast and store the results.
-            Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, towerPlaceRaycastMask);
-            return hit;
+            if (IsLegalHit(hit))
+            {
+                hitPosGrid = new Vector3(Mathf.Round(hit.point.x),
+                    hit.point.y + towerUpdatePosYOffset,
+                    Mathf.Round(hit.point.z));
+                currentTower.transform.position = hitPosGrid;
+                SetTowerColor(Color.green);
+            }
+            else
+            {
+                SetTowerColor(Color.red);
+            }
+
+            hitPosGrid.y = 0;
+        }
+
+        private void SetTowerColor(Color color)
+        {
+            for (int i = 0; i < towerRenderer.Length; i++)
+            {
+                if (towerRenderer[i] != null)
+                {
+                    towerRenderer[i].material.SetColor(towerRendererColorTag, color);
+                }
+            }
         }
 
         private void PlaceTower(RaycastHit hit)
         {
-            // Only allow placing turrets on level blocks.
-            if (Input.GetMouseButtonDown(0) && hit.collider.CompareTag(levelTag) && hit.normal.y > 0.5f)
+            if (Input.GetMouseButtonDown(0)
+                && IsLegalHit(hit))
             {
-                // When tower is placed, set it's color to default.
-                SetDefaultColor();
-                // Position the tower on the block correctly. 
-                PositionTower();
-                // Make sure placing bools are resetted.
+                SetTowerDefaultColors();
+                InitializeTower();
                 isPlacing = false;
                 currentTowerType.IsCurrentPlacing(enable: false);
             }
         }
 
-        private void SetDefaultColor()
+        private void SetTowerDefaultColors()
         {
             for (int i = 0; i < towerRenderer.Length; i++)
             {
-                if (towerRenderer[i] != null && towerRenderer[i].material.HasProperty("_BaseColor"))
+                if (towerRenderer[i] != null
+                    && towerRenderer[i].material.HasProperty(towerRendererColorTag))
                 {
-                    // Loop through the towerRenderers and set temporary colors with it's default colors.
-                    towerRenderer[i].material.SetColor("_BaseColor", defaultColor[i]);
+                    towerRenderer[i].material.SetColor(towerRendererColorTag, defaultColor[i]);
                 }
             }
         }
 
-        private void PositionTower()
+        private void InitializeTower()
         {
-            if (currentTower != null)
-            {
-                // Place the tower on the surface of the level block aligned with the grid.
-                currentTower.transform.position = hitPosGrid + new Vector3(0, currentTower.transform.localScale.y, 0);
-                // Deduct funds from the player.
-                PlayerData.Instance.Funds -= currentTowerType.Cost;
-                // Add this tower instance to the entities list to make it easy to find later.
-                EntityData.Instance.ActiveMapEntityList.Add(currentTower);
-            }
+            currentTower.transform.position = hitPosGrid + new Vector3(0, currentTower.transform.localScale.y, 0);
+            PlayerData.Instance.Funds -= currentTowerType.Cost;
+            EntityData.Instance.ActiveMapEntityList.Add(currentTower);
         }
 
-        private RaycastHit ChangeTowerColor(RaycastHit hit)
+        private bool IsLegalHit(RaycastHit hit)
         {
-            // Set colors on the tower depending hit collider.
-            if (hit.collider.CompareTag(levelTag) && hit.normal.y > 0.5f)
-            {
-                SetColor(Color.green);
-            }
-            else
-            {
-                SetColor(Color.red);
-            }
-
-            return hit;
-        }
-
-        private void SetColor(Color color)
-        {
-            // Method for settings the colors on the towerRenderer array.
-            foreach (Renderer renderer in towerRenderer)
-            {
-                if (renderer != null)
-                {
-                    renderer.material.SetColor("_BaseColor", color);
-                }
-            }
+            return hit.collider.CompareTag(levelTag)
+                && hit.normal.y > towerPosUpdateNormalMinAngle;
         }
     }
 }

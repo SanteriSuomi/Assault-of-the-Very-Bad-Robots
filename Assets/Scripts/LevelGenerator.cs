@@ -57,7 +57,6 @@ namespace AOTVBR
         [SerializeField]
         private int nonWalkableLevelLayerInt = 11;
 
-
         protected override void Awake()
             => map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
 
@@ -82,6 +81,7 @@ namespace AOTVBR
             GenerateMapPath();
             GenerateNavMesh();
             ForceCleanUp();
+            CombineMap();
             GeneratingTextHideEvent.Invoke();
         }
 
@@ -297,6 +297,11 @@ namespace AOTVBR
         {
             GC.Collect();
             Resources.UnloadUnusedAssets();
+        }
+
+        private void CombineMap()
+        {
+
         }
 
         private void SetAgentStart(int firstPathXStartPos) 
