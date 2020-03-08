@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System;
 using Random = UnityEngine.Random;
+using System.Collections.Generic;
 
 namespace AOTVBR
 {
@@ -77,7 +78,7 @@ namespace AOTVBR
             yield return null;
             ClearCurrentMap();
             InitializeRandomSeed();
-            GenerateMapBlocks();
+            List<MeshFilter> blockMeshes = GenerateMapBlocks();
             GenerateMapPath();
             GenerateNavMesh();
             ForceCleanUp();
@@ -86,47 +87,53 @@ namespace AOTVBR
         }
 
         #region Generate Map
-        private void GenerateMapBlocks()
+        private List<MeshFilter> GenerateMapBlocks()
         {
+            List<MeshFilter> blockMeshes = new List<MeshFilter>();
             for (int x = 0; x < xLength; x++)
             {
-                InitializeX(x);
+                InitializeX(blockMeshes, x);
                 for (int z = 0; z < zLength; z++)
                 {
-                    InitializeZ(x, z);
+                    InitializeZ(blockMeshes, x, z);
                     for (float y = 0; y < yLength; y += yInitializationOffset)
                     {
-                        InitializeY(x, z, y);
+                        InitializeY(blockMeshes, x, z, y);
                     }
                 }
             }
+
+            return blockMeshes;
         }
 
-        private void InitializeX(int x)
+        private void InitializeX(List<MeshFilter> blockMeshes, int x)
         {
             GameObject xObj = Instantiate(levelPathPrefab);
             xObj.transform.SetParent(levelPrefabParent);
             xObj.layer = walkableLayerInt;
             xObj.transform.position = new Vector3(x, 0, 0);
+            blockMeshes.Add(xObj.GetComponent<MeshFilter>());
             map[x, 0, 0] = xObj;
         }
 
-        private void InitializeZ(int x, int z)
+        private void InitializeZ(List<MeshFilter> blockMeshes, int x, int z)
         {
             GameObject zObj = Instantiate(levelPathPrefab);
             zObj.transform.SetParent(levelPrefabParent);
             zObj.layer = walkableLayerInt;
             zObj.transform.position = new Vector3(x, 0, z);
+            blockMeshes.Add(zObj.GetComponent<MeshFilter>());
             map[x, 0, z] = zObj;
         }
 
-        private void InitializeY(int x, int z, float y)
+        private void InitializeY(List<MeshFilter> blockMeshes, int x, int z, float y)
         {
             GameObject yObj = Instantiate(levelPrefab);
             yObj.transform.SetParent(levelPrefabParent);
             yObj.layer = nonWalkableLevelLayerInt;
             yObj.AddComponent<NavMeshObstacle>().carving = true; // Level blocks that are not the path should not have navmesh.
             yObj.transform.position = new Vector3(x, y + yInitializationOffset, z);
+            blockMeshes.Add(yObj.GetComponent<MeshFilter>());
             map[x, Mathf.RoundToInt(y + y), z] = yObj;
         }
         #endregion
@@ -299,7 +306,7 @@ namespace AOTVBR
             Resources.UnloadUnusedAssets();
         }
 
-        private void CombineMap()
+        private void CombineMap(List<MeshFilter> blockMeshes)
         {
 
         }
