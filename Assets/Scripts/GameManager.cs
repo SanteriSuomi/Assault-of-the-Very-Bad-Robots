@@ -6,16 +6,13 @@ using UnityEngine.AI;
 
 namespace AOTVBR
 {
-    public class PlayerManager : Singleton<PlayerManager>
+    public class GameManager : Singleton<GameManager>
     {
-        public int Health { get; set; }
-        public float Funds { get; set; }
-
         public delegate void GameMenuHide();
         public event GameMenuHide GameMenuHideEvent;
 
         [SerializeField]
-        private TextMeshProUGUI gameStartedCountdownText = default;
+        private TextMeshProUGUI countdownText = default;
         [SerializeField]
         private TextMeshProUGUI healthText = default;
         [SerializeField]
@@ -29,13 +26,11 @@ namespace AOTVBR
         [SerializeField]
         private GameObject gameOverScreen = default;
         private WaitForSeconds countdownLoopWFS;
+        private WaitForSeconds resetGameWFS;
+        private WaitForSeconds decreaseSpawnWFS;
 
         [SerializeField]
         private int gameStartCountdownTime = 3;
-        [SerializeField]
-        private int health = 100;
-        [SerializeField]
-        private int funds = 10;
 
         [SerializeField]
         private float enemyBasicSpawnInterval = 5;
@@ -49,20 +44,23 @@ namespace AOTVBR
         private float minSpawnInterval = 0.2f;
         [SerializeField]
         private float countdownLoopInterval = 1;
+        [SerializeField]
+        private float resetGameDelay = 2.5f;
         private float enemyBasicSpawnIntervalDefault;
         private float enemyStrongSpawnIntervalDefault;
         private float enemyTimerBasic;
         private float enemyTimerStrong;
         private float textTime;
 
-        #region Game Flow
         private bool hasGameResetted;
-        private bool decreasedInterval;
-        #endregion
+        private bool hasDecreasedSpawnInterval;
 
         protected override void Awake()
         {
             countdownLoopWFS = new WaitForSeconds(countdownLoopInterval);
+            resetGameWFS = new WaitForSeconds(resetGameDelay);
+            decreaseSpawnWFS = new WaitForSeconds(spawnIntervalDecreaseTime);
+
             GameState.Instance.GameStartedEvent += GameStart;
             // Store the default spawn intervals to reset them later.
             enemyBasicSpawnIntervalDefault = enemyBasicSpawnInterval;
@@ -73,15 +71,13 @@ namespace AOTVBR
         {
             // Reset most of the game variables back to zero.
             StopCoroutine(nameof(UpdateLoop));
-            StopCoroutine(nameof(CountdownLoop));
-            decreasedInterval = false;
+            StopCoroutine(nameof(Countdown));
+            hasDecreasedSpawnInterval = false;
             enemyTimerBasic = 0;
             enemyTimerStrong = 0;
             textTime = 0;
             enemyBasicSpawnInterval = enemyBasicSpawnIntervalDefault;
             enemyStrongSpawnInterval = enemyStrongSpawnIntervalDefault;
-            Funds = funds;
-            Health = health;
         }
 
         private void GameStart()
@@ -97,80 +93,64 @@ namespace AOTVBR
 
         private IEnumerator UpdateLoop()
         {
-            yield return StartCoroutine(CountdownLoop());
-            Debug.Log("asd");
+            yield return StartCoroutine(Countdown());
             while (enabled)
             {
-                GameLoop();
+                UpdateGameState();
+                yield return null;
             }
-
-            yield return null;
         }
 
-        private IEnumerator CountdownLoop()
+        private IEnumerator Countdown()
         {
-            CursorLock(false, CursorLockMode.Locked);
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
             for (int i = gameStartCountdownTime; i >= 0; i--)
             {
-                gameStartedCountdownText.text = i.ToString();
+                countdownText.text = i.ToString();
                 yield return countdownLoopWFS;
             }
 
-            gameStartedCountdownText.text = string.Empty;
-            CursorLock(true, CursorLockMode.None);
+            countdownText.text = string.Empty;
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
 
-        private void CursorLock(bool cursorVisible, CursorLockMode cursorLock)
+        private void UpdateGameState()
         {
-            Cursor.visible = cursorVisible;
-            Cursor.lockState = cursorLock;
-        }
-
-        private void GameLoop()
-        {
-            // Reset the game if base health reaches zero or less.
-            if (Health <= 0)
+            if (PlayerData.Instance.Health <= 0)
             {
-                // Start a delay and show an ending screen before changing state.
-                StartCoroutine(ResetDelay());
+                StartCoroutine(DeactivateGame());
             }
-            // Update the health, fund and time info on top of the screen.
-            UpdateHealthFundTimeText();
-            // Spawn the enemies on intervals.
-            SpawnEnemyBasic(enemy: enemyBasic, interval: enemyBasicSpawnInterval);
-            SpawnEnemyStrong(enemy: enemyStrong, interval: enemyStrongSpawnInterval);
-            // Decrease spawn interval every X seconds, while capping it.
-            if (!decreasedInterval
+
+            UpdateGameUI();
+            SpawnEnemyBasic(enemyBasic, enemyBasicSpawnInterval);
+            SpawnEnemyStrong(enemyStrong, enemyStrongSpawnInterval);
+
+            if (!hasDecreasedSpawnInterval
                 && enemyBasicSpawnInterval >= minSpawnInterval)
             {
-                decreasedInterval = true;
-                // Decrease spawn interval.
+                hasDecreasedSpawnInterval = true;
                 StartCoroutine(DecreaseSpawnInterval());
             }
         }
 
-        private IEnumerator ResetDelay()
+        private IEnumerator DeactivateGame()
         {
-            // Show the game over screen.
             gameOverScreen.SetActive(true);
-            yield return new WaitForSeconds(2.5f);
+            yield return resetGameWFS;
             gameOverScreen.SetActive(false);
-            // When dead, make sure reset is false, so game can be resetted again.
+
             hasGameResetted = false;
-            // Make sure to start the game only from the play map button.
             StopCoroutine(nameof(UpdateLoop));
-            // Invoke an event to hide the game menus.
             GameMenuHideEvent.Invoke();
-            // Set the state to the generate menu.
-            GameState.Instance.SetState(2);
+            GameState.Instance.SetState((int)GameStates.Menu);
         }
 
-        private void UpdateHealthFundTimeText()
+        private void UpdateGameUI()
         {
-            // Updating the necessary data for gameplay.
-            healthText.text = $"{Health}";
-            fundsText.text = $"{Math.Round(Funds, 2)}";
-            // Time text timer.
+            healthText.text = $"{PlayerData.Instance.Health}";
+            fundsText.text = $"{Math.Round(PlayerData.Instance.Funds, 2)}";
             textTime += Time.deltaTime;
             timeText.text = $"{Mathf.RoundToInt(textTime)}";
         }
@@ -181,9 +161,7 @@ namespace AOTVBR
             if (enemyTimerBasic >= interval)
             {
                 enemyTimerBasic = 0;
-                // Initialize the given parameter gameobject on given intervals and get the navmeshagent.
                 InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
-                // Set the required path for the enemy to travel (leveldata).
                 SetEnemyPath(spawnedEnemy, enemyAgent);
             }
         }
@@ -194,9 +172,7 @@ namespace AOTVBR
             if (enemyTimerStrong >= interval)
             {
                 enemyTimerStrong = 0;
-                // Initialize the given parameter gameobject on given intervals and get the navmeshagent.
                 InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
-                // Set the required path for the enemy to travel (leveldata).
                 SetEnemyPath(spawnedEnemy, enemyAgent);
             }
         }
@@ -205,28 +181,23 @@ namespace AOTVBR
         {
             spawnedEnemy = Instantiate(enemy);
             enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
-            // Add the enemy isntance to the entitylist.
             EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
         }
 
         private void SetEnemyPath(GameObject spawnedEnemy, NavMeshAgent enemyAgent)
         {
-            // Set the starting point.
             spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint;
             // Enable navmeshagent after placing it on the navmesh.
             enemyAgent.enabled = true;
-            // Start moving to the end point.
             enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
         }
 
         private IEnumerator DecreaseSpawnInterval()
         {
-            // Wait 15 seconds every time before decreasing interval.
-            yield return new WaitForSeconds(spawnIntervalDecreaseTime);
-            // Decrease both interval with percentage.
+            yield return decreaseSpawnWFS;
             enemyBasicSpawnInterval -= spawnIntervalDecrease;
             enemyStrongSpawnInterval -= spawnIntervalDecrease;
-            decreasedInterval = false;
+            hasDecreasedSpawnInterval = false;
         }
     }
 }

@@ -20,19 +20,19 @@ namespace AOTVBR
         public delegate void GameStarted();
         public event GameStarted GameStartedEvent;
 
-        private void Start() 
-            => currentState = GameStates.Menu;
+        private void Start() => SetState((int)GameStates.Menu);
 
         private GameStates currentState;
 
-        public void SetState(int state) 
-            => currentState = (GameStates)state;
-
-        public GameStates GetState() => currentState;
-
-        private void Update()
+        public void SetState(int state)
         {
-            switch (currentState)
+            currentState = (GameStates)state;
+            InvokeStateEvents(currentState);
+        }
+
+        private void InvokeStateEvents(GameStates state)
+        {
+            switch (state)
             {
                 case GameStates.Menu:
                     MainMenuEvent?.Invoke();
@@ -52,6 +52,8 @@ namespace AOTVBR
                     break;
             }
         }
+
+        public GameStates GetState() => currentState;
 
         private static void ClearEntities()
         {

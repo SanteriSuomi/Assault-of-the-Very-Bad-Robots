@@ -49,7 +49,7 @@ namespace AOTVBR
 
         // Register this event in start because awake is too early (for some reason).
         private void Start()
-            => PlayerManager.Instance.GameMenuHideEvent += DisablePlayMenu;
+            => GameManager.Instance.GameMenuHideEvent += DisablePlayMenu;
 
         #region Button & Event Methods
         private void ActivateMainMenu()

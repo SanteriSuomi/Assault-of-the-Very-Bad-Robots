@@ -21,8 +21,6 @@ namespace AOTVBR
         private float fundAmount = 1;
         public float FundAmount { get => fundAmount; }
 
-        private const float MaxFunds = 30; // TODO: move this somewhere else
-
         [SerializeField]
         protected GameObject explosionPrefab = default;
 
@@ -50,9 +48,9 @@ namespace AOTVBR
 
         protected virtual void GiveFundsToPlayer()
         {
-            if (PlayerManager.Instance.Funds < MaxFunds)
+            if (!PlayerData.Instance.HasMaxFunds())
             {
-                PlayerManager.Instance.Funds += fundAmount;
+                PlayerData.Instance.Funds += fundAmount;
             }
         }
 
