@@ -7,76 +7,80 @@ namespace AOTVBR
     {
         [SerializeField]
         private GameObject fundsOutText = default;
-        private Camera mainCam;
-        private GameObject towerPrefab;
+        private Camera mainCamera;
+        private GameObject currentTower;
+        private TowerBase currentTowerType;
         private Renderer[] towerRenderer;
-        private TowerBase towerType;
+        private WaitForSeconds outOfFundsWFS;
+
+        [SerializeField]
+        private LayerMask towerPlaceRaycastMask = default;
         private Color[] defaultColor;
+        private Vector3 hitPosGrid;
 
-        Vector3 hitPosGrid;
+        [SerializeField]
+        private float outOfFundsTextTime = 1;
 
-        private readonly string levelTag = "Level";
-
-        private int layerMask;
+        [SerializeField]
+        private string towerRendererColorTag = "_BaseColor";
+        [SerializeField]
+        private string levelTag = "Level";
 
         private bool isPlacing;
 
         private void Awake()
         {
-            // Only check for collisions in layer 0 (default), layer 10 (tower) and layer 11 (level).
-            layerMask = (1 << 0) | (1 << 10) | (1 << 11);
-            mainCam = Camera.main;
+            outOfFundsWFS = new WaitForSeconds(outOfFundsTextTime);
+            mainCamera = Camera.main;
         }
 
         public void ActivatePlacer(GameObject tower)
         {
-            // This method is activated from the button and initializes the needed properties.
-            towerPrefab = Instantiate(tower);
-            towerType = towerPrefab.GetComponent<TowerBase>();
-            // Check if player has funds.
-            CheckCost();
-            // Make sure to signal the tower that it is being placed.
-            towerType.IsCurrentPlacing(enable: true);
-            towerRenderer = towerPrefab.GetComponentsInChildren<Renderer>();
-            // Store the default colors of the tower.
-            GetDefaultColors();
-            // Indicate the script the tower is being placed.
-            isPlacing = true;
-        }
+            currentTower = Instantiate(tower);
+            currentTowerType = currentTower.GetComponent<TowerBase>();
 
-        private void CheckCost()
-        {
-            // Destroy the prefab if player doesn't have the needed funds.
-            if (towerType.Cost > PlayerData.Instance.Funds)
+            if (CheckFunds())
             {
-                if (towerPrefab != null)
-                {
-                    Destroy(towerPrefab);
-                }
-                // Display a funds out text.
-                StartCoroutine(NoFundsTextDelay());
+                currentTowerType.IsCurrentPlacing(enable: true);
+                towerRenderer = currentTower.GetComponentsInChildren<Renderer>();
+                SaveDefaultRendererColors();
+                isPlacing = true;
             }
         }
 
-        private IEnumerator NoFundsTextDelay()
+        private bool CheckFunds()
+        {
+            if (currentTowerType.Cost > PlayerData.Instance.Funds)
+            {
+                if (currentTower != null)
+                {
+                    Destroy(currentTower);
+                }
+
+                StartCoroutine(OutOfFundsText());
+                return false;
+            }
+
+            return true;
+        }
+
+        private void SaveDefaultRendererColors()
+        {
+            defaultColor = new Color[towerRenderer.Length];
+            for (int i = 0; i < towerRenderer.Length - 1; i++)
+            {
+                if (towerRenderer[i].material.HasProperty(towerRendererColorTag))
+                {
+                    defaultColor[i] = towerRenderer[i].material.GetColor(towerRendererColorTag);
+                }
+            }
+        }
+
+        private IEnumerator OutOfFundsText()
         {
             fundsOutText.SetActive(true);
-            yield return new WaitForSeconds(1);
+            yield return outOfFundsWFS;
             fundsOutText.SetActive(false);
-        }
-
-        private void GetDefaultColors()
-        {
-            // Initialize the defaultcolors.
-            defaultColor = new Color[towerRenderer.Length];
-            for (int i = 0; i < towerRenderer.Length; i++)
-            {
-                // Loop through the towerRenderers and get the current color and store it in an array.
-                if (towerRenderer[i].material.HasProperty("_BaseColor"))
-                {
-                    defaultColor[i] = towerRenderer[i].material.GetColor("_BaseColor");
-                }
-            }
         }
 
         private void Update()
@@ -105,27 +109,27 @@ namespace AOTVBR
                 if (Input.GetKeyDown(KeyCode.C))
                 {
                     isPlacing = false;
-                    towerType.IsCurrentPlacing(enable: false);
-                    Destroy(towerPrefab);
+                    currentTowerType.IsCurrentPlacing(enable: false);
+                    Destroy(currentTower);
                 }
             }
             else
             {
                 isPlacing = false;
-                towerType.IsCurrentPlacing(enable: false);
-                Destroy(towerPrefab);
+                currentTowerType.IsCurrentPlacing(enable: false);
+                Destroy(currentTower);
             }
         }
 
         private RaycastHit UpdateTowerPosition(RaycastHit hit)
         {
             // Only update the tower placing position on level blocks.
-            if (towerPrefab != null && hit.collider.CompareTag(levelTag) && hit.normal.y > 0.5f)
+            if (currentTower != null && hit.collider.CompareTag(levelTag) && hit.normal.y > 0.5f)
             {
                 // Calculate a grid with rounding from the hit point.
                 hitPosGrid = new Vector3(Mathf.Round(hit.point.x), hit.point.y + 2, Mathf.Round(hit.point.z));
                 // Update the tower to the calculated grid.
-                towerPrefab.transform.position = hitPosGrid;
+                currentTower.transform.position = hitPosGrid;
             }
             // Grid should be 0 if no level blocks hit.
             hitPosGrid.y = 0;
@@ -135,9 +139,9 @@ namespace AOTVBR
         private RaycastHit RaycastGround()
         {
             // Translate mouse position input to a ray.
-            Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             // Use that ray to raycast and store the results.
-            Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerMask);
+            Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, towerPlaceRaycastMask);
             return hit;
         }
 
@@ -152,7 +156,7 @@ namespace AOTVBR
                 PositionTower();
                 // Make sure placing bools are resetted.
                 isPlacing = false;
-                towerType.IsCurrentPlacing(enable: false);
+                currentTowerType.IsCurrentPlacing(enable: false);
             }
         }
 
@@ -170,14 +174,14 @@ namespace AOTVBR
 
         private void PositionTower()
         {
-            if (towerPrefab != null)
+            if (currentTower != null)
             {
                 // Place the tower on the surface of the level block aligned with the grid.
-                towerPrefab.transform.position = hitPosGrid + new Vector3(0, towerPrefab.transform.localScale.y, 0);
+                currentTower.transform.position = hitPosGrid + new Vector3(0, currentTower.transform.localScale.y, 0);
                 // Deduct funds from the player.
-                PlayerData.Instance.Funds -= towerType.Cost;
+                PlayerData.Instance.Funds -= currentTowerType.Cost;
                 // Add this tower instance to the entities list to make it easy to find later.
-                EntityData.Instance.ActiveMapEntityList.Add(towerPrefab);
+                EntityData.Instance.ActiveMapEntityList.Add(currentTower);
             }
         }
 
@@ -207,5 +211,5 @@ namespace AOTVBR
                 }
             }
         }
-    } 
+    }
 }

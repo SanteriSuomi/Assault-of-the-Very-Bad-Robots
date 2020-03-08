@@ -232,6 +232,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fundsOutText: {fileID: 1065739690}
+  towerPlaceRaycastMask:
+    serializedVersion: 2
+    m_Bits: 3073
+  outOfFundsTextTime: 1
+  towerRendererColorTag: _BaseColor
+  levelTag: Level
 --- !u!1 &201972981
 GameObject:
   m_ObjectHideFlags: 0
