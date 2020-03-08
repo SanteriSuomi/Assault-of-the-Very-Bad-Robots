@@ -1,13 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using System;
 using Random = UnityEngine.Random;
-using System.Collections.Generic;
 
 namespace AOTVBR
 {
-    #pragma warning disable S1215 // "GC.Collect" should not be called
+#pragma warning disable S1215 // "GC.Collect" should not be called
     public class LevelGenerator : Singleton<LevelGenerator>
     {
         public delegate void GeneratingTextHide();
@@ -16,9 +16,22 @@ namespace AOTVBR
         [SerializeField]
         private GameObject levelPrefab = default;
         [SerializeField]
-        private Transform levelPrefabParent = default;
-        [SerializeField]
         private GameObject levelPathPrefab = default;
+
+        private GameObject enemyShipBase;
+        private GameObject playerBase;
+        private GameObject[,,] map;
+        [SerializeField]
+        private MeshFilter pathMeshFilter = default;
+        [SerializeField]
+        private MeshFilter levelMeshFilter = default;
+        private MeshRenderer pathMeshRenderer;
+        private MeshRenderer levelMeshRenderer;
+        [SerializeField]
+        private Material pathMaterial = default;
+        [SerializeField]
+        private Material levelMaterial = default;
+
         [SerializeField]
         private GameObject cameraPivot = default;
         [SerializeField]
@@ -29,18 +42,13 @@ namespace AOTVBR
         private GameObject shipPrefab = default;
 
         [SerializeField]
-        private Quaternion enemyShipBaseStartRotation = Quaternion.Euler(0, 270, 0);
+        private Quaternion shipStartRotation = Quaternion.Euler(0, 270, 0);
         [SerializeField]
-        private Vector3 enemyShipBaseStartPositionOffset = new Vector3(0.08f, 0, -2.15f);
-
+        private Vector3 shipStartPositionOffset = new Vector3(0.08f, 0, -2.15f);
         [SerializeField]
-        private Quaternion playerBaseStartRotation = Quaternion.Euler(0, 180, 0);
+        private Quaternion baseStartRotation = Quaternion.Euler(0, 180, 0);
         [SerializeField]
-        private Vector3 playerBaseStartPositionOffset = new Vector3(0, 0, 3.695f);
-
-        private GameObject enemyShipBase;
-        private GameObject playerBase;
-        private GameObject[,,] map;
+        private Vector3 baseStartPositionOffset = new Vector3(0, 0, 3.695f);
 
         [SerializeField]
         private int xLength = 24;
@@ -56,10 +64,14 @@ namespace AOTVBR
         [SerializeField]
         private int walkableLayerInt = 9;
         [SerializeField]
-        private int nonWalkableLevelLayerInt = 11;
+        private int nonWalkableLayerInt = 11;
 
         protected override void Awake()
-            => map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
+        {
+            map = new GameObject[xLength, Mathf.RoundToInt(yLength + yLength), zLength];
+            pathMeshRenderer = pathMeshFilter.GetComponent<MeshRenderer>();
+            levelMeshRenderer = levelMeshFilter.GetComponent<MeshRenderer>();
+        }
 
         private void OnEnable() => InitializeCamera();
 
@@ -78,62 +90,53 @@ namespace AOTVBR
             yield return null;
             ClearCurrentMap();
             InitializeRandomSeed();
-            List<MeshFilter> blockMeshes = GenerateMapBlocks();
+            GenerateMapBlocks();
             GenerateMapPath();
             GenerateNavMesh();
-            ForceCleanUp();
             CombineMap();
+            ForceCleanUp();
             GeneratingTextHideEvent.Invoke();
         }
 
         #region Generate Map
-        private List<MeshFilter> GenerateMapBlocks()
+        private void GenerateMapBlocks()
         {
-            List<MeshFilter> blockMeshes = new List<MeshFilter>();
             for (int x = 0; x < xLength; x++)
             {
-                InitializeX(blockMeshes, x);
+                InitializeX(x);
                 for (int z = 0; z < zLength; z++)
                 {
-                    InitializeZ(blockMeshes, x, z);
+                    InitializeZ(x, z);
                     for (float y = 0; y < yLength; y += yInitializationOffset)
                     {
-                        InitializeY(blockMeshes, x, z, y);
+                        InitializeY(x, z, y);
                     }
                 }
             }
-
-            return blockMeshes;
         }
 
-        private void InitializeX(List<MeshFilter> blockMeshes, int x)
+        private void InitializeX(int x)
         {
             GameObject xObj = Instantiate(levelPathPrefab);
-            xObj.transform.SetParent(levelPrefabParent);
             xObj.layer = walkableLayerInt;
             xObj.transform.position = new Vector3(x, 0, 0);
-            blockMeshes.Add(xObj.GetComponent<MeshFilter>());
             map[x, 0, 0] = xObj;
         }
 
-        private void InitializeZ(List<MeshFilter> blockMeshes, int x, int z)
+        private void InitializeZ(int x, int z)
         {
             GameObject zObj = Instantiate(levelPathPrefab);
-            zObj.transform.SetParent(levelPrefabParent);
             zObj.layer = walkableLayerInt;
             zObj.transform.position = new Vector3(x, 0, z);
-            blockMeshes.Add(zObj.GetComponent<MeshFilter>());
             map[x, 0, z] = zObj;
         }
 
-        private void InitializeY(List<MeshFilter> blockMeshes, int x, int z, float y)
+        private void InitializeY(int x, int z, float y)
         {
             GameObject yObj = Instantiate(levelPrefab);
-            yObj.transform.SetParent(levelPrefabParent);
-            yObj.layer = nonWalkableLevelLayerInt;
-            yObj.AddComponent<NavMeshObstacle>().carving = true; // Level blocks that are not the path should not have navmesh.
+            yObj.layer = nonWalkableLayerInt;
+            //yObj.AddComponent<NavMeshObstacle>().carving = true; // Level blocks that are not the path should not have navmesh.
             yObj.transform.position = new Vector3(x, y + yInitializationOffset, z);
-            blockMeshes.Add(yObj.GetComponent<MeshFilter>());
             map[x, Mathf.RoundToInt(y + y), z] = yObj;
         }
         #endregion
@@ -163,9 +166,9 @@ namespace AOTVBR
             }
             catch (IndexOutOfRangeException e)
             {
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 Debug.Log(e);
-                #endif
+#endif
 
                 // If there is a problem with the generation, start a new one.
                 GenerateMap();
@@ -257,9 +260,9 @@ namespace AOTVBR
 
             void SetShipTransform()
             {
-                enemyShipBase.transform.rotation = enemyShipBaseStartRotation;
+                enemyShipBase.transform.rotation = shipStartRotation;
                 enemyShipBase.transform.position =
-                    LevelData.Instance.AgentStartPoint + enemyShipBaseStartPositionOffset;
+                    LevelData.Instance.AgentStartPoint + shipStartPositionOffset;
             }
         }
 
@@ -275,9 +278,9 @@ namespace AOTVBR
 
             void SetBaseTransform()
             {
-                playerBase.transform.rotation = playerBaseStartRotation;
-                playerBase.transform.position = 
-                    LevelData.Instance.AgentEndPoint + playerBaseStartPositionOffset;
+                playerBase.transform.rotation = baseStartRotation;
+                playerBase.transform.position =
+                    LevelData.Instance.AgentEndPoint + baseStartPositionOffset;
             }
         }
         #endregion
@@ -285,11 +288,19 @@ namespace AOTVBR
         #region Other Map Methods
         private void ClearCurrentMap()
         {
-            foreach (GameObject mapBlock in map)
+            //foreach (GameObject block in map)
+            //{
+            //    Destroy(block);
+            //}
+            for (int x = 0; x < map.GetLength(0); x++)
             {
-                if (mapBlock != null)
+                for (int y = 0; y < map.GetLength(1); y++)
                 {
-                    Destroy(mapBlock);
+                    for (int z = 0; z < map.GetLength(2); z++)
+                    {
+                        Debug.Log("asd");
+                        Destroy(map[x, y, z]);
+                    }
                 }
             }
         }
@@ -306,12 +317,7 @@ namespace AOTVBR
             Resources.UnloadUnusedAssets();
         }
 
-        private void CombineMap(List<MeshFilter> blockMeshes)
-        {
-
-        }
-
-        private void SetAgentStart(int firstPathXStartPos) 
+        private void SetAgentStart(int firstPathXStartPos)
             => LevelData.Instance.AgentStartPoint = map[firstPathXStartPos, 0, 0].transform.position;
 
         private Vector3 GetAgentEnd(int fifthPathZCarveAmount)
@@ -326,6 +332,71 @@ namespace AOTVBR
             }
 
             return agentEndPoint;
+        }
+
+        private void CombineMap()
+        {
+            List<MeshFilter> pathMeshFilters = new List<MeshFilter>();
+            List<MeshFilter> levelMeshFilters = new List<MeshFilter>();
+            for (int x = 0; x < map.GetLength(0); x++)
+            {
+                for (int y = 0; y < map.GetLength(1); y++)
+                {
+                    for (int z = 0; z < map.GetLength(2); z++)
+                    {
+                        if (map[x,y,z].layer == walkableLayerInt)
+                        {
+                            pathMeshFilters.Add(map[x,y,z].GetComponent<MeshFilter>());
+                        }
+                        else
+                        {
+                            levelMeshFilters.Add(map[x,y,z].GetComponent<MeshFilter>());
+                        }
+                    }
+                }
+            }
+            //foreach (GameObject block in map)
+            //{
+            //    Debug.Log(block.layer);
+            //    if (block.layer == walkableLayerInt)
+            //    {
+            //        pathMeshFilters.Add(block.GetComponent<MeshFilter>());
+            //    }
+            //    else
+            //    {
+            //        levelMeshFilters.Add(block.GetComponent<MeshFilter>());
+            //    }
+            //}
+
+            CombineInstance[] combinedPathMeshes = new CombineInstance[pathMeshFilters.Count];
+            for (int i = 0; i < pathMeshFilters.Count; i++)
+            {
+                if (pathMeshFilters[i] != null)
+                {
+                    combinedPathMeshes[i].mesh = pathMeshFilters[i].mesh;
+                    combinedPathMeshes[i].transform = pathMeshFilters[i].transform.localToWorldMatrix;
+                    Destroy(pathMeshFilters[i].gameObject);
+                }
+            }
+
+            pathMeshFilter.mesh = new Mesh();
+            pathMeshFilter.mesh.CombineMeshes(combinedPathMeshes);
+            pathMeshRenderer.material = pathMaterial;
+
+            CombineInstance[] combinedLevelMeshes = new CombineInstance[levelMeshFilters.Count];
+            for (int i = 0; i < levelMeshFilters.Count; i++)
+            {
+                if (levelMeshFilters[i] != null)
+                {
+                    combinedLevelMeshes[i].mesh = levelMeshFilters[i].mesh;
+                    combinedLevelMeshes[i].transform = levelMeshFilters[i].transform.localToWorldMatrix;
+                    Destroy(levelMeshFilters[i].gameObject);
+                }
+            }
+
+            levelMeshFilter.mesh = new Mesh();
+            levelMeshFilter.mesh.CombineMeshes(combinedLevelMeshes);
+            levelMeshRenderer.material = levelMaterial;
         }
         #endregion
     }
