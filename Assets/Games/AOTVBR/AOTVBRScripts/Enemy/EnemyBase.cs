@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace AOTVBR
 {
-    #pragma warning disable // No need to override other comparison operators
+#pragma warning disable // No need to override other comparison operators
     public abstract class EnemyBase : MonoBehaviour, IComparable<EnemyBase>
     {
         [SerializeField]
@@ -12,6 +12,7 @@ namespace AOTVBR
         [SerializeField]
         private float hitpoints = 50;
         public float Hitpoints { get => hitpoints; }
+        private float originalHitpoints;
         [SerializeField]
         private int damage = 5;
         public int Damage { get => damage; }
@@ -19,20 +20,28 @@ namespace AOTVBR
         private float fundAmount = 1;
         public float FundAmount { get => fundAmount; }
 
+        private bool isDead;
+
+        private void Awake() => originalHitpoints = hitpoints;
+
+        private void OnEnable()
+        {
+            hitpoints = originalHitpoints;
+            isDead = false;
+        }
+
         public virtual void TakeDamage(float damage)
         {
+            if (isDead) return; // Prevent spamming death events
+
             hitpoints -= damage;
             if (hitpoints <= 0)
             {
-                Die();
+                isDead = true;
+                Explosion();
                 GiveFundsToPlayer();
+                DeathEvent();
             }
-        }
-
-        public virtual void Die()
-        {
-            Explosion();
-            Destroy(gameObject);
         }
 
         protected virtual void Explosion()
@@ -48,6 +57,8 @@ namespace AOTVBR
                 PlayerData.Instance.Funds += fundAmount;
             }
         }
+
+        public abstract void DeathEvent();
 
         /// <summary>
         /// Compare hitpoints equality.

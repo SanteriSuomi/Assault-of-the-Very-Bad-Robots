@@ -492,7 +492,7 @@ GameObject:
   - component: {fileID: 4103687959212580938}
   - component: {fileID: 7839517244910777862}
   - component: {fileID: 3248761335894158771}
-  - component: {fileID: 2284272481621593356}
+  - component: {fileID: 4227540069706383073}
   - component: {fileID: -4003846555069486768}
   m_Layer: 12
   m_Name: PRE_Enemy_Strong
@@ -587,8 +587,8 @@ NavMeshAgent:
   m_Height: 0.5
   m_BaseOffset: -0.02
   m_WalkableMask: 1
-  m_ObstacleAvoidanceType: 1
---- !u!114 &2284272481621593356
+  m_ObstacleAvoidanceType: 0
+--- !u!114 &4227540069706383073
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -597,14 +597,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5775063816360608880}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb4befbd72a75024b976d95f030a95d0, type: 3}
+  m_Script: {fileID: 11500000, guid: 2a75f12013e34ed479e4012bf6f52c6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   name: Big Robot
   hitpoints: 150
   damage: 15
   fundAmount: 5
-  explosionPrefab: {fileID: 100006, guid: e076683e0305e35498b8e8834978c0fa, type: 3}
 --- !u!82 &-4003846555069486768
 AudioSource:
   m_ObjectHideFlags: 0

@@ -125,12 +125,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deactivationDelay: 5
-  hitEnemiesArrayLength: 10
+  hitEnemiesArrayLength: 5
   bombDamageMask:
     serializedVersion: 2
     m_Bits: 4096
-  damageRadius: 2
-  bombDamage: 22.5
+  damageRadius: 1.5
+  bombDamage: 20
 --- !u!1 &7656167787987787334
 GameObject:
   m_ObjectHideFlags: 0

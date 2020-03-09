@@ -20,9 +20,9 @@ namespace AOTVBR
         [SerializeField]
         private TextMeshProUGUI timeText = default;
         [SerializeField]
-        private GameObject enemyBasic = default;
+        private EnemyBasic enemyBasic = default;
         [SerializeField]
-        private GameObject enemyStrong = default;
+        private EnemyStrong enemyStrong = default;
         [SerializeField]
         private GameObject gameOverScreen = default;
         private WaitForSeconds countdownLoopWFS;
@@ -54,6 +54,7 @@ namespace AOTVBR
 
         private bool hasGameResetted;
         private bool hasDecreasedSpawnInterval;
+        private bool finishedGame;
 
         protected override void Awake()
         {
@@ -67,17 +68,18 @@ namespace AOTVBR
             enemyStrongSpawnIntervalDefault = enemyStrongSpawnInterval;
         }
 
-        public void GameReset()
+        private void GameReset()
         {
             // Reset most of the game variables back to zero.
-            StopCoroutine(nameof(UpdateLoop));
-            StopCoroutine(nameof(Countdown));
+            StopAllCoroutines();
             hasDecreasedSpawnInterval = false;
+            finishedGame = false;
             enemyTimerBasic = 0;
             enemyTimerStrong = 0;
             textTime = 0;
             enemyBasicSpawnInterval = enemyBasicSpawnIntervalDefault;
             enemyStrongSpawnInterval = enemyStrongSpawnIntervalDefault;
+            PlayerData.Instance.Health = PlayerData.Instance.StartingHealth;
         }
 
         private void GameStart()
@@ -118,8 +120,10 @@ namespace AOTVBR
 
         private void UpdateGameState()
         {
-            if (PlayerData.Instance.Health <= 0)
+            if (PlayerData.Instance.Health <= 0 
+                && !finishedGame)
             {
+                finishedGame = true;
                 StartCoroutine(DeactivateGame());
             }
 
@@ -141,10 +145,10 @@ namespace AOTVBR
             yield return resetGameWFS;
             gameOverScreen.SetActive(false);
 
+            StopAllCoroutines();
             hasGameResetted = false;
-            StopCoroutine(nameof(UpdateLoop));
             GameMenuHideEvent.Invoke();
-            GameState.Instance.SetState((int)GameStates.Menu);
+            GameState.Instance.SetState((int)GameStates.GenerateMap);
         }
 
         private void UpdateGameUI()
@@ -155,36 +159,44 @@ namespace AOTVBR
             timeText.text = $"{Mathf.RoundToInt(textTime)}";
         }
 
-        private void SpawnEnemyBasic(GameObject enemy, float interval)
+        private void SpawnEnemyBasic(EnemyBase enemy, float interval)
         {
             enemyTimerBasic += Time.deltaTime;
             if (enemyTimerBasic >= interval)
             {
                 enemyTimerBasic = 0;
-                InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
+                InitializeEnemy(enemy, out EnemyBase spawnedEnemy, out NavMeshAgent enemyAgent);
                 SetEnemyPath(spawnedEnemy, enemyAgent);
             }
         }
 
-        private void SpawnEnemyStrong(GameObject enemy, float interval)
+        private void SpawnEnemyStrong(EnemyBase enemy, float interval)
         {
             enemyTimerStrong += Time.deltaTime;
             if (enemyTimerStrong >= interval)
             {
                 enemyTimerStrong = 0;
-                InitializeEnemy(enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent);
+                InitializeEnemy(enemy, out EnemyBase spawnedEnemy, out NavMeshAgent enemyAgent);
                 SetEnemyPath(spawnedEnemy, enemyAgent);
             }
         }
 
-        private void InitializeEnemy(GameObject enemy, out GameObject spawnedEnemy, out NavMeshAgent enemyAgent)
+        private void InitializeEnemy(EnemyBase enemy, out EnemyBase spawnedEnemy, out NavMeshAgent enemyAgent)
         {
-            spawnedEnemy = Instantiate(enemy);
+            if (enemy is EnemyBasic)
+            {
+                spawnedEnemy = EnemyBasicPool.Instance.Get();
+            }
+            else
+            {
+                spawnedEnemy = EnemyStrongPool.Instance.Get();
+            }
+
             enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
-            EntityData.Instance.ActiveMapEntityList.Add(spawnedEnemy);
+            EntityData.Instance.ActiveMapEntities.Add(spawnedEnemy.gameObject);
         }
 
-        private void SetEnemyPath(GameObject spawnedEnemy, NavMeshAgent enemyAgent)
+        private void SetEnemyPath(EnemyBase spawnedEnemy, NavMeshAgent enemyAgent)
         {
             spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint;
             // Enable navmeshagent after placing it on the navmesh.

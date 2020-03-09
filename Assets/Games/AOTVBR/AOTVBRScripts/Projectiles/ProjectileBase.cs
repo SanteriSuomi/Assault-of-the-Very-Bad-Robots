@@ -17,7 +17,5 @@ namespace AOTVBR
         protected abstract void DeactivateDelay();
 
         protected virtual void OnCollisionEnter(Collision collision){}
-
-        private void OnDisable() => CancelInvoke();
     }
 }

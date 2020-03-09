@@ -30,12 +30,15 @@ namespace AOTVBR
             InvokeStateEvents(currentState);
         }
 
+        public GameStates GetState() => currentState;
+
         private void InvokeStateEvents(GameStates state)
         {
             switch (state)
             {
                 case GameStates.Menu:
                     MainMenuEvent?.Invoke();
+                    ClearEntities();
                     break;
 
                 case GameStates.GenerateMap:
@@ -53,13 +56,11 @@ namespace AOTVBR
             }
         }
 
-        public GameStates GetState() => currentState;
-
         private static void ClearEntities()
         {
-            foreach (GameObject entity in EntityData.Instance.ActiveMapEntityList)
+            foreach (GameObject entity in EntityData.Instance.ActiveMapEntities)
             {
-                if (entity != null)
+                if (!(entity is null))
                 {
                     Destroy(entity);
                 }

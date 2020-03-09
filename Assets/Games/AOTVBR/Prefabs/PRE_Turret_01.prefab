@@ -452,10 +452,10 @@ MonoBehaviour:
   nearEnemiesArrayLength: 5
   name: Beam Tower
   cost: 10
-  damage: 2.5
+  damage: 2.6
   damageTimerInterval: 0.25
   checkRadius: 3
-  minimumDotProductToFire: -0.95
+  minimumDotProductToFire: -0.9
   laserOnPositionOffset: {x: 0, y: 0.4, z: 0}
 --- !u!82 &-5600195842730260347
 AudioSource:

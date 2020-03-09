@@ -12,6 +12,7 @@ namespace AOTVBR
         private int maxFunds = 30;
 
         public int Health { get; set; }
+        public int StartingHealth { get; private set; }
         public float Funds { get; set; }
         public int MaxFunds { get; private set; }
 
@@ -28,6 +29,7 @@ namespace AOTVBR
         protected override void Awake()
         {
             Health = startingHealth;
+            StartingHealth = startingHealth;
             Funds = startingFunds;
             MaxFunds = maxFunds;
         }

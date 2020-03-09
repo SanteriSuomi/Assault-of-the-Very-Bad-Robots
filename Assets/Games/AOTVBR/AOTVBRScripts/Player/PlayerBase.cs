@@ -24,6 +24,7 @@ namespace AOTVBR
             {
                 // Subtract health from the player.
                 PlayerData.Instance.Health -= enemy.Damage;
+                enemy.DeathEvent();
                 if (!isShowingDamageText)
                 {
                     isShowingDamageText = true;
@@ -35,7 +36,6 @@ namespace AOTVBR
         private IEnumerator ShowDamageText(EnemyBase enemy)
         {
             damageText.text = $"{enemy.Name} has dealt {enemy.Damage} to your base!";
-            enemy.Die();
             yield return showDamageTextWFS;
             damageText.text = string.Empty;
             isShowingDamageText = false;

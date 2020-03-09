@@ -643,8 +643,8 @@ MonoBehaviour:
   nearEnemiesArrayLength: 5
   name: Bomb Tower
   cost: 30
-  damage: 22.5
-  damageTimerInterval: 0.65
+  damage: 21
+  damageTimerInterval: 0.7
   checkRadius: 4
   minimumDotProductToFire: -0.7
   bombHole: {fileID: 3572490093727427503}

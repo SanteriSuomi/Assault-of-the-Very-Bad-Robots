@@ -529,7 +529,7 @@ MonoBehaviour:
   nearEnemiesArrayLength: 5
   name: Gun Tower
   cost: 20
-  damage: 3.25
+  damage: 3.3
   damageTimerInterval: 0.3
   checkRadius: 3.5
   minimumDotProductToFire: -0.95

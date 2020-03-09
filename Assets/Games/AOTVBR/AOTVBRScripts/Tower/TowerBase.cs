@@ -31,9 +31,9 @@ namespace AOTVBR
         private float damageTimerInterval = 1;
         [SerializeField]
         private float checkRadius = 3.25f;
-        private float damageTimer;
         [SerializeField]
         protected float minimumDotProductToFire = -0.95f;
+        private float damageTimer;
 
         protected bool isPlacing;
 

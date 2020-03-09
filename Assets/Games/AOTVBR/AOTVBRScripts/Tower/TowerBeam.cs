@@ -23,13 +23,8 @@ namespace AOTVBR
             ActivateLineRenderer(false);
         }
 
-        private void ActivateLineRenderer(bool enable)
-        {
-            if (lineRenderer != null)
-            {
-                lineRenderer.enabled = enable;
-            }
-        }
+        private void ActivateLineRenderer(bool value) 
+            => lineRenderer.enabled = value;
 
         private void ActivateLaser(Vector3 target)
         {

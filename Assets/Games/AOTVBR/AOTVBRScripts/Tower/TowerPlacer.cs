@@ -185,7 +185,7 @@ namespace AOTVBR
             }
             
             PlayerData.Instance.Funds -= currentTowerType.Cost;
-            EntityData.Instance.ActiveMapEntityList.Add(currentTower);
+            EntityData.Instance.ActiveMapEntities.Add(currentTower);
         }
 
         private bool IsLegalHit(RaycastHit hit)
