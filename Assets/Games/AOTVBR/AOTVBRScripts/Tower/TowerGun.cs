@@ -65,7 +65,7 @@ namespace AOTVBR
             bulletObj.Rigidbody.velocity = transform.forward * bulletSpeed;
         }
 
-        protected override void PlayAudio()
+        protected override void PlayEnemyDetectedAttackAudio()
         {
             if (playGunShot)
             {

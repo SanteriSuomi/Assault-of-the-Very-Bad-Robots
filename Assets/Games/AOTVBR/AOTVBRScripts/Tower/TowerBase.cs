@@ -28,15 +28,15 @@ namespace AOTVBR
         public float Damage { get => damage; }
 
         [SerializeField]
-        private float damageTimerAmount = 1;
+        private float damageTimerInterval = 1;
         [SerializeField]
         private float checkRadius = 3.25f;
         private float damageTimer;
 
         protected bool isPlacing;
 
-        public void IsCurrentPlacing(bool enable)
-            => isPlacing = enable;
+        public void IsCurrentPlacing(bool value)
+            => isPlacing = value;
 
         private void Start()
         {
@@ -60,12 +60,12 @@ namespace AOTVBR
 
         private void DetectEnemies()
         {
-            (bool, EnemyBase) value = GetEnemyInRadius();
+            (bool, EnemyBase) value = GetEnemies();
             if (value.Item1)
             {
                 EnemyDetectedEvent(value.Item2.transform.position);
-                DamageWithInterval(value.Item2);
-                PlayAudio();
+                DamageEnemyOnDetection(value.Item2);
+                PlayEnemyDetectedAttackAudio();
             }
             else
             {
@@ -73,7 +73,7 @@ namespace AOTVBR
             }
         }
 
-        private (bool, EnemyBase) GetEnemyInRadius()
+        private (bool, EnemyBase) GetEnemies()
         {
             int nearEnemiesAmount = Physics.OverlapSphereNonAlloc(transform.position, checkRadius, 
                 nearEnemies, enemyLayers);
@@ -83,20 +83,20 @@ namespace AOTVBR
             }
             else if (nearEnemiesAmount > 1)
             {
-                EnemyBase lowestEnemy = GetEnemiesInRadius(nearEnemies).Min();
+                EnemyBase lowestEnemy = GetEnemyBases().Min();
                 return (true, lowestEnemy);
             }
 
             return (false, null);
         }
 
-        private List<EnemyBase> GetEnemiesInRadius(Collider[] enemyCollisions)
+        private List<EnemyBase> GetEnemyBases()
         {
             List<EnemyBase> activeEnemyList = new List<EnemyBase>(nearEnemiesArrayLength);
-            for (int i = 0; i < enemyCollisions.Length - 1; i++)
+            for (int i = 0; i < nearEnemies.Length; i++)
             {
-                if (enemyCollisions[i] != null
-                    && enemyCollisions[i].TryGetComponent(out EnemyBase enemy))
+                if (nearEnemies[i] != null
+                    && nearEnemies[i].TryGetComponent(out EnemyBase enemy))
                 {
                     activeEnemyList.Add(enemy);
                 }
@@ -107,17 +107,17 @@ namespace AOTVBR
 
         protected abstract void EnemyDetectedEvent(Vector3 enemyPosition);
 
-        private void DamageWithInterval(EnemyBase enemy)
+        protected virtual void DamageEnemyOnDetection(EnemyBase enemy)
         {
             damageTimer += Time.deltaTime;
-            if (damageTimer >= damageTimerAmount)
+            if (damageTimer >= damageTimerInterval)
             {
                 damageTimer = 0;
                 enemy.TakeDamage(Damage);
             }
         }
 
-        protected abstract void PlayAudio();
+        protected abstract void PlayEnemyDetectedAttackAudio();
 
         protected virtual void ResetTower()
         {

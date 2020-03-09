@@ -47,7 +47,7 @@ namespace AOTVBR
 
             if (CheckFunds())
             {
-                currentTowerType.IsCurrentPlacing(enable: true);
+                currentTowerType.IsCurrentPlacing(value: true);
                 towerRenderer = currentTower.GetComponentsInChildren<Renderer>();
                 SaveDefaultRendererColors();
                 isPlacing = true;
@@ -105,7 +105,7 @@ namespace AOTVBR
             if (Input.GetKeyDown(KeyCode.C))
             {
                 isPlacing = false;
-                currentTowerType.IsCurrentPlacing(enable: false);
+                currentTowerType.IsCurrentPlacing(value: false);
                 Destroy(currentTower);
             }
         }
@@ -154,7 +154,7 @@ namespace AOTVBR
                 SetTowerDefaultColors();
                 InitializeTower();
                 isPlacing = false;
-                currentTowerType.IsCurrentPlacing(enable: false);
+                currentTowerType.IsCurrentPlacing(value: false);
             }
         }
 
