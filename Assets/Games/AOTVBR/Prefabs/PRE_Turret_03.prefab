@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1963596183764709778}
   - component: {fileID: 8570063148622948393}
   - component: {fileID: 166403458038998236}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MSH_Turret_03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   - component: {fileID: 7442824368743038433}
   - component: {fileID: 3014903595560135798}
   - component: {fileID: 8042940852759187510}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MSH_Turret_03_Flag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -173,7 +173,7 @@ GameObject:
   - component: {fileID: 2245585374220017999}
   - component: {fileID: 3013504968892081846}
   - component: {fileID: 4355063423893814919}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MSH_Turret_03_Flagpole
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -241,6 +241,36 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1 &2017187333336934862
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3572490093727427503}
+  m_Layer: 10
+  m_Name: BombHole
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3572490093727427503
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2017187333336934862}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.55, z: 1.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7496626247986105304}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3577421572183372439
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,7 +282,7 @@ GameObject:
   - component: {fileID: 1558017408166508761}
   - component: {fileID: 4105565747548777978}
   - component: {fileID: 6449977559818868622}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MSH_Turret_03_Stand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,7 +362,7 @@ GameObject:
   - component: {fileID: 7496626247986105304}
   - component: {fileID: 4161000767253302184}
   - component: {fileID: 1560326034992923939}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MSH_Turret_03_Pipes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -349,7 +379,8 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.0016375908, y: -0.3307022, z: -0.27406406}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 3572490093727427503}
   m_Father: {fileID: 1963596183764709778}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -411,7 +442,7 @@ GameObject:
   - component: {fileID: 654716224036410425}
   - component: {fileID: 4174892573034118718}
   - component: {fileID: 3410179561376686436}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MSH_Turret_03_Sides
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -490,7 +521,7 @@ GameObject:
   - component: {fileID: 4380277800475774643}
   - component: {fileID: 3195953477397517245}
   - component: {fileID: 3705600046889816309}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: MSH_Turret_03_Stand_Top
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -569,9 +600,10 @@ GameObject:
   - component: {fileID: 5024776840843234731}
   - component: {fileID: 6291736782469037919}
   - component: {fileID: 2688106367234381590}
-  m_Layer: 0
+  - component: {fileID: 7725557883872779714}
+  m_Layer: 10
   m_Name: PRE_Turret_03
-  m_TagString: Untagged
+  m_TagString: Tower
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -584,8 +616,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8349900427541938104}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.65, y: 0.65, z: 0.65}
   m_Children:
   - {fileID: 1963596183764709778}
   - {fileID: 1558017408166508761}
@@ -610,11 +642,15 @@ MonoBehaviour:
     m_Bits: 4096
   nearEnemiesArrayLength: 5
   name: Bomb Tower
-  cost: 10
-  damage: 10
-  damageTimerInterval: 0.5
-  checkRadius: 3.25
-  bombAttackInterval: 2
+  cost: 30
+  damage: 22.5
+  damageTimerInterval: 0.65
+  checkRadius: 4
+  minimumDotProductToFire: -0.7
+  bombHole: {fileID: 3572490093727427503}
+  bombAttackInterval: 3
+  rotationSpeed: 1
+  bombShootSpeedMultiplier: 2
 --- !u!82 &2688106367234381590
 AudioSource:
   m_ObjectHideFlags: 0
@@ -628,8 +664,8 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 2ea8255d413447c4abe1f950861eb3a4, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
+  m_Volume: 0.225
+  m_Pitch: 2.5
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -712,3 +748,16 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!65 &7725557883872779714
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8349900427541938104}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.25, y: 1, z: 1.25}
+  m_Center: {x: 0, y: 0.5, z: 0}

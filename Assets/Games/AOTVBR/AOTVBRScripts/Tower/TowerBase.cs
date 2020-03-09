@@ -32,11 +32,16 @@ namespace AOTVBR
         [SerializeField]
         private float checkRadius = 3.25f;
         private float damageTimer;
+        [SerializeField]
+        protected float minimumDotProductToFire = -0.95f;
 
         protected bool isPlacing;
 
         public void IsCurrentPlacing(bool value)
             => isPlacing = value;
+
+        protected void SetInitialRotation()
+            => turret.rotation = Quaternion.Euler(new Vector3(0, 180, 0));
 
         private void Start()
         {
@@ -75,7 +80,7 @@ namespace AOTVBR
 
         private (bool, EnemyBase) GetEnemies()
         {
-            int nearEnemiesAmount = Physics.OverlapSphereNonAlloc(transform.position, checkRadius, 
+            int nearEnemiesAmount = Physics.OverlapSphereNonAlloc(transform.position, checkRadius,
                 nearEnemies, enemyLayers);
             if (nearEnemiesAmount == 1)
             {
@@ -126,6 +131,29 @@ namespace AOTVBR
             {
                 audioSource.Stop();
             }
+        }
+
+        protected void RotateTurret(Vector3 target, float rotationSpeed, bool disableVerticalRotation)
+        {
+            Vector3 direction = target - turret.position;
+            if (disableVerticalRotation)
+            {
+                direction.y = 0;
+            }
+
+            Quaternion rotation = Quaternion.LookRotation(direction);
+            turret.rotation = Quaternion.Slerp(turret.rotation, rotation, rotationSpeed * Time.deltaTime);
+        }
+
+        protected bool IsFacingTarget(Vector3 current, Vector3 target)
+        {
+            Vector3 directionToTarget = (turret.position - target).normalized;
+            if (Vector3.Dot(current, directionToTarget) <= minimumDotProductToFire)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -1,30 +1,63 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace AOTVBR
 {
     public class TowerBomb : TowerBase
     {
         [SerializeField]
+        private Transform bombHole = default;
+
+        [SerializeField]
         private float bombAttackInterval = 2;
         private float bombAttackTimer;
+        [SerializeField]
+        private float rotationSpeed = 1;
+        [SerializeField]
+        private float bombShootSpeedMultiplier = 2;
 
         private bool playBombShoot;
         
+        private void Awake()
+            => SetInitialRotation();
+
         protected override void EnemyDetectedEvent(Vector3 enemyPosition)
         {
+            RotateTurret(enemyPosition, rotationSpeed, true);
+            bombAttackTimer += Time.deltaTime;
+            if (bombAttackTimer >= bombAttackInterval 
+                && IsFacingTarget(turret.forward, enemyPosition))
+            {
+                playBombShoot = true;
+                bombAttackTimer = 0;
+                ShootBomb(enemyPosition);
+            }
+        }
 
+        private void ShootBomb(Vector3 enemyPosition)
+        {
+            Bomb bomb = TowerBombBombPool.Instance.Get();
+            bomb.transform.position = bombHole.transform.position;
+            float distanceToEnemy = (enemyPosition - transform.position).magnitude;
+            if (distanceToEnemy <= 2)
+            {
+                ApplyVelocity(bomb, distanceToEnemy, bombShootSpeedMultiplier / 2);
+            }
+            else
+            {
+                ApplyVelocity(bomb, distanceToEnemy, bombShootSpeedMultiplier);
+            }
+        }
+
+        private void ApplyVelocity(Bomb bomb, float distanceToEnemy, float multiplier)
+        {
+            bomb.Rigidbody.velocity = bombHole.transform.forward
+                * distanceToEnemy
+                * multiplier;
         }
 
         protected override void DamageEnemyOnDetection(EnemyBase enemy)
         {
-            bombAttackTimer += Time.deltaTime;
-            if (bombAttackTimer >= bombAttackInterval)
-            {
-                playBombShoot = true;
-                bombAttackTimer = 0;
-            }
+            // Disable base damage.
         }
 
         protected override void PlayAttackAudio()

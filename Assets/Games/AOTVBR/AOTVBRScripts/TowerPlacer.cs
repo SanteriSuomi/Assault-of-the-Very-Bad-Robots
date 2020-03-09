@@ -26,6 +26,8 @@ namespace AOTVBR
         private float towerPosUpdateNormalMinAngle = 0.5f;
         [SerializeField]
         private float towerUpdatePosYOffset = 2;
+        [SerializeField]
+        private float bombTowerPlacePositionYOffsetFix = 0.35f;
 
         [SerializeField]
         private string towerRendererColorTag = "_BaseColor";
@@ -172,7 +174,16 @@ namespace AOTVBR
 
         private void InitializeTower()
         {
-            currentTower.transform.position = hitPosGrid + new Vector3(0, currentTower.transform.localScale.y, 0);
+            if (currentTowerType is TowerBomb) // Fix Bomb Tower going in to the ground
+            {
+                currentTower.transform.position = hitPosGrid + new Vector3(0, currentTower.transform.localScale.y 
+                    + bombTowerPlacePositionYOffsetFix, 0);
+            }
+            else
+            {
+                currentTower.transform.position = hitPosGrid + new Vector3(0, currentTower.transform.localScale.y, 0);
+            }
+            
             PlayerData.Instance.Funds -= currentTowerType.Cost;
             EntityData.Instance.ActiveMapEntityList.Add(currentTower);
         }
