@@ -22,14 +22,14 @@ namespace AOTVBR
         }
 
         protected override void DeactivateDelay()
-            => TowerBombBombPool.Instance.Return(this);
+            => BombPool.Instance.Return(this);
 
         protected override void OnCollisionEnter(Collision collision)
         {
             Explosion explosion = ExplosionPool.Instance.Get();
             explosion.transform.position = transform.position;
             DealDamageInRadius();
-            TowerBombBombPool.Instance.Return(this);
+            BombPool.Instance.Return(this);
         }
 
         private void DealDamageInRadius()

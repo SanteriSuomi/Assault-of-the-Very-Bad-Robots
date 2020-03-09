@@ -3,6 +3,6 @@
     public class Bullet : ProjectileBase
     {
         protected override void DeactivateDelay() 
-            => TowerGunBulletPool.Instance.Return(this);
+            => BulletPool.Instance.Return(this);
     } 
 }

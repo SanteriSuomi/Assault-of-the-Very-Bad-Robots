@@ -544,7 +544,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -2797,7 +2797,7 @@ GameObject:
   - component: {fileID: 1229036729}
   - component: {fileID: 1229036728}
   m_Layer: 0
-  m_Name: TBBombPool
+  m_Name: BombPool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2815,6 +2815,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8e7f27fb1abca145b4b07d761eb346f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parent: {fileID: 0}
   prefabToPool: {fileID: 3417243620040018209, guid: 833fca00785df7d46b1008029f59e7e9,
     type: 3}
   poolSize: 100
@@ -4884,7 +4885,7 @@ GameObject:
   - component: {fileID: 1956633598}
   - component: {fileID: 1956633597}
   m_Layer: 0
-  m_Name: TGBulletPool
+  m_Name: BulletPool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

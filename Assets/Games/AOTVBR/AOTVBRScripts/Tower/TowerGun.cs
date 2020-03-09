@@ -43,7 +43,7 @@ namespace AOTVBR
 
         private void SpawnBulletAt(Transform transform)
         {
-            Bullet bulletObj = TowerGunBulletPool.Instance.Get();
+            Bullet bulletObj = BulletPool.Instance.Get();
             bulletObj.transform.position = transform.position;
             bulletObj.Rigidbody.velocity = transform.forward * bulletSpeed;
         }

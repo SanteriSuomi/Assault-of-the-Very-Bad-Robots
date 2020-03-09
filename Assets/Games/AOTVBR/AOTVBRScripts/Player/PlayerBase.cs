@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AOTVBR
 {
-    public class Base : MonoBehaviour
+    public class PlayerBase : MonoBehaviour
     {
         private TextMeshProUGUI damageText;
         private WaitForSeconds showDamageTextWFS;

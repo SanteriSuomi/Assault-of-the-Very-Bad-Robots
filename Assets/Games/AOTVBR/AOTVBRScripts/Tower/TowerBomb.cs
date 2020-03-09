@@ -35,7 +35,7 @@ namespace AOTVBR
 
         private void ShootBomb(Vector3 enemyPosition)
         {
-            Bomb bomb = TowerBombBombPool.Instance.Get();
+            Bomb bomb = BombPool.Instance.Get();
             bomb.transform.position = bombHole.transform.position;
             float distanceToEnemy = (enemyPosition - transform.position).magnitude;
             if (distanceToEnemy <= 2)
