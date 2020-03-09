@@ -530,7 +530,7 @@ MonoBehaviour:
   name: Gun Tower
   cost: 20
   damage: 3.55
-  damageTimerAmount: 0.3
+  damageTimerInterval: 0.5
   checkRadius: 3.8
   bulletHoleLeft: {fileID: 6734040212037515472}
   bulletHoleRight: {fileID: 1712061335621097867}

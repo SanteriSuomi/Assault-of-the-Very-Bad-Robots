@@ -65,7 +65,7 @@ namespace AOTVBR
             {
                 EnemyDetectedEvent(value.Item2.transform.position);
                 DamageEnemyOnDetection(value.Item2);
-                PlayEnemyDetectedAttackAudio();
+                PlayAttackAudio();
             }
             else
             {
@@ -117,7 +117,7 @@ namespace AOTVBR
             }
         }
 
-        protected abstract void PlayEnemyDetectedAttackAudio();
+        protected abstract void PlayAttackAudio();
 
         protected virtual void ResetTower()
         {

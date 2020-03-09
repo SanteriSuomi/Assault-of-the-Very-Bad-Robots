@@ -453,7 +453,7 @@ MonoBehaviour:
   name: Beam Tower
   cost: 10
   damage: 2.8
-  damageTimerAmount: 0.25
+  damageTimerInterval: 0.5
   checkRadius: 3.3
   laserOnPositionOffset: {x: 0, y: 0.4, z: 0}
 --- !u!82 &-5600195842730260347

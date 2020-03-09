@@ -51,7 +51,6 @@ namespace AOTVBR
                 {
                     playGunShot = true;
                     bulletShootTimer = 0;
-
                     SpawnBulletAt(bulletHoleLeft);
                     SpawnBulletAt(bulletHoleRight);
                 }
@@ -65,7 +64,7 @@ namespace AOTVBR
             bulletObj.Rigidbody.velocity = transform.forward * bulletSpeed;
         }
 
-        protected override void PlayEnemyDetectedAttackAudio()
+        protected override void PlayAttackAudio()
         {
             if (playGunShot)
             {

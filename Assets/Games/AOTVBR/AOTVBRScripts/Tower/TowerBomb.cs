@@ -9,24 +9,31 @@ namespace AOTVBR
         [SerializeField]
         private float bombAttackInterval = 2;
         private float bombAttackTimer;
+
+        private bool playBombShoot;
         
         protected override void EnemyDetectedEvent(Vector3 enemyPosition)
         {
-            bombAttackTimer += Time.deltaTime;
-            if (bombAttackTimer >= bombAttackInterval)
-            {
-                bombAttackTimer = 0;
-            }
+
         }
 
         protected override void DamageEnemyOnDetection(EnemyBase enemy)
         {
-            // Disable regular attacking on Bomb Tower (bombs deal damage).
+            bombAttackTimer += Time.deltaTime;
+            if (bombAttackTimer >= bombAttackInterval)
+            {
+                playBombShoot = true;
+                bombAttackTimer = 0;
+            }
         }
 
-        protected override void PlayEnemyDetectedAttackAudio()
+        protected override void PlayAttackAudio()
         {
-            throw new System.NotImplementedException();
+            if (playBombShoot)
+            {
+                playBombShoot = false;
+                audioSource.Play();
+            }
         }
 
         protected override void ResetTower()

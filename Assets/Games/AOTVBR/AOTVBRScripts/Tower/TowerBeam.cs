@@ -37,7 +37,7 @@ namespace AOTVBR
             lineRenderer.SetPosition(1, target);
         }
 
-        protected override void PlayEnemyDetectedAttackAudio()
+        protected override void PlayAttackAudio()
         {
             if (!audioSource.isPlaying)
             {
