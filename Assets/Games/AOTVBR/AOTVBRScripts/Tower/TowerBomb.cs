@@ -14,6 +14,8 @@ namespace AOTVBR
         private float rotationSpeed = 1;
         [SerializeField]
         private float bombShootSpeedMultiplier = 2;
+        [SerializeField]
+        private float maxDistanceForVelocityHalve = 2;
 
         private bool playBombShoot;
         
@@ -38,7 +40,7 @@ namespace AOTVBR
             Bomb bomb = BombPool.Instance.Get();
             bomb.transform.position = bombHole.transform.position;
             float distanceToEnemy = (enemyPosition - transform.position).magnitude;
-            if (distanceToEnemy <= 2)
+            if (distanceToEnemy <= maxDistanceForVelocityHalve) // Have speed for lower distance so they don't go too far.
             {
                 ApplyVelocity(bomb, distanceToEnemy, bombShootSpeedMultiplier / 2);
             }

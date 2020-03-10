@@ -10,6 +10,7 @@ namespace AOTVBR
         private WaitForSeconds showDamageTextWFS;
         [SerializeField]
         private float showDamageTextDelay = 2.5f;
+
         private bool isShowingDamageText;
 
         private void Awake()
@@ -22,7 +23,6 @@ namespace AOTVBR
         {
             if (collision.TryGetComponent(out EnemyBase enemy))
             {
-                // Subtract health from the player.
                 PlayerData.Instance.Health -= enemy.Damage;
                 PlayerData.Instance.Funds += enemy.FundAmount / 2;
                 enemy.DeathEvent();
