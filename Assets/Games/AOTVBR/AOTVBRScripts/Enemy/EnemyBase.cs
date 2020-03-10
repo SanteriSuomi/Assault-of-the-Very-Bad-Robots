@@ -1,11 +1,13 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace AOTVBR
 {
 #pragma warning disable // No need to override other comparison operators
     public abstract class EnemyBase : MonoBehaviour, IComparable<EnemyBase>
     {
+        public NavMeshAgent NavMeshAgent { get; private set; }
         [SerializeField]
         private new string name = "Enemy";
         public string Name { get => name; }
@@ -22,7 +24,11 @@ namespace AOTVBR
 
         private bool isDead;
 
-        private void Awake() => originalHitpoints = hitpoints;
+        private void Awake()
+        {
+            originalHitpoints = hitpoints;
+            NavMeshAgent = GetComponent<NavMeshAgent>();
+        }
 
         private void OnEnable()
         {

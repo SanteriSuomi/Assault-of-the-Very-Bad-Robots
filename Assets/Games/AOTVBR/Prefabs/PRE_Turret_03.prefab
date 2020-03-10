@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1963596183764709778}
   - component: {fileID: 8570063148622948393}
   - component: {fileID: 166403458038998236}
+  - component: {fileID: 192769840682117860}
   m_Layer: 10
   m_Name: MSH_Turret_03
   m_TagString: Untagged
@@ -82,6 +83,19 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!65 &192769840682117860
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 58065314143341649}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.4, z: 0.7}
+  m_Center: {x: 0, y: -0.2, z: 0}
 --- !u!1 &335682437663610115
 GameObject:
   m_ObjectHideFlags: 0
@@ -643,7 +657,7 @@ MonoBehaviour:
   nearEnemiesArrayLength: 5
   name: Bomb Tower
   cost: 30
-  damage: 21
+  damage: 20
   damageTimerInterval: 0.7
   checkRadius: 4
   minimumDotProductToFire: -0.7
@@ -759,5 +773,5 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.25, y: 1, z: 1.25}
-  m_Center: {x: 0, y: 0.5, z: 0}
+  m_Size: {x: 1.25, y: 0.5, z: 1.25}
+  m_Center: {x: 0, y: 0.25, z: 0}

@@ -6,6 +6,7 @@ using UnityEngine.AI;
 
 namespace AOTVBR
 {
+    #pragma warning disable IDE0066 // Unity complains from switch expressions
     public class GameManager : Singleton<GameManager>
     {
         public delegate void GameMenuHide();
@@ -31,7 +32,6 @@ namespace AOTVBR
 
         [SerializeField]
         private int gameStartCountdownTime = 3;
-
         [SerializeField]
         private float enemyBasicSpawnInterval = 5;
         [SerializeField]
@@ -50,7 +50,7 @@ namespace AOTVBR
         private float enemyStrongSpawnIntervalDefault;
         private float enemyTimerBasic;
         private float enemyTimerStrong;
-        private float textTime;
+        private float timeTextTime;
 
         private bool hasGameResetted;
         private bool hasDecreasedSpawnInterval;
@@ -61,22 +61,19 @@ namespace AOTVBR
             countdownLoopWFS = new WaitForSeconds(countdownLoopInterval);
             resetGameWFS = new WaitForSeconds(resetGameDelay);
             decreaseSpawnWFS = new WaitForSeconds(spawnIntervalDecreaseTime);
-
-            GameState.Instance.GameStartedEvent += GameStart;
-            // Store the default spawn intervals to reset them later.
             enemyBasicSpawnIntervalDefault = enemyBasicSpawnInterval;
             enemyStrongSpawnIntervalDefault = enemyStrongSpawnInterval;
+            GameState.Instance.GameStartedEvent += GameStart;
         }
 
         private void GameReset()
         {
-            // Reset most of the game variables back to zero.
             StopAllCoroutines();
             hasDecreasedSpawnInterval = false;
             finishedGame = false;
             enemyTimerBasic = 0;
             enemyTimerStrong = 0;
-            textTime = 0;
+            timeTextTime = 0;
             enemyBasicSpawnInterval = enemyBasicSpawnIntervalDefault;
             enemyStrongSpawnInterval = enemyStrongSpawnIntervalDefault;
             PlayerData.Instance.Health = PlayerData.Instance.StartingHealth;
@@ -107,9 +104,9 @@ namespace AOTVBR
         {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
-            for (int i = gameStartCountdownTime; i >= 0; i--)
+            for (int count = gameStartCountdownTime; count >= 0; count--)
             {
-                countdownText.text = i.ToString();
+                countdownText.text = count.ToString();
                 yield return countdownLoopWFS;
             }
 
@@ -131,8 +128,8 @@ namespace AOTVBR
             SpawnEnemyBasic(enemyBasic, enemyBasicSpawnInterval);
             SpawnEnemyStrong(enemyStrong, enemyStrongSpawnInterval);
 
-            if (!hasDecreasedSpawnInterval
-                && enemyBasicSpawnInterval >= minSpawnInterval)
+            if (enemyBasicSpawnInterval >= minSpawnInterval 
+                && !hasDecreasedSpawnInterval)
             {
                 hasDecreasedSpawnInterval = true;
                 StartCoroutine(DecreaseSpawnInterval());
@@ -155,8 +152,8 @@ namespace AOTVBR
         {
             healthText.text = $"{PlayerData.Instance.Health}";
             fundsText.text = $"{Math.Round(PlayerData.Instance.Funds, 2)}";
-            textTime += Time.deltaTime;
-            timeText.text = $"{Mathf.RoundToInt(textTime)}";
+            timeTextTime += Time.deltaTime;
+            timeText.text = $"{Mathf.RoundToInt(timeTextTime)}";
         }
 
         private void SpawnEnemyBasic(EnemyBase enemy, float interval)
@@ -165,8 +162,7 @@ namespace AOTVBR
             if (enemyTimerBasic >= interval)
             {
                 enemyTimerBasic = 0;
-                InitializeEnemy(enemy, out EnemyBase spawnedEnemy, out NavMeshAgent enemyAgent);
-                SetEnemyPath(spawnedEnemy, enemyAgent);
+                InitializeEnemy(enemy);
             }
         }
 
@@ -176,30 +172,35 @@ namespace AOTVBR
             if (enemyTimerStrong >= interval)
             {
                 enemyTimerStrong = 0;
-                InitializeEnemy(enemy, out EnemyBase spawnedEnemy, out NavMeshAgent enemyAgent);
-                SetEnemyPath(spawnedEnemy, enemyAgent);
+                InitializeEnemy(enemy);
             }
         }
 
-        private void InitializeEnemy(EnemyBase enemy, out EnemyBase spawnedEnemy, out NavMeshAgent enemyAgent)
+        private void InitializeEnemy(EnemyBase enemy)
         {
-            if (enemy is EnemyBasic)
+            GetEnemy(enemy, out EnemyBase spawnedEnemy, out NavMeshAgent enemyAgent);
+            EntityData.Instance.ActiveMapEntities.Add(spawnedEnemy.gameObject);
+            SetEnemyPath(spawnedEnemy, enemyAgent);
+        }
+
+        private void GetEnemy(EnemyBase enemy, out EnemyBase spawnedEnemy, out NavMeshAgent enemyAgent)
+        {
+            switch (enemy)
             {
-                spawnedEnemy = EnemyBasicPool.Instance.Get();
-            }
-            else
-            {
-                spawnedEnemy = EnemyStrongPool.Instance.Get();
+                case EnemyStrong _:
+                    spawnedEnemy = EnemyStrongPool.Instance.Get();
+                    break;
+                default:
+                    spawnedEnemy = EnemyBasicPool.Instance.Get();
+                    break;
             }
 
-            enemyAgent = spawnedEnemy.GetComponent<NavMeshAgent>();
-            EntityData.Instance.ActiveMapEntities.Add(spawnedEnemy.gameObject);
+            enemyAgent = spawnedEnemy.NavMeshAgent;
         }
 
         private void SetEnemyPath(EnemyBase spawnedEnemy, NavMeshAgent enemyAgent)
         {
             spawnedEnemy.transform.position = LevelData.Instance.AgentStartPoint;
-            // Enable navmeshagent after placing it on the navmesh.
             enemyAgent.enabled = true;
             enemyAgent.SetDestination(LevelData.Instance.AgentEndPoint);
         }
