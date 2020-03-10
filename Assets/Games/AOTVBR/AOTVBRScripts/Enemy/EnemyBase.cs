@@ -36,6 +36,8 @@ namespace AOTVBR
             isDead = false;
         }
 
+        private void OnDisable() => NavMeshAgent.enabled = false;
+
         public virtual void TakeDamage(float damage)
         {
             if (isDead) return; // Prevent spamming death events

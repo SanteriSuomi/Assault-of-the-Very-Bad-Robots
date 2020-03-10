@@ -1831,6 +1831,7 @@ MonoBehaviour:
   startingHealth: 100
   startingFunds: 10
   maxFunds: 30
+  startingFundsMultiplier: 1
 --- !u!1 &836581726
 GameObject:
   m_ObjectHideFlags: 0
@@ -4617,12 +4618,14 @@ MonoBehaviour:
   gameStartCountdownTime: 3
   enemyBasicSpawnInterval: 5.5
   enemyStrongSpawnInterval: 13.75
-  spawnIntervalDecreaseTime: 1.75
-  spawnIntervalDecrease: 0.05
+  spawnIntervalDecreaseTime: 2
+  spawnIntervalDecrease: 0.04
   minSpawnInterval: 0.2
   countdownLoopInterval: 1
   resetGameDelay: 2.5
-  gameUIUpdateTimeInterval: 1
+  gameUIUpdateTimeInterval: 0.5
+  halveFundsAmountAtSeconds: 200
+  halveFundsAmountDivisor: 2
 --- !u!1 &1912862142
 GameObject:
   m_ObjectHideFlags: 0

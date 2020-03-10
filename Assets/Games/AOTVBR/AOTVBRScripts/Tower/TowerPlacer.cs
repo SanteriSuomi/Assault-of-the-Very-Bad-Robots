@@ -49,7 +49,8 @@ namespace AOTVBR
 
             if (CheckFunds())
             {
-                currentTowerType.IsCurrentPlacing(value: true);
+                EntityData.Instance.ActiveMapEntities.Add(currentTower);
+                currentTowerType.IsCurrentPlacing(true);
                 towerRenderer = currentTower.GetComponentsInChildren<Renderer>();
                 SaveDefaultRendererColors();
                 isPlacing = true;
@@ -185,7 +186,6 @@ namespace AOTVBR
             }
             
             PlayerData.Instance.Funds -= currentTowerType.Cost;
-            EntityData.Instance.ActiveMapEntities.Add(currentTower);
         }
 
         private bool IsLegalHit(RaycastHit hit)

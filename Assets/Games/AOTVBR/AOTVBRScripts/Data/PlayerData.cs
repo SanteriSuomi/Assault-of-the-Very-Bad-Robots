@@ -10,10 +10,20 @@ namespace AOTVBR
         private int startingFunds = 10;
         [SerializeField]
         private int maxFunds = 30;
+        [SerializeField]
+        private float startingFundsMultiplier = 1;
 
         public int Health { get; set; }
         public int StartingHealth { get; private set; }
-        public float Funds { get; set; }
+        private float funds;
+        public float Funds
+        {
+            get => funds;
+            set => funds = value * FundsMultiplier;
+        }
+        public float FundsMultiplier { get; set; }
+        public float StartingFundsMultiplier { get; private set; }
+        public float StartingFunds { get; private set; }
         public int MaxFunds { get; private set; }
 
         public bool HasMaxFunds()
@@ -30,8 +40,11 @@ namespace AOTVBR
         {
             Health = startingHealth;
             StartingHealth = startingHealth;
-            Funds = startingFunds;
             MaxFunds = maxFunds;
+            FundsMultiplier = startingFundsMultiplier;
+            StartingFundsMultiplier = startingFundsMultiplier;
+            Funds = startingFunds;
+            StartingFunds = startingFunds;
         }
     }
 }

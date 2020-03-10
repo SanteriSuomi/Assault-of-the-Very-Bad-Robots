@@ -48,6 +48,10 @@ namespace AOTVBR
         private float resetGameDelay = 2.5f;
         [SerializeField]
         private float gameUIUpdateTimeInterval = 1;
+        [SerializeField]
+        private float halveFundsAmountAtSeconds = 300;
+        [SerializeField]
+        private float halveFundsAmountDivisor = 2;
         private float enemyBasicSpawnIntervalDefault;
         private float enemyStrongSpawnIntervalDefault;
         private float enemyTimerBasic;
@@ -58,6 +62,7 @@ namespace AOTVBR
         private bool hasGameResetted;
         private bool hasDecreasedSpawnInterval;
         private bool finishedGame;
+        private bool halvedFunds;
 
         protected override void Awake()
         {
@@ -74,6 +79,7 @@ namespace AOTVBR
             StopAllCoroutines();
             hasDecreasedSpawnInterval = false;
             finishedGame = false;
+            halvedFunds = false;
             enemyTimerBasic = 0;
             enemyTimerStrong = 0;
             timeTextTime = 0;
@@ -81,6 +87,8 @@ namespace AOTVBR
             enemyBasicSpawnInterval = enemyBasicSpawnIntervalDefault;
             enemyStrongSpawnInterval = enemyStrongSpawnIntervalDefault;
             PlayerData.Instance.Health = PlayerData.Instance.StartingHealth;
+            PlayerData.Instance.FundsMultiplier = PlayerData.Instance.StartingFundsMultiplier;
+            PlayerData.Instance.Funds = PlayerData.Instance.StartingFunds;
         }
 
         private void GameStart()
@@ -132,8 +140,9 @@ namespace AOTVBR
             SpawnEnemyBasic(enemyBasic, enemyBasicSpawnInterval);
             SpawnEnemyStrong(enemyStrong, enemyStrongSpawnInterval);
 
-            if (enemyBasicSpawnInterval >= minSpawnInterval 
-                && !hasDecreasedSpawnInterval)
+            if (!hasDecreasedSpawnInterval 
+                && enemyBasicSpawnInterval >= minSpawnInterval && 
+                enemyStrongSpawnInterval >= minSpawnInterval)
             {
                 hasDecreasedSpawnInterval = true;
                 StartCoroutine(DecreaseSpawnInterval());
@@ -161,7 +170,6 @@ namespace AOTVBR
                 gameUIUpdateTime = 0;
                 healthText.text = $"{PlayerData.Instance.Health}";
                 fundsText.text = $"{Math.Round(PlayerData.Instance.Funds, 2)}";
-                
                 timeText.text = $"{Mathf.RoundToInt(timeTextTime)}";
             }
         }
@@ -222,6 +230,18 @@ namespace AOTVBR
             enemyBasicSpawnInterval -= spawnIntervalDecrease;
             enemyStrongSpawnInterval -= spawnIntervalDecrease;
             hasDecreasedSpawnInterval = false;
+            HalveFundingAmount();
+        }
+
+        private void HalveFundingAmount()
+        {
+            int timeInSeconds = (int)(timeTextTime % 60);
+            if (timeInSeconds >= halveFundsAmountAtSeconds
+                && !halvedFunds)
+            {
+                halvedFunds = true;
+                PlayerData.Instance.FundsMultiplier /= halveFundsAmountDivisor;
+            }
         }
     }
 }
