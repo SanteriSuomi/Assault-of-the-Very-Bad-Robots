@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 namespace AOTVBR
 {
-#pragma warning disable // No need to override other comparison operators
+    #pragma warning disable // No need to override other comparison operators
     public abstract class EnemyBase : MonoBehaviour, IComparable<EnemyBase>
     {
         public NavMeshAgent NavMeshAgent { get; private set; }

@@ -14,7 +14,7 @@ namespace AOTVBR
         {
             get
             {
-                if (ApplicationIsQuitting) return null;
+                if (ApplicationIsQuitting) return default;
                 else if (ValidateInstance()) return BaseInstance;
                 else
                 {
@@ -29,7 +29,7 @@ namespace AOTVBR
             if (!ValidateInstance()) LogInitializationError();
         }
 
-        private static void LogInitializationError()
+        private static void LogInitializationError() 
             => Debug.LogError($"{typeof(T).Name} error, instance initialization has most likely failed.");
 
         private static bool ValidateInstance()
@@ -39,8 +39,8 @@ namespace AOTVBR
             T[] instances = FindObjectsOfType<T>();
             if (instances.Length <= 0)
             {
-                GameObject typeGameObject = new GameObject($"{typeof(T).Name}");
-                ActivateInstance(typeGameObject.AddComponent<T>());
+                GameObject typeObj = new GameObject($"{typeof(T).Name}");
+                ActivateInstance(typeObj.AddComponent<T>());
             }
             else if (instances.Length == 1)
             {
@@ -55,7 +55,7 @@ namespace AOTVBR
 
                 ActivateInstance(instances[0]);
             }
-            else if (BaseInstance is null || BaseInstance == null)
+            else if (BaseInstance is null)
             {
                 return false;
             }

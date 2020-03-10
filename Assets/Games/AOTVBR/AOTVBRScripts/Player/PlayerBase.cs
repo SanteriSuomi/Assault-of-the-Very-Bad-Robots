@@ -24,6 +24,7 @@ namespace AOTVBR
             {
                 // Subtract health from the player.
                 PlayerData.Instance.Health -= enemy.Damage;
+                PlayerData.Instance.Funds += enemy.FundAmount / 2;
                 enemy.DeathEvent();
                 if (!isShowingDamageText)
                 {

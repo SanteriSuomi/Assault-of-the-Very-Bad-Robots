@@ -49,7 +49,7 @@ namespace AOTVBR
 
         // Register this event in start because awake is too early (for some reason).
         private void Start()
-            => GameManager.Instance.GameMenuHideEvent += DisablePlayMenu;
+            => PlayStateManager.Instance.GameMenuHideEvent += DisablePlayMenu;
 
         #region Button & Event Methods
         private void ActivateMainMenu()
@@ -92,8 +92,6 @@ namespace AOTVBR
 
         public void ReActivateMenu()
         {
-            // Method for showing the menu again (from a button in the pause menu).
-            // If the current state isn't the correct one already, set it.
             GameState.Instance.SetState((int)GameStates.GenerateMap);
 
             Time.timeScale = 1;

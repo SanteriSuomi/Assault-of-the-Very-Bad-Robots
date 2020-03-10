@@ -21,11 +21,20 @@ namespace AOTVBR
         private void InitializePool()
         {
             pool = new Queue<T>(poolSize);
-            parent = new GameObject($"{typeof(T).Name} Pool Objects").transform;
-            DontDestroyOnLoad(parent);
+            AddParent();
             for (int i = 0; i < poolSize; i++)
             {
-                AddNewObjectToPool();
+                NewPoolObject();
+            }
+        }
+
+        private void AddParent()
+        {
+            string parentName = $"{typeof(T).Name} Pool Objects";
+            if (GameObject.Find(parentName) == null)
+            {
+                parent = new GameObject($"{typeof(T).Name} Pool Objects").transform;
+                DontDestroyOnLoad(parent);
             }
         }
 
@@ -35,44 +44,44 @@ namespace AOTVBR
         /// <returns></returns>
         public T Get()
         {
-            CheckObjectInUse(pool.Peek());
+            CheckObjectValidity(pool.Peek());
 
-            T poppedObject = pool.Dequeue();
-            SetObjectActiveState(poppedObject, true);
-            return poppedObject;
+            T obj = pool.Dequeue();
+            Activate(obj, true);
+            return obj;
         }
 
         /// <summary>
         /// Return a object to the pool.
         /// </summary>
-        /// <param name="returnedObject"></param>
-        public void Return(T returnedObject)
+        /// <param name="obj"></param>
+        public void Return(T obj)
         {
-            SetObjectActiveState(returnedObject, false);
-            pool.Enqueue(returnedObject);
+            Activate(obj, false);
+            pool.Enqueue(obj);
         }
 
-        private void CheckObjectInUse(T peekedObject)
+        private void CheckObjectValidity(T peekedObject)
         {
             if (peekedObject is null)
             {
-                AddNewObjectToPool();
+                NewPoolObject();
             }
             else if (peekedObject.gameObject.activeSelf)
             {
-                AddNewObjectToPool();
+                NewPoolObject();
             }
         }
 
-        private void AddNewObjectToPool()
+        private void NewPoolObject()
         {
-            T newObject = Instantiate(prefabToPool);
-            SetObjectActiveState(newObject, false);
-            newObject.transform.SetParent(parent);
-            pool.Enqueue(newObject);
+            T obj = Instantiate(prefabToPool);
+            Activate(obj, false);
+            obj.transform.SetParent(parent);
+            pool.Enqueue(obj);
         }
 
-        private void SetObjectActiveState(T poolObject, bool active)
-            => poolObject.gameObject.SetActive(active);
+        private void Activate(T obj, bool value)
+            => obj.gameObject.SetActive(value);
     }
 }

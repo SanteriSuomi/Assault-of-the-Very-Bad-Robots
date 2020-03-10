@@ -35,6 +35,7 @@ namespace AOTVBR
                 EnableEscMenu(true);
                 PauseGame(true);
                 PauseAudio(true);
+
                 if (IsPauseTrueDelayCoroutine != null)
                 {
                     StopCoroutine(IsPauseTrueDelayCoroutine);
@@ -44,13 +45,6 @@ namespace AOTVBR
             }
         }
 
-        private IEnumerator IsPauseTrueDelay()
-        {
-            // Introduce a frame delay to prevent accidentally double triggering input.
-            yield return null;
-            isPaused = true;
-        }
-
         private void PauseGame(bool pause)
         {
             switch (pause)
@@ -58,6 +52,7 @@ namespace AOTVBR
                 case true:
                     Time.timeScale = 0;
                     break;
+
                 case false:
                     Time.timeScale = 1;
                     break;
@@ -71,6 +66,7 @@ namespace AOTVBR
                 case true:
                     AudioListener.volume = 0;
                     break;
+
                 case false:
                     AudioListener.volume = 1;
                     break;
@@ -79,5 +75,12 @@ namespace AOTVBR
 
         public void EnableEscMenu(bool activate)
             => escMenuButtons.SetActive(activate);
+
+        private IEnumerator IsPauseTrueDelay()
+        {
+            // Introduce a frame delay to prevent accidentally double triggering input.
+            yield return null;
+            isPaused = true;
+        }
     }
 }

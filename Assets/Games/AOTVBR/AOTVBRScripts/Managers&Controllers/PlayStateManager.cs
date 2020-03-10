@@ -7,7 +7,7 @@ using UnityEngine.AI;
 namespace AOTVBR
 {
     #pragma warning disable IDE0066 // Unity complains from switch expressions
-    public class GameManager : Singleton<GameManager>
+    public class PlayStateManager : Singleton<PlayStateManager>
     {
         public delegate void GameMenuHide();
         public event GameMenuHide GameMenuHideEvent;
@@ -46,11 +46,14 @@ namespace AOTVBR
         private float countdownLoopInterval = 1;
         [SerializeField]
         private float resetGameDelay = 2.5f;
+        [SerializeField]
+        private float gameUIUpdateTimeInterval = 1;
         private float enemyBasicSpawnIntervalDefault;
         private float enemyStrongSpawnIntervalDefault;
         private float enemyTimerBasic;
         private float enemyTimerStrong;
         private float timeTextTime;
+        private float gameUIUpdateTime;
 
         private bool hasGameResetted;
         private bool hasDecreasedSpawnInterval;
@@ -74,6 +77,7 @@ namespace AOTVBR
             enemyTimerBasic = 0;
             enemyTimerStrong = 0;
             timeTextTime = 0;
+            gameUIUpdateTime = 0;
             enemyBasicSpawnInterval = enemyBasicSpawnIntervalDefault;
             enemyStrongSpawnInterval = enemyStrongSpawnIntervalDefault;
             PlayerData.Instance.Health = PlayerData.Instance.StartingHealth;
@@ -150,10 +154,16 @@ namespace AOTVBR
 
         private void UpdateGameUI()
         {
-            healthText.text = $"{PlayerData.Instance.Health}";
-            fundsText.text = $"{Math.Round(PlayerData.Instance.Funds, 2)}";
             timeTextTime += Time.deltaTime;
-            timeText.text = $"{Mathf.RoundToInt(timeTextTime)}";
+            gameUIUpdateTime += Time.deltaTime;
+            if (gameUIUpdateTime >= gameUIUpdateTimeInterval)
+            {
+                gameUIUpdateTime = 0;
+                healthText.text = $"{PlayerData.Instance.Health}";
+                fundsText.text = $"{Math.Round(PlayerData.Instance.Funds, 2)}";
+                
+                timeText.text = $"{Mathf.RoundToInt(timeTextTime)}";
+            }
         }
 
         private void SpawnEnemyBasic(EnemyBase enemy, float interval)
@@ -190,6 +200,7 @@ namespace AOTVBR
                 case EnemyStrong _:
                     spawnedEnemy = EnemyStrongPool.Instance.Get();
                     break;
+
                 default:
                     spawnedEnemy = EnemyBasicPool.Instance.Get();
                     break;
