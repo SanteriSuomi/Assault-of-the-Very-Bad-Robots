@@ -243,6 +243,7 @@ namespace AOTVBR
             }
 
             enemyShipBase = Instantiate(shipPrefab);
+            enemyShipBase.isStatic = true;
             SetShipTransform();
 
             void SetShipTransform()
@@ -261,6 +262,7 @@ namespace AOTVBR
             }
 
             playerBase = Instantiate(basePrefab);
+            playerBase.isStatic = true;
             SetBaseTransform();
 
             void SetBaseTransform()
