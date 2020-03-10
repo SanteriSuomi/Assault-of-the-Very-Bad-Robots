@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 namespace AOTVBR
 {
-    #pragma warning disable S1215 // "GC.Collect" should not be called
+    #pragma warning disable S1215 // GC.Collect can be called at this case, as it's a one time operation before gameplay.
     public class LevelGenerator : Singleton<LevelGenerator>
     {
         public delegate void GeneratingTextHide();
